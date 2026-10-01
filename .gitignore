@@ -1,0 +1,7 @@
+data/
+out/
+build/
+.DS_Store
+*.o
+/v/
+.venv/

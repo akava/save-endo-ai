@@ -1,5 +1,5 @@
 // DNA -> RNA executor (spec section 3).
-// DNA is an implicit treap of pieces referring into an append-only arena.
+// DNA is a persistent implicit treap of pieces referring into an append-only arena.
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -15,66 +15,58 @@ static std::vector<char> arena;
 
 struct Node {
     u64 off, sum;
-    uint32_t len, pri;
+    uint32_t len, cnt;
     int l, r;
 };
+// Persistent treap: nodes are never modified after creation.
 static std::vector<Node> pool(1);
-static std::vector<int> freeList;
-static std::mt19937 rng(12345);
+static uint64_t rngState = 88172645463325252ull;
+static inline uint64_t rnd() { rngState ^= rngState << 13; rngState ^= rngState >> 7; rngState ^= rngState << 17; return rngState; }
 
 static inline u64 S(int t) { return t ? pool[t].sum : 0; }
-static inline void upd(int t) { pool[t].sum = S(pool[t].l) + S(pool[t].r) + pool[t].len; }
+static inline uint32_t C(int t) { return t ? pool[t].cnt : 0; }
 
-static int newNode(u64 off, u64 len) {
-    int t;
-    if (!freeList.empty()) { t = freeList.back(); freeList.pop_back(); }
-    else { t = (int)pool.size(); pool.push_back(Node()); }
-    Node& n = pool[t];
-    n.off = off; n.len = (uint32_t)len; n.sum = len; n.pri = rng(); n.l = n.r = 0;
+static int mk(u64 off, u64 len, int l, int r) {
+    int t = (int)pool.size();
+    pool.push_back(Node{off, S(l) + S(r) + len, (uint32_t)len, C(l) + C(r) + 1, l, r});
     return t;
 }
-
-static void freeTree(int t) {
-    std::vector<int> st;
-    if (t) st.push_back(t);
-    while (!st.empty()) {
-        int x = st.back(); st.pop_back();
-        if (pool[x].l) st.push_back(pool[x].l);
-        if (pool[x].r) st.push_back(pool[x].r);
-        freeList.push_back(x);
-    }
-}
+static int newNode(u64 off, u64 len) { return mk(off, len, 0, 0); }
 
 static int merge(int a, int b) {
     if (!a) return b;
     if (!b) return a;
-    if (pool[a].pri > pool[b].pri) {
+    if (rnd() % (C(a) + C(b)) < C(a)) {
         int m = merge(pool[a].r, b);
-        pool[a].r = m; upd(a); return a;
+        return mk(pool[a].off, pool[a].len, pool[a].l, m);
     } else {
         int m = merge(a, pool[b].l);
-        pool[b].l = m; upd(b); return b;
+        return mk(pool[b].off, pool[b].len, m, pool[b].r);
     }
 }
 
 // a gets first k bases, b the rest
 static void split(int t, u64 k, int& a, int& b) {
     if (!t) { a = b = 0; return; }
-    u64 ls = S(pool[t].l), len = pool[t].len;
+    if (k == 0) { a = 0; b = t; return; }
+    if (k >= S(t)) { a = t; b = 0; return; }
+    Node n = pool[t];
+    u64 ls = S(n.l);
     if (k <= ls) {
-        int x, y; split(pool[t].l, k, x, y);
-        pool[t].l = y; upd(t); a = x; b = t;
-    } else if (k >= ls + len) {
-        int x, y; split(pool[t].r, k - ls - len, x, y);
-        pool[t].r = x; upd(t); a = t; b = y;
+        int x, y; split(n.l, k, x, y);
+        a = x; b = mk(n.off, n.len, y, n.r);
+    } else if (k >= ls + n.len) {
+        int x, y; split(n.r, k - ls - n.len, x, y);
+        a = mk(n.off, n.len, n.l, x); b = y;
     } else {
         u64 cut = k - ls;
-        int nn = newNode(pool[t].off + cut, len - cut);
-        pool[t].len = (uint32_t)cut;
-        int rr = pool[t].r; pool[t].r = 0; upd(t);
-        a = t; b = merge(nn, rr);
+        a = mk(n.off, cut, n.l, 0);
+        b = mk(n.off + cut, n.len - cut, 0, n.r);
     }
 }
+static int suffix(int t, u64 k) { int a, b; split(t, k, a, b); return b; }
+static int prefix(int t, u64 k) { int a, b; split(t, k, a, b); return a; }
+static int substr(int t, u64 lo, u64 hi) { return prefix(suffix(t, lo), hi - lo); }
 
 struct Piece { u64 off, len; };
 
@@ -289,39 +281,36 @@ static void templ(std::vector<TItem>& t) {
 
 // ---------- replacement builder ----------
 struct Builder {
-    std::vector<Piece> ps;
-    static const u64 SMALL = 64;
-    void addArena(const char* s, u64 n) {
-        if (!n) return;
+    int t = 0;
+    std::string pend; // small constant run
+    void flush() {
+        if (pend.empty()) return;
         u64 off = arena.size();
-        arena.insert(arena.end(), s, s + n);
-        if (!ps.empty() && ps.back().off + ps.back().len == off) ps.back().len += n;
-        else ps.push_back({off, n});
+        arena.insert(arena.end(), pend.begin(), pend.end());
+        t = merge(t, newNode(off, pend.size()));
+        pend.clear();
     }
-    void addChar(char c) { addArena(&c, 1); }
-    void addPiece(Piece p) {
-        if (!p.len) return;
-        if (!ps.empty() && ps.back().off + ps.back().len == p.off) { ps.back().len += p.len; return; }
-        if (p.len < SMALL) {
-            // copy (arena may reallocate: copy via temp)
-            char tmp[SMALL];
-            memcpy(tmp, arena.data() + p.off, p.len);
-            addArena(tmp, p.len);
-        } else ps.push_back(p);
+    void addStr(const char* s, u64 n) {
+        if (n > 4096) {
+            flush();
+            u64 off = arena.size();
+            arena.insert(arena.end(), s, s + n);
+            for (u64 o = 0; o < n; ) { u64 k = std::min<u64>(n - o, 1u << 30); t = merge(t, newNode(off + o, k)); o += k; }
+        } else pend.append(s, n);
     }
-    int build() {
-        int t = 0;
-        for (auto& p : ps) {
-            // pieces may exceed uint32; split
-            u64 off = p.off, len = p.len;
-            while (len) {
-                u64 k = std::min<u64>(len, 1u << 30);
-                t = merge(t, newNode(off, k));
-                off += k; len -= k;
-            }
+    void addChar(char c) { pend += c; }
+    void addTree(int x, u64 len) {
+        if (!x) return;
+        if (len <= 16) {
+            // copy small subtrees to limit fragmentation
+            std::vector<Piece> ps; collect(x, 0, len, ps);
+            for (auto& p : ps) pend.append(arena.data() + p.off, p.len);
+            return;
         }
-        return t;
+        flush();
+        t = merge(t, x);
     }
+    int build() { flush(); return t; }
 };
 
 static std::string asnat(u64 n) {
@@ -347,19 +336,36 @@ static void quote(const std::string& d, std::string& out) {
 
 static u64 totalLen() { return S(root); }
 
-static void flattenIfNeeded() {
-    u64 live = pool.size() - freeList.size();
-    if (live < 2000000 && arena.size() < (u64)3 << 30) return;
-    // flatten whole dna into a fresh arena
+static int buildBalanced(const std::vector<Piece>& ps, size_t lo, size_t hi) {
+    if (lo >= hi) return 0;
+    size_t m = (lo + hi) / 2;
+    int l = buildBalanced(ps, lo, m);
+    int r = buildBalanced(ps, m + 1, hi);
+    return mk(ps[m].off, ps[m].len, l, r);
+}
+
+static u64 gcCount = 0;
+static void gcIfNeeded() {
+    if (pool.size() < 6000000) return;
+    gcCount++;
     std::vector<Piece> ps;
     collect(root, 0, S(root), ps);
-    std::vector<char> na; na.reserve(S(root) + (64 << 20));
-    for (auto& p : ps) na.insert(na.end(), arena.begin() + p.off, arena.begin() + p.off + p.len);
-    freeTree(root);
-    arena.swap(na);
-    root = 0;
-    u64 off = 0, len = arena.size();
-    while (len) { u64 k = std::min<u64>(len, 1u << 30); root = merge(root, newNode(off, k)); off += k; len -= k; }
+    // merge adjacent contiguous pieces
+    std::vector<Piece> qs;
+    for (auto& p : ps) {
+        if (!qs.empty() && qs.back().off + qs.back().len == p.off && qs.back().len + p.len < (1u << 30)) qs.back().len += p.len;
+        else qs.push_back(p);
+    }
+    if (qs.size() > 1500000 || arena.size() > ((u64)2 << 30)) {
+        // flatten into fresh arena
+        std::vector<char> na; na.reserve(S(root) + (256 << 20));
+        for (auto& p : qs) na.insert(na.end(), arena.begin() + p.off, arena.begin() + p.off + p.len);
+        arena.swap(na);
+        qs.clear();
+        for (u64 o = 0; o < arena.size(); ) { u64 k = std::min<u64>(arena.size() - o, 1u << 30); qs.push_back({o, k}); o += k; }
+    }
+    pool.clear(); pool.push_back(Node());
+    root = buildBalanced(qs, 0, qs.size());
 }
 
 static bool step() {
@@ -428,7 +434,8 @@ static bool step() {
         if (ok) { fprintf(traceOut, "  env:"); for (auto& e : env) fprintf(traceOut, " %llu", (unsigned long long)(e.second - e.first)); fprintf(traceOut, "\n"); }
     }
     if (!ok) {
-        int a, b; split(root, p0, a, b); freeTree(a); root = b;
+        root = suffix(root, p0);
+        gcIfNeeded();
         return true;
     }
     // build replacement
@@ -437,7 +444,7 @@ static bool step() {
         if (t.t == TB) bld.addChar(t.b);
         else if (t.t == TLEN) {
             u64 L = t.n < env.size() ? env[t.n].second - env[t.n].first : 0;
-            std::string s = asnat(L); bld.addArena(s.data(), s.size());
+            std::string s = asnat(L); bld.addStr(s.data(), s.size());
         } else {
             if (t.n >= env.size()) continue;
             u64 lo = p0 + env[t.n].first, hi = p0 + env[t.n].second;
@@ -447,8 +454,7 @@ static bool step() {
                     fprintf(logOut, "R %llu %llu %llu %llu\n", (unsigned long long)iters, (unsigned long long)(p.off - prefixLen), (unsigned long long)p.len, (unsigned long long)t.l);
             }
             if (t.l == 0) {
-                std::vector<Piece> ps; collect(root, lo, hi, ps);
-                for (auto& p : ps) bld.addPiece(p);
+                bld.addTree(substr(root, lo, hi), hi - lo);
             } else {
                 std::vector<Piece> ps; collect(root, lo, hi, ps);
                 std::string d, q;
@@ -458,13 +464,12 @@ static bool step() {
                     if (protectCostMode == 1) cost += d.size();
                 }
                 if (protectCostMode == 0) cost += d.size();
-                bld.addArena(d.data(), d.size());
+                bld.addStr(d.data(), d.size());
             }
         }
     }
-    int a, b; split(root, p0 + i, a, b); freeTree(a);
-    root = merge(bld.build(), b);
-    flattenIfNeeded();
+    root = merge(bld.build(), suffix(root, p0 + i));
+    gcIfNeeded();
     return true;
 }
 

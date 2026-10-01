@@ -249,3 +249,34 @@ def adapter_call(offset, size):
     """activate gene at green-zone offset with given size via the Adapter"""
     pat = 'IIP' + 'IFF' + lit(ADAPTER_MARK) + 'IIP' + 'IFF' + lit(ADAPTER_MARK) + 'IIC' + 'IIC' + 'IIC'
     return pat + T().ref(0).b(nat(offset) + nat(size)).ref(1).end()
+
+
+def noop(n):
+    """an instruction of exactly n bases (n >= 9) that does nothing: pattern !0 (zero-padded nat), empty template"""
+    assert n >= 9
+    return 'IP' + 'I' * (n - 9) + 'P' + 'IIC' + 'IIC'
+
+
+def enc_str(s):
+    """raw template-literal bases for a drawString text (EBCDIC-64, 8 bits LSB first + P) without terminator"""
+    out = ''
+    for ch in s:
+        c = (s.encode('cp037')[0] if False else ch.encode('cp037')[0]) - 64
+        out += ''.join('C' if (c >> k) & 1 else 'I' for k in range(8)) + 'P'
+    return lit(out)
+
+
+def key128(s):
+    """int9[128] key string: chars (EBCDIC-64, 9 bases each), 255 terminator, zero padding"""
+    out = ''
+    codes = [ch.encode('cp037')[0] - 64 for ch in s] + [255]
+    codes += [0] * (128 - len(codes))
+    for c in codes:
+        out += ''.join('C' if (c >> k) & 1 else 'I' for k in range(8)) + 'P'
+    return out
+
+
+def crypt_call(key, offset, size, order='kos'):
+    """decrypt/encrypt green-zone [offset, offset+size) with key via the Adapter"""
+    a = {'k': key128(key), 'o': word(offset), 's': word(size)}
+    return ''.join(push_arg(a[c]) for c in order) + adapter_call(5086510, 20482)

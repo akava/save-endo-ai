@@ -246,6 +246,24 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 - Зашифрованные блоки, найденные раньше по статистике, — это `help-beautiful-numbers` (G+941328), `vmu-code` (G+2176355), `help-error-correcting-codes` (G+4377843), `cow-tail` (G+4892541), `caravan` (G+5703332).
 - `crackKeyAndPrint` (G+7115881) с аргументом purchase code должен подобрать и напечатать ключ.
 
+## Шифр FuunTech = RC4, свой переборщик ключей
+
+- `crackKeyAndPrint` (G+7115881) через Adapter с purchase code `help-error-correcting-codes` за 56 млн итераций напечатал «Key recovered: "42"».
+- Расшифровка `help-error-correcting-codes` вызовом `crypt('42', 4377843, 28376)` через Adapter работает: порядок аргументов в Blue Zone такой же, как в сигнатуре. Страница 84 — «Error Correcting Codes», Хэмминг(8,4).
+- Дамп DNA до и после `crypt` дал поток ключа. Он **точно совпал с RC4**: ключ — коды символов (EBCDIC−64), каждый байт потока XOR-ится с 4 основаниями (I=0, C=1, F=2, P=3, младшие биты первыми). Итак, «метод A» — это тоже RC4. `tools/fcrypt.py` — та же функция на Python.
+- Purchase code — это `crypt(key, word(0))`, то есть первые 6 байт потока RC4. Переборщик `tools/c/rc4crack.c` находит ключи за секунды: **«42»** (error-correcting-codes), **«OPE»** (vmu-code), beautiful-numbers — ключ длиннее 4 символов.
+- Страница `vmu-code` (расшифрована ключом «OPE»): «Your registration code: **Out_of_Band_II**». Этот же ключ расшифровывает `caravan`.
+
+| ключ «42» | регистрационный код |
+|---|---|
+| ![](img/help/crack_42.png) | ![](img/help/vmu_code.png) |
+
+## Улучшение 6: фургон
+
+`vmuMode` = 31 (G+210027) и `vmuRegCode` = «Out_of_Band_II» (G+210051, первые 15 символов). Вместо НЛО рисуется фургон. Префикс `prefixes/05_caravan.dna` (499 оснований): **121 240**.
+
+![фургон](img/14_caravan.png)
+
 ## Префиксы
 
 | файл | длина | ≈неверных px | что делает |
@@ -256,5 +274,6 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 | `prefixes/02_day.dna` | 38 | 134 188 | флаг `night-or-day` = F |
 | `prefixes/03_day_hills.dna` | 144 | 126 732 | + холмы, обезврежен `surfaceTransform` |
 | `prefixes/04_cow.dna` | 231 | 125 112 | + `enableBioMorph`, корова при ясной погоде |
+| `prefixes/05_caravan.dna` | 499 | 121 240 | + VMU: фургон вместо НЛО |
 
 _(файл обновляется по мере исследования)_

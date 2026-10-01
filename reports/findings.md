@@ -186,6 +186,38 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 
 *Сверху: исходная картинка, `night-or-day`=F, `hillsEnabled`, `cloudy`. Снизу: `ducksShown`, `enableBioMorph`, день + холмы, target.*
 
+## Field Repair Manual: глобальная `helpScreen`
+
+`main` (G+6530301) при `helpScreen` ≠ 0 рисует вместо сцены страницу справки. Номер страницы — 24-основное число по адресу G+1252. Страница 2 («Repair guide navigation») сообщает индекс каталога **1337**. Каталог «Catalog seems to be damaged» перечисляет:
+
+| номер | тема | что там |
+|---|---|---|
+| 1 | вступление | «If you are having difficulty…», жёлтый текст на чёрном |
+| 2 | навигация | «take an existing repair guide prefix and replace the encoded integer»; кодировка чисел; «Don't change the length of integers» |
+| 3 | стеганография | картинка спрятана внутри другой картинки |
+| 5 | Synthesis of complex structures | L-системы |
+| 8 | More notes on Fuun Genomics | кодировки: P = True, F = False; числа; строки (9 оснований на символ, 255 в конце); многоугольники |
+| 9 | Super adaptive genes | adaptation trees: trunk + branches, green zone |
+| 23 | Activating genes **[encrypted]** | зависает |
+| 42 | Gene list | printGeneTable, 14 страниц |
+| 84 | How to fix corrupted DNA **[encrypted]** | падает |
+| 85 | **Field-repairing Fuuns** | штатный **Adapter** для вызова генов из префикса |
+| 112 | Some things to look out for | «Intergalactic Most-Wanted List» (шутка) |
+| 1337 | этот каталог | |
+| 1729 | **Structure of the Fuun Genome** | RED / GREEN / BLUE zone |
+| 10646 | Intergalactic Character Set | таблица символов |
+| 123456 | RNA compression | «RNA-Comprez», около 2 оснований на RNA-команду |
+| 2181889 | Notes on weird RNA | `CFPICFP` означает «часть морфинга сделана», остальные коды начинаются с `C` |
+| 4405829 | **Fuun security features** | текст в ROT13, см. ниже |
+
+- **Зоны** (стр. 1729): RED zone — где «всё происходит», рождается из green zone. GREEN zone никогда не меняет размер, её и надо чинить. BLUE zone растёт и сжимается в начале, это наша «память».
+- **Adapter** (стр. 85): чтобы вызвать ген, префикс копирует в начало DNA код между маркерами `IFPICFPPCCC`, затем дописывает offset (относительно green zone) и размер гена. Аргументы кладутся в начало Blue Zone, после маркера `IFPICFPPCFIPP`. Результат функции остаётся там же.
+- **Безопасность** (стр. 4405829, ROT13): части DNA зашифрованы двумя методами. **Метод A** взломан: ключ восстанавливает «key cracker» (`crackKey`) по 24-основному **purchase code**; ключ из 2 символов ищется минуты, из 3 — дольше. **Метод B** — это RC4: список 0…255, перемешанный ключом; каждый байт потока делится на 4 пары бит и XOR-ится с основаниями (I=0, C=1, F=2, P=3). В таблице генов есть три purchase code: `help-error-correcting-codes_purchase_code`, `vmu-code_purchase_code`, `help-beautiful-numbers_purchase_code`.
+
+| каталог 1337 | структура 1729 | Adapter 85 |
+|---|---|---|
+| ![](img/help/help_1337.png) | ![](img/help/help_1729.png) | ![](img/help/help_85.png) |
+
 ## Префиксы
 
 | файл | длина | ≈неверных px | что делает |

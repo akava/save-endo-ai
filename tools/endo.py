@@ -280,3 +280,21 @@ def crypt_call(key, offset, size, order='kos'):
     """decrypt/encrypt green-zone [offset, offset+size) with key via the Adapter"""
     a = {'k': key128(key), 'o': word(offset), 's': word(size)}
     return ''.join(push_arg(a[c]) for c in order) + adapter_call(5086510, 20482)
+
+
+def fix_bases(start, good, cur, gap=12):
+    """patches turning cur into good (same length) at absolute offset start; nearby diffs merged into one write"""
+    diffs = [i for i in range(len(good)) if good[i] != cur[i]]
+    groups = []
+    for i in diffs:
+        if groups and i - groups[-1][1] <= gap:
+            groups[-1][1] = i
+        else:
+            groups.append([i, i])
+    pats = []
+    for a, b in groups:
+        if a == b:
+            pats.append(lambda o, a=a: set_base(start + a, good[a], off=o))
+        else:
+            pats.append(lambda o, a=a, b=b: write_at(start + a, good[a:b + 1], b - a + 1, o))
+    return pats

@@ -1,0 +1,1890 @@
+839010	1998
+839824	1999
+840638	2000
+841452	2001
+842266	2002
+843080	2003
+843894	2004
+844708	2005
+845522	2006
+846336	2007
+847169	prosecuted to the fullest extend of the law.
+848402	without a license is theft, and you will be 
+849635	Mu is licensed material. Using the Mu 
+855089	Cops & Robbers - PLT and friends
+858363	In the far-flung future of the year 2000, functional programming has taken over the world and so 
+860023	humans live in an almost unimaginable luxury. Since it's so easy, humans have used robots to 
+861643	automate everything, even law enforcement and bank robbery --- the only job left to humans is to 
+863302	write their robots' control programs. In this year's task, you will play two roles in the world of 2000 
+865032	by writing the control program that guides a Robber-Bot through a quiet urban neighborhood on a 
+866682	mission to rob every bank without getting caught, and the control program for a Cop-Bot dedicated 
+868352	to stopping it. Your Robber-Bot has the benefit of stealth; your Cop-Bot will work on a team with 
+870022	four other contestants' entries and have the power of numbers and coordination (not to mention an 
+871693	awesome late-model Police Robo-Cruiser).
+875840	First prize
+876743	Language of choice
+879324	KiebererAndXiaoTou
+880298	Haskell
+980143	ICFP Programming Contest Team 2007
+1670418	Super adaptive genes
+1674039	any).
+1674881	similarity with such organisms. Adaptation trees consist of a trunk and a number of branches (if 
+1676642	Super adaptive genes are used in special genetic structures called adaptation trees because of their 
+1678446	zone.
+1679288	called activateAdaptationTree. The selector in the trunk points to genetic material in the green 
+1681049	acids following the reference. Very often the trunk selects another adaptation tree through a gene 
+1682831	The trunk selects a super adaptive gene to be activated, and sometimes it has some information 
+1684573	branch is itself an adaptation tree, preceeded by an integer that encodes its size.
+1686195	The genetic material activated by the trunk uses the branches as adaptation information. Each 
+1687928	extreme environments.
+1688930	Intergalactic Multi-Conference on Morphing Eukaryotes) allowing Fuun to adapt to a host of 
+1690632	Super Adaptive Genes are FuunTech's award winning technology (1st price at the 65536th 
+1693808	gene selector
+1696244	extra
+1698600	size 1
+1700965	adaptation tree 1
+1703441	size 2
+1705807	adapt. tree 2
+1708243	...
+1709066	itself (the adaptation), and the size of the remaining green zone.
+1710518	In the green zone, adaptive genes consist of the size of the genetic payload, the genetic payload 
+1713804	...
+1716140	size payload
+1718565	genetic payload
+1721021	size rest
+1723417	rest gr. zone
+1730231	1998
+1731045	1999
+1731859	2000
+1732673	2001
+1733487	2002
+1734301	2003
+1735115	2004
+1735929	2005
+1736743	2006
+1737557	2007
+1738390	prosecuted to the fullest extend of the law.
+1739623	without a license is theft, and you will be 
+1740856	Mu is licensed material. Using the Mu 
+1744722	Pousse - Universite de Montreal and MIT
+1748065	The contest task is to write a program that plays "pousse", an odd variant of tic-tac-toe. Contestant 
+1749775	programs will then be entered into a tournament to determine the first- and second-place program.
+1754492	First prize
+1755395	Language of choice
+1757976	The MIT Cilk Pousse Team
+1759010	Cilk
+2072702	ImpDoc
+2080134	int24
+2080978	addInts
+2081842	(int24 
+2083510	, int24 
+2085991	Add two integers.
+2086955	void
+2087788	beginRelativeMode
+2088752	()
+2089565	This function looks like an awful hack.
+2090749	bool
+2091582	checkIntegrity
+2092516	(void* 
+2093380	ptr
+2095007	Check the integrity of a single gene.
+2096171	int24
+2097015	checksum
+2097889	(int24 
+2098753	offset
+2099607	, int24 
+2100481	size
+2102119	Green Zone.
+2103021	Compute a checksum over a region of the DNA string. The offset is relative to the start of the 
+2104765	void
+2105599	colorBlack
+2106493	()
+2107306	Outputs one color black command (possibly after resetting the bucket).
+2108800	void
+2109634	colorBlue
+2110518	()
+2111331	Outputs one color blue command (possibly after resetting the bucket).
+2112815	void
+2113649	colorByIndex
+2114563	()
+2115376	Appears to mutate colors now and then.
+2116550	void
+2117384	colorCyan
+2118268	()
+2119081	Outputs one color cyan command (possibly after resetting the bucket).
+2120565	void
+2121399	colorGreen
+2122293	()
+2123106	Outputs one color green command (possibly after resetting the bucket).
+2124600	1/10
+2134077	1998
+2134891	1999
+2135705	2000
+2136519	2001
+2137333	2002
+2138147	2003
+2138961	2004
+2139775	2005
+2140589	2006
+2141403	2007
+2142236	prosecuted to the fullest extend of the law.
+2143469	without a license is theft, and you will be 
+2144702	Mu is licensed material. Using the Mu 
+2147774	Morph Endo| - Utrecht University
+2151048	Endo is an alien life form, belonging to the species of the Fuun. Endo needs your help| Earth's 
+2152698	environmental conditions can be harsh for a life form not properly adapted. Endo had the bad luck 
+2154367	of being dropped on Earth by an Interstellar Garbage Collector. Both the life form and its faithful 
+2156057	space ship Arrow were severely hurt in the crash, and even worse, after leaving the damaged space 
+2157727	craft Endo was hit by a cargo container that was also dropped by the Garbage Collector. Endo is 
+2159377	now in a coma, only kept alive by Arrow, which has recovered a bit, but is running low on power. 
+2161037	According to Arrow, the only hope for Endo is to change its DNA and thereby adapt it to the 
+2162647	conditions of our planet. To this end, Arrow has been able to come up with a form in which Endo 
+2164297	will survive. Unfortunately, given its current condition, Arrow lacks the resources for coming up 
+2165967	with proper DNA modifications itself. Your task is therefore to help us find such a DNA sequence 
+2167628	within 72 hours.
+2171535	First prize
+2172438	Language of choice
+2175020	you?
+2175854	...
+2254884	*** FATAL ERROR *** 
+2255755	Error description: 
+2257208	Offset: 
+2272248	Contents
+2273122	Index
+2274748	FuunDoc
+2276493	compose_adaptation
+2277467	 :: 
+2278615	(b -> c) -> (a -> b) -> a -> c
+2279708	Function composition.
+2281594	false
+2282438	 :: 
+2283587	Bool
+2284421	False.
+2286156	goldenFish_adaptation
+2287160	 :: 
+2288309	PictureDescr
+2289222	Golden fish description.
+2291138	i_adaptation
+2292052	 :: 
+2293201	a -> a
+2294937	intBox
+2295791	 :: 
+2296940	int24 -> Int
+2297853	Encapsulates a 24-acid integer in an adaptation branch.
+2300883	 :: 
+2302032	a -> b -> a
+2302935	Takes two arguments and returns the first one.
+2305070	mkBeforeAbove_adaptation
+2306104	 :: 
+2307252	PictureDescr -> PictureDescr -> PictureDescr
+2308485	Places the second image at the south east position of the first image.
+2310860	mkEmp_adaptation
+2311814	 :: 
+2312962	Int -> Int -> PictureDescr
+2314015	Empty rectangle of the given width and height.
+2316150	mkGoldfishL_adaptation
+2317164	 :: 
+2318313	PictureDescr
+2319226	Golden fish facing left.
+2321141	mkGoldfishR_adaptation
+2322155	 :: 
+2323304	PictureDescr
+2324217	Golden fish facing right.
+2326142	mkSucc_adaptation
+2327106	 :: 
+2328255	Nat -> Nat
+2329148	The succesor of the argument.
+2330914	Produced by 
+2331828	FuunDoc
+2332692	 version 0.13
+2342972	Please specify your VMU registration code.
+2356882	1998
+2357696	1999
+2358510	2000
+2359324	2001
+2360138	2002
+2360952	2003
+2361766	2004
+2362580	2005
+2363394	2006
+2364208	2007
+2365041	prosecuted to the fullest extend of the law.
+2366274	without a license is theft, and you will be 
+2367507	Mu is licensed material. Using the Mu 
+2370579	Auto Racing - Chalmers
+2373753	The object of this year's programming contest is to drive a simulated car around a set of racing 
+2375412	tracks as fast as possible. The solutions you submit will consist of a trace of the commands you give 
+2377122	to the car at each moment of the simulation. We will run your commands on our simulator to 
+2378722	determine your finishing time, and the team with the best overall performance will be crowned the 
+2380394	winners|
+2384221	First prize
+2385124	Language of choice
+2387706	Andrew Hudson
+2388630	C++
+2392015	1998
+2392829	1999
+2393643	2000
+2394457	2001
+2395271	2002
+2396085	2003
+2396899	2004
+2397713	2005
+2398527	2006
+2399341	2007
+2400174	prosecuted to the fullest extend of the law.
+2401407	without a license is theft, and you will be 
+2402640	Mu is licensed material. Using the Mu 
+2405712	Package-delivering Robots - OGI
+2408976	The challenge is to implement a program that acts as a player in a multi-player robot game. 
+2410585	Contributed programs will play against each other in a tournament, which will determine the winner 
+2412266	of the programming contest.
+2413226	In the game, simulated robots deliver packages in a simulated world. Each player controls one 
+2414856	robot. The simulation proceeds in discrete steps. At every step, each robot executes one command, 
+2416526	which may move the robot, pick up packages or drop packages. Robots win points for successfully 
+2418176	delivering packages to their destination. The winner of a game is the robot who finishes the game 
+2419847	with the most points (but see the tournament rules later).
+2424174	First prize
+2425077	Language of choice
+2427659	TAPLAS
+2428513	OCaml
+2440480	Major Imp's Next Assignment Episode 222
+2443045	fellow came out of the Imp foreign function interface. 
+2444389	"Hmm"
+2445233	, 
+2446046	be a diplomat. Why don't Alpha and I follow this bloke and you stick 
+2447529	around to see what else is happening. And"
+2448742	, waving his eye-phone, 
+2449775	"keep us informed."
+2451563	Morph said, 
+2452476	"I see what you mean. He looks a bit too well-trained to 
+2453839	At that point, Beta grunted and nodded. Outside, a smart looking 
+2455282	trace. There is little doubt as to what happened to them."
+2456656	, Alpha 
+2457530	began. 
+2458393	"With a Sun this large and a climate so hot and humid, you 
+2459777	it pours."
+2460671	. 
+2461484	"Glad I'm no fool then"
+2462507	, Morph replied.
+2463460	strong and black. The populace just put their cups outdoors, when 
+2464913	interruption, 
+2465846	"Every fool knows that rain on Caffee is typically hot, 
+2467200	easy"
+2468043	, Alpha stated coolly, and none too happy with the 
+2469346	wonder why they don't have open air terraces."
+2470600	, Imp mused. 
+2471524	"That's 
+2472397	course of action. 
+2473370	"Our contacts have all disappeared without a 
+2474613	we found our threesome sitting in a small bar, deciding on their 
+2476056	All roads on Caffee lead to the city of Aroma. No surprise then that 
+2526151	ImpDoc
+2533583	void
+2534417	resetOrigin
+2535321	()
+2536133	Change the origin back to what it was before the last call to setOrigin.
+2537647	void
+2538481	rotateColor
+2539385	()
+2540199	void
+2541032	setGlobalPolarRotation
+2542046	(int24 
+2544517	Globally apply a rotation to all polar operations.
+2545811	void
+2546645	setOrigin
+2547529	(int24 
+2549197	, int24 
+2551678	Make coordinate (x,y) the new origin.
+2552842	void
+2553676	spirograph
+2554570	extra
+2555414	, int24 
+2556288	cycles
+2557946	(int24 
+2558810	magnify
+2559674	, int24 
+2560548	radiusSum
+2561432	, int24 
+2562306	radiusMoving
+2563220	, int24 
+2564094	radiusSumDiv
+2565008	, int24 
+2565881	Draw a strange, highly configurable geometric figure.
+2567205	void
+2568039	startup
+2568903	()
+2569716	DNA entry point.
+2570670	int24
+2571514	stringLength
+2572428	(int9¢128! 
+2574939	Return the length of a string.
+2576033	int24
+2576877	subInts
+2577741	(int24 
+2579409	, int24 
+2581890	Subtractd two integers.
+2582914	void
+2583748	terminate
+2584632	()
+2585445	End the Fuun's suffering.
+2586489	9/10
+2593966	Major Imp's Next Assignment Episode 125
+2596531	Map. Something had come up.
+2597594	His eye-phone rang. The screen revealed his direct superior Nat 
+2599027	The duty to guard the Lisper Excavation site had been his longest 
+2600480	During his early years as a functor, he had had his share of 
+2601883	help to know that the Lispers had been much like his own, even if 
+2603336	police inspector, there weren't as overwhelmingly many of them as 
+2604789	the Cobolds that the Imp archaeologists had to deal with.
+2606152	curvaceous scientist who did not mind socializing a little with a 
+2607605	impediment called lambdacism. But at least, according to the 
+2609008	they did look a bit strange and all suffered from a speech 
+2610391	have flesh on them, unlike these age-old remains. And no, it didn't 
+2611864	non-functional bodies, but they at least had the decency to still 
+2613317	and most boring task yet; hopefully somebody was just testing him. 
+2614780	working through a well-worn copy of the Silence Of The Lambda's. 
+2616223	On the other side of the Multiverse, Morph Jones was listlessly 
+2648860	 AAA_geneTablePageNr
+2649116	åM-class-planet
+2649324	 __array_index
+2649522	 __array_value
+2649720	 __bool
+2649849	 __bool_2
+2649998	 __funptr
+2650147	 __int1
+2650276	 __int12
+2650416	 __int12_2
+2650576	 __int24
+2650716	 __int24_2
+2650876	 __int3
+2651006	 __int48
+2651146	 __int9
+2651276	 acc1
+2651386	 acc2
+2651497	 acc3
+2651608	 activateAdaptationTree
+2651899	 activateGene
+2652090	 adapter
+2652232	 addFunctionsCBF
+2652454	 addInts
+2652596	èalien-lifeforms
+2652819	 anticompressant
+2653041	 apple
+2653163	 appletree
+2653325	 apply1_adaptation
+2653566	 apply2_adaptation
+2653807	 babel-survey
+2654000	 balloon
+2654142	 beginRelativeMode
+2654384	 bioAdd_adaptation
+2654626	 bioMorphPerturb
+2654848	 bioMul_adaptation
+2655090	 bioSucc_adaptation
+2655342	 bioZero_adaptation
+2655594	 biomorph_adaptation
+2655856	 blueZoneStart
+2656058	 bmu
+2656161	 bresenhamArray
+2656373	 bresenhamIndex
+2656585	 bresenhamRadius
+2656807	 bridge
+2656940	 bridge-close
+2657133	 bridge-far
+2657306	 cachedFastCircle
+2657539	 cachedFastCorner
+2657772	 cachedFastEllipse
+2658015	 caravan
+2658158	 caravan-axis
+2658351	 caravan-door
+2658544	 caravan-frame
+2658747	 caravan-wheel
+2658950	 caravan-window1
+2659173	 caravan-window2
+2659396	 cargobox
+2659549	 caseNat_adaptation
+2659801	 casePair_adaptation
+2660063	 casePictureDescr_adaptation
+2660405	 caseVar1_adaptation
+2660667	 caseVar2_adaptation
+2660929	 cbfArray
+2661081	 charColorCallback
+2661323	 charColorCallbackFade
+2661606	 charCounter
+2661789	 charIndexArray
+2662002	 charIndexOffset
+2662225	 charInfo_Tempus-Bold-Huge_ 
+2662568	 charInfo_Tempus-Bold-Huge_L
+2662911	 charInfo_Tempus-Bold-Huge_M
+2663254	 checkIntegrity
+2663468	 checksum
+2663622	 chick
+2663746	 cloak-night
+2663930	ãcloak-rain
+2664104	 closureArguments
+2664337	 closureIndex
+2664530	 cloud
+2664654	 clouds
+2664788	 cloudy
+2664922	 colorBlack
+2665096	 colorBlue
+2665260	 colorByIndex
+2665454	 colorCyan
+2665618	 colorDuckBrown
+2665832	 colorDuckOrange
+2666056	 colorDuckYellow
+2666280	 colorGermanyYellow
+2666534	 colorGreen
+2666708	 colorLila
+2666872	 colorMagenta
+2667066	 colorRed
+2667220	 colorReset
+2667393	 colorSoftYellow
+2667617	 colorTable
+2667790	 colorWhite
+2667964	 compose_adaptation
+2668217	 contest-1998
+2668411	 contest-1999
+2668605	 contest-2000
+2668799	 contest-2001
+2668993	 contest-2002
+2669187	 contest-2003
+2669381	 contest-2004
+2669575	 contest-2005
+2669769	 contest-2006
+2669963	 contest-2007
+2670157	 correctErrors
+2670361	 cosineArray
+2670544	 cow-body
+2670698	 cow-head
+2670852	 cow-holy
+2671006	 cow-left-eye
+2671200	 cow-left-foot
+2671404	 cow-left-horn
+2671608	 cow-middle-foot
+2671832	 cow-mouth
+2671996	 cow-right-ear
+2672200	 cow-right-eye
+2672404	 cow-right-foot
+2672618	 cow-right-horn
+2672832	 cow-spot-butt
+2673036	 cow-spot-left
+2673240	 cow-spot-middle
+2673464	 cow-spot-middle-ecc
+2673727	 cow-spot-right
+2673941	 cow-tail
+2674095	 crackChars
+2674269	 crackKey
+2674424	 crackKeyAndPrint
+2674659	 crackTestValue
+2674873	 crater
+2675008	 crypt
+2675133	 curX
+2675247	 curY
+2675361	 div2
+2675476	 doSelfCheck
+2675660	 drawChar
+2675815	 drawCircleFast
+2676030	 drawCornerFast
+2676245	 drawEllipse
+2676430	 drawEllipseFast
+2676655	 drawFunctionBase
+2676890	 drawGoldFishL_adaptation
+2677204	 drawGoldFishR_adaptation
+2677518	 drawGoldenFish_adaptation
+2677842	 drawGradientCornerNW
+2678117	 drawGradientCornerSE
+2678392	 drawGradientH
+2678597	 drawGradientV
+2678802	 drawGrassPatch
+2679017	 drawHexDigit
+2679212	 drawIntHex
+2679387	 drawPolyline
+2679582	 drawPolylinePolar
+2679827	 drawRect
+2679982	 drawRoundedRect
+2680207	 drawString
+2680382	 drawStringHere
+2680597	 ducksShown
+2680772	 duolc
+2680896	 ellipseAngleIncr
+2681130	 emptyBox_adaptation
+2681394	 enableBioMorph
+2681608	 enableBioMorph_adaptation
+2681932	 endRelativeMode
+2682157	 endo
+2682272	 endo-bottom
+2682457	 endo-left-arm
+2682662	 endo-left-eye
+2682867	 endo-right-arm
+2683082	 endo-right-eye
+2683297	 endo-top
+2683452	 endocow
+2683597	 fadingColors
+2683792	 false
+2683916	 fastForward
+2684101	 fastRandom
+2684276	 fatalError
+2684451	 flower
+2684586	 flowerbed
+2684751	 fontCombinator
+2684965	 fontTable_Bird-Ring
+2685229	 fontTable_Cyperus
+2685473	 fontTable_Cyperus-Big
+2685757	 fontTable_Cyperus-Italic
+2686071	 fontTable_Dots
+2686285	 fontTable_Messenger
+2686549	 fontTable_Tempus-Bold-Huge
+2686883	 fontTable_Tempus-Small
+2687177	 fontTable_Tempus-Small-Italic
+2687541	 fpForward
+2687706	 fpForwardPenUp
+2687921	 fpMoveAbsolute
+2688136	 fpPop
+2688261	 fpPush
+2688396	 fpTurnLeft
+2688571	 fpTurnRight
+2688756	 fri
+2688860	 frj
+2688964	 fromNat_adaptation
+2689218	 frs
+2689322	 fstP_adaptation
+2689546	 functionAdd
+2689731	 functionParabola
+2689966	 functionSine
+2690161	âfuundoc1
+2690316	âfuundoc2
+2690471	 fuundoc3
+2690626	 ge
+2690721	 germanColors
+2690916	 giveMeAPresent
+2691130	 goldenFish_adaptation
+2691414	 goldfishLeft
+2691609	 goldfishRight
+2691814	 goodVibrations
+2692028	 grass
+2692153	 grass1
+2692288	 grass2
+2692423	 grass3
+2692558	 grass4
+2692693	 greenZoneStart
+2692907	 height_adaptation
+2693151	 help-activating-genes
+2693436	 help-adaptive-genes
+2693701	 help-background
+2693926	 help-background'
+2694161	 help-beautiful-numbers
+2694456	 help-beautiful-numbers_purchase_code
+2694890	 help-catalog-page
+2695135	 help-compression-rna
+2695410	 help-encodings
+2695625	 help-error-correcting-codes
+2695970	 help-error-correcting-codes_purchase_code
+2696454	âhelp-fuun-security
+2696709	 help-fuun-structure
+2696974	 help-initial-cond
+2697219	 help-integer-encoding
+2697504	<help-intro
+2697679	 help-lsystems
+2697884	 help-palindromes
+2698120	 help-patching-dna
+2698365	åhelp-steganography
+2698621	 help-undocumented-rna
+2698906	 help-virus
+2699081	 help-vmu
+2699236	 helpScreen
+2699410	 hillsEnabled
+2699605	ãhitWithTheClueStick
+2699869	 i_adaptation
+2700063	 impdoc-background
+2700308	 impdoc1
+2700453	 impdoc10
+2700608	 impdoc2
+2700753	äimpdoc3
+2700898	âimpdoc4
+2701044	 impdoc5
+2701190	 impdoc6
+2701336	 impdoc7
+2701482	 impdoc8
+2701628	 impdoc9
+2701774	 init
+2701890	 initDone
+2702045	 initFastRandom
+2702261	 intBox
+2702396	 k
+2702481	 lambda-id
+2702647	 lightningBolt
+2702853	 lindenmayerAngle
+2703088	 lindenmayerDistance
+2703353	 lsystem-kochisland
+2703609	 lsystem-kochisland-F
+2703885	 lsystem-kochisland-f
+2704161	 lsystem-sierpinski
+2704417	 lsystem-sierpinski-l
+2704693	 lsystem-sierpinski-r
+2704969	 lsystem-weed
+2705165	 lsystem-weed-F
+2705381	 lt
+2705477	âmain
+2705593	 majorimp-background
+2705860	 majorimp-episode1
+2706107	 majorimp-episode125
+2706374	 majorimp-episode126
+2706641	 majorimp-episode2
+2706888	 majorimp-episode222
+2707155	 majorimp-episode285
+2707422	 majorimp-episode496
+2707689	 makeDarkness
+2707885	 max
+2707991	 mkAbove_adaptation
+2708246	 mkBeforeAbove_adaptation
+2708561	 mkEmp_adaptation
+2708796	 mkGoldfishL_adaptation
+2709091	 mkGoldfishR_adaptation
+2709386	 mkPair_adaptation
+2709631	 mkSucc_adaptation
+2709876	 mkZero_adaptation
+2710121	 mlephant
+2710277	 modInts
+2710423	 moon
+2710539	åmost-wanted
+2710725	 motherDuck
+2710901	 motherDuckWithChicks
+2711177	 moveTo
+2711313	 moveToPolar
+2711499	 mulInts
+2711645	 mulModInts
+2711821	 negateInt
+2711987	 night-or-day
+2712182	 ocaml
+2712308	 ocamlrules
+2712483	 originStackIndex
+2712718	 originStackX
+2712913	 originStackY
+2713108	 parabolaCBF
+2713294	 payloadBioMorph
+2713520	 payloadBioMorph_adaptation
+2713855	 pear
+2713971	 peartree
+2714127	 pictureDescrRenderer_adaptation
+2714512	 polarAngleIncr
+2714727	 printCharSet
+2714923	àprintGeneTable
+2715139	 randomInt
+2715305	 resetOrigin
+2715491	 resetOrigin_adaptation
+2715786	 river
+2715912	 rotateColorVar
+2716127	 s_adaptation
+2716322	 scenario
+2716478	 seed
+2716593	(selfCheck
+2716760	 setFastCircleArray
+2717016	 setGlobalPolarRotation
+2717312	 setOrigin
+2717478	 setOrigin_adaptation
+2717753	 shoutOut
+2717909	 sineArray
+2718074	 sineCBF
+2718220	 sky
+2718326	 sky-day
+2718472	 sky-day-bodies
+2718688	 sky-night
+2718854	 sky-night-bodies
+2719090	 sky-waves
+2719256	 smoke
+2719382	 sndP_adaptation
+2719607	 spirograph
+2719783	 star
+2719899	ñsticky
+2720036	 stringLength
+2720232	 subInts
+2720378	 sun
+2720484	 sunflower
+2720649	 superDuck
+2720815	 surfaceTransform
+2721051	 terminate
+2721217	 threeFish_adaptation
+2721492	 tmpCurX
+2721637	 tmpCurY
+2721782	 transmission-buffer
+2722049	 true
+2722164	 tulip
+2722290	 tulips
+2722426	 turtleFPX
+2722591	 turtleFPY
+2722756	 turtleHeading
+2722961	 turtleStackFPX
+2723176	 turtleStackFPY
+2723391	 turtleStackHeading
+2723646	 turtleStackIndex
+2723881	 ufo
+2723987	 ufo-bottom
+2724163	 ufo-cup
+2724309	 ufo-frame
+2724475	 ufo-left-foot
+2724681	 ufo-middle-foot
+2724907	 ufo-right-foot
+2725123	 ufo-with-smoke
+2725339	 useColorTable
+2725545	 var1_adaptation
+2725770	 var2_adaptation
+2725995	 vmu
+2726101	 vmu-code
+2726257	 vmu-code_purchase_code
+2726552	 vmuMode
+2726697	 vmuRegCode
+2726872	 void
+2726987	 water
+2727113	 weather
+2727258	 weeds
+2727384	 whale
+2727510	 width_adaptation
+2727745	âwindmill
+2727901	 wrapAdd_adaptation
+2728156	 wrapImp
+2728301	 wrapMax_adaptation
+2728556	 wrapSub_adaptation
+2730433	Gene Table - distances relative to green zone start at IFPICFPPCFFPP
+2731887	Page 
+2733196	 out of 14
+2790340	*** DAMAGED ENTRY ***
+2795241	PASS
+2796157	FAIL
+2797851	Note: FAIL can indicate both corruption or encryption.
+2799164	Note: integrity checks are 
+2800056	disabled
+2809838	1998
+2810652	1999
+2811466	2000
+2812280	2001
+2813094	2002
+2813908	2003
+2814722	2004
+2815536	2005
+2816350	2006
+2817164	2007
+2817997	prosecuted to the fullest extend of the law.
+2819230	without a license is theft, and you will be 
+2820463	Mu is licensed material. Using the Mu 
+2823535	Dinner with Ambiants - Penn
+2826759	The object of this year's programming contest is to design an ant colony that will bring the most 
+2828428	food particles back to its anthill, while fending off ants of another species. To win the contest, you 
+2830147	must submit the neural wiring for the ants in your colony--a text file containing code for a simple, 
+2831846	finite state machine that is run by all of your ants. In principle, your entry can be written by hand, 
+2833565	but for complex behaviors you will probably find it useful to write tools that generate ant code in 
+2835255	some way. You may use any programming language you like for this purpose.
+2839732	First prize
+2840635	Language of choice
+2843216	Dunkosmiloolump
+2844160	Haskell
+2846377	Undocumented RNA
+2849957	*** ABNORMAL RNA ***
+2850950	seem to be related to the morphing process, because peculiar 
+2852353	patterns have been observed.
+2853425	It's not entirely clear what the real purpose of the RNA is, but it does 
+2854948	For example, the RNA code
+2855991	produced. This `hiccup' RNA is nothing to worry about and doesn't 
+2857444	serve any purpose for morphing.
+2858547	When a Fuun has suffered a severe crash abnormal RNA may be 
+2859941	CFPICFP
+2860804	been figured out, though.
+2861847	indicate the start of a morphing process. Their exact meaning hasn't 
+2863329	There are also other RNA codes, all starting with a C, that most likely 
+2864842	process is done.
+2865795	occurs very often and seems to indicate a small part of the morphing 
+3399739	ImpDoc
+3406529	int24
+3407373	max
+3408197	(int24 
+3409865	, int24 
+3412346	Return the larger of two integers.
+3413480	int24
+3414324	modInts
+3415188	(int24 
+3416856	, int24 
+3419337	Compute the remainder of the division of two integers.
+3420671	void
+3421505	moveTo
+3422359	(int24 
+3424027	, int24 
+3426508	Move to coordinate (x,y) relative to the current origin.
+3427862	void
+3428696	moveToPolar
+3429600	(int12 
+3430464	angle
+3431308	, int12 
+3432182	dist
+3433819	Move the current position to some angle and distance from the origin.
+3435303	int24
+3436147	mulInts
+3437011	(int24 
+3438679	, int24 
+3441160	Multiply two integers.
+3442174	int24
+3443018	negateInt
+3443902	(int24 
+3446373	Return the negation of an integer.
+3447507	void
+3448340	printGeneTable
+3449274	(bool 
+3450127	integrityCheck
+3451863	time-consuming. You may want to get yourself a cup of good ol' Romulan ale while you're 
+3453536	waiting for it to finish.
+3454578	Print all genes, optionally performing an integrity check. Warning: integrity checking is rather 
+3456342	int24
+3457186	randomInt
+3458070	(int24 
+3460541	number generator.
+3461503	Return a pseudo-random number. Computed using a simple linear congruential pseudo-random 
+3463187	8/10
+3466582	1998
+3467396	1999
+3468210	2000
+3469024	2001
+3469838	2002
+3470652	2003
+3471466	2004
+3472280	2005
+3473094	2006
+3473908	2007
+3474741	prosecuted to the fullest extend of the law.
+3475974	without a license is theft, and you will be 
+3477207	Mu is licensed material. Using the Mu 
+3481073	Wireless Interactive Fiction - Harvard and Virginia
+3484537	Frobozz Role Playing, Ltd, has obtained funding to promote the concept of wireless interactive 
+3486177	fiction. Traditional interactive fiction emphasizes explorations of created worlds, but this new 
+3487837	venture will be more like the ``multi-user dungeons'' popularized by such programs as TinyMUD, 
+3489477	which emphasize interaction over exploration. Frobozz expects to distinguish itself in two ways: 
+3491136	thanks to wireless technology, the game will be available anywhere, any time---and even if a player 
+3492825	is disconnected, there will always be computer-controlled ``non-player characters'' to interact with.
+3494524	Creating computer-controlled characters is still a black art, and the ``mimesis team'' has developed a 
+3496243	new, ultra-high-level language to specify their behaviors. The high-level compiler translates these 
+3497932	behaviors into state machines. Unfortunately, the logic used to decide on state transitions is looking 
+3499652	very complicated, and management is concerned that the state machines may exceed both code-size 
+3501302	and power budgets for the hand-held devices---and nobody is going to buy unless price is low and 
+3502961	battery life is high. Your task, for the next 72 hours, is to write an optimizer that will improve the 
+3504681	state machines emitted by the compiler. Speed is nice, but management is more concerned about 
+3506310	code size---if the system is 10% slower than projected, users might not notice, but if the system is 
+3508010	10% larger than projected, that means more memory, and that eats into profits.
+3512537	First prize
+3513440	Language of choice
+3516022	Camls R'Us
+3516916	OCaml
+3982951	Major Imp's Next Assignment Episode 126
+3985516	Transcendence, Morph was in for a surprise. Instead of meeting a 
+3986959	walked through the spacious corridors, she spoke to Morph: 
+3988343	"Some 
+3989196	Blocker, an Unsafe assassin and Alpha Blending, a trained 
+3990569	Diagram consist of four? Bad luck, you know?"
+3991812	, Morph hesitantly 
+3992795	compose well and commute."
+3993848	disposal, your task should be easy as pi-calculus. May you 
+3995231	Imp...let us not be too superstituous. With Alpha and Beta at your 
+3996695	interjected. 
+3997618	"No, my young one, spending four of us on a single 
+3998921	psychologist.". "Excuse me, Your Excellency, but shouldn't a 
+4000324	have requested two agents to serve with you in a Diagram: Beta 
+4001747	that this particular agent is worthy of winning over to our cause. I 
+4003230	the eventual mistakes that characterize their agents. It may well be 
+4004713	to expect from our opponents, but, unfortunately for us, without 
+4006156	Caffee, and he has been doing this as efficiently as we have come 
+4007609	weeks ago a new agent has been sent to eliminate our functors on 
+4009052	high-ranking orderly to the Magnificent State Monad. As they 
+4010455	minor official, he soon found himself in the presence of a 
+4011838	After he entered the offices of the General Agency for Divine 
+4037044	Contents
+4037918	Index
+4039544	FuunDoc
+4041289	activateAdaptationTree
+4042303	zone.
+4043145	Activates an adaptation tree whose offset is given in the adaptation trunk residing in the blue 
+4045781	activateGene
+4046693	Activates the gene whose offset is given in the adaptation trunk residing in the blue zone.
+4049278	apply1_adaptation
+4050242	 :: 
+4051390	BioNat -> BioNat -> BioNat
+4052443	argument, yielding its return value.
+4053595	The value returned by the second argument is taken by variable1. Then it executes the first 
+4056190	apply2_adaptation
+4057154	 :: 
+4058302	BioNat -> BioNat -> BioNat -> BioNat
+4059454	respectively. Then it executes the first argument, yielding its return value.
+4061016	The values returned by the second and third arguments are taken by variable1 and variable2 
+4063601	bioAdd_adaptation
+4064565	 :: 
+4065714	BioNat
+4066567	Computes the sum of variable1 and variable2.
+4068682	bioMul_adaptation
+4069646	 :: 
+4070795	BioNat
+4071648	Computes the product of variable1 and variable2.
+4073803	bioSucc_adaptation
+4074777	 :: 
+4075926	BioNat
+4076779	Takes the natural number in variable1 and returns it incremented.
+4079104	bioZero_adaptation
+4080078	 :: 
+4081227	BioNat
+4082080	Returns the natural zero.
+4084005	caseVar1_adaptation
+4084989	 :: 
+4086137	BioNat -> BioNat -> BioNat
+4087190	executed. The result is given by the executed alternative.
+4088562	with variable1 unchanged. Otherwise, variable1 is decremented and the second argument is 
+4090243	Does case analysis on the natural number in variable1. If it is zero, the first argument is executed 
+4092928	caseVar2_adaptation
+4093912	 :: 
+4095060	BioNat -> BioNat -> BioNat
+4096113	The same as caseVar1_adaptation, but for variable2.
+4098099	Produced by 
+4099013	FuunDoc
+4099877	 version 0.13
+4107341	*** ¢1642007122918! ***
+4108364	*** Irregular Radio Noise Detected ***
+4109537	*** Investigate ***
+4164273	white: right to left: numbers 1 to 10
+4165436	purple: atom numbers of elements
+4166549	green: prehistoric DNA formulas
+4167652	*** Bored; ignoring transmission ***
+4203944	Structure of the Fuun Genome
+4207644	*** PRELIMINARY ***
+4208628	there also.
+4209531	The BLUE ZONE waxes and wanes. It grows at the start and shrinks 
+4210974	zone. Field engineers who wish to repair the Fuun can modify the 
+4212417	green zone, but should not change its size.
+4213640	The GREEN ZONE is forever unchanging in size. It feeds the red 
+4215063	zone. When it dies, the blue zone tells us what to do next.
+4216446	The RED ZONE is where THINGS happen. It is born from the green 
+4217869	All of the Fuun genome is divided into three parts.
+4219172	incompetence after the Biomorph debacle) failed to produce any 
+4220595	documentation, so this info is a bit sketchy. This is what we 
+4222008	discovered after months of relentless reverse engineering...
+4223401	Note: the original FuunTech engineers (who were fired for 
+4226287	RED
+4228623	GREEN
+4230979	BLUE
+4268047	Contents
+4268921	Index
+4270547	FuunDoc
+4272292	mkZero_adaptation
+4273256	 :: 
+4274405	Nat
+4275229	Zero.
+4276954	pictureDescrRenderer_adaptation
+4278058	 :: 
+4279206	PictureDescr -> Int -> Int -> RNAAction
+4280389	Draws a picture description at the given coordinate.
+4282585	s_adaptation
+4283499	 :: 
+4284647	(a -> b -> c) -> (a -> b) -> a -> c
+4286673	true
+4287507	 :: 
+4288656	Bool
+4289490	True.
+4291215	var1_adaptation
+4292159	 :: 
+4293308	BioNat
+4294161	Returns the natural number that is in variable1.
+4296316	var2_adaptation
+4297260	 :: 
+4298409	BioNat
+4299262	Returns the natural number that is in variable2.
+4301218	Produced by 
+4302132	FuunDoc
+4302996	 version 0.13
+4319403	ImpDoc
+4326835	bool
+4327669	ge
+4328483	(int24 
+4330151	, int24 
+4332632	Return true iff x is greater than or equal to y.
+4333906	int24
+4334750	incInt
+4335604	(int24 
+4338075	Increment an integer by one.
+4339149	void
+4339983	init
+4340817	()
+4341631	length.
+4342493	Global initialisation. Ensures happy, trouble-free arithmetic by growing the DNA to the right 
+4344227	void
+4345060	initFastRandom
+4345994	(int9¢128! 
+4346898	key
+4348525	Initialise the fast pseudo-random number generator.
+4349829	void
+4350662	lsystem-kochisland
+4351636	(int24 
+4352500	depth
+4354147	L-System that generates a combination of islands and lakes.
+4355531	void
+4356364	lsystem-sierpinski
+4357338	(int24 
+4358202	depth
+4359849	L-System that generates the Sierpinski gasket.
+4361103	void
+4361937	lsystem-weed
+4362851	(int24 
+4363715	depth
+4365362	L-System that generates stochastic branching structures.
+4366716	bool
+4367550	lt
+4368364	(int24 
+4370032	, int24 
+4372513	Return true iff x is less than y.
+4373637	void
+4374471	makeDarkness
+4375385	()
+4376198	Cover the whole world in darkness.
+4377332	7/10
+4416328	1998
+4417142	1999
+4417956	2000
+4418770	2001
+4419584	2002
+4420398	2003
+4421212	2004
+4422026	2005
+4422840	2006
+4423654	2007
+4424487	prosecuted to the fullest extend of the law.
+4425720	without a license is theft, and you will be 
+4426953	Mu is licensed material. Using the Mu 
+4430025	An Urgent Appeal - Carnegie Mellon University
+4433429	In 1967, during excavation for the construction of a new shopping center in Monroeville, 
+4435009	Pennsylvania, workers uncovered a vault containing a cache of ancient scrolls. Most were severely 
+4436679	damaged, but those that could be recovered confirmed the existence of a secret society long 
+4438290	suspected to have been active in the region around the year 200 BC.
+4439650	Based on a translation of these documents, we now know that the society, the Cult of the Bound 
+4441289	Variable, was devoted to the careful study of computation, over two millennia before the invention 
+4442970	of the digital computer.
+4446957	First prize
+4447860	Language of choice
+4450442	Team Smartass
+4451366	2D
+4458850	Repair guide navigation
+4459873	of the desired repair guide page.
+4460996	and replacing the encoded integer with the encoding of the integer 
+4462459	Access repair guide topics by taking an existing repair guide prefix 
+4463942	Encoding of positive n-bit integers
+4465086	b_1 ... b_n
+4465989	b_i = C if the ith least-significant bit is set
+4467252	b_i = I otherwise
+4468215	Catalog page index
+4469189	1337
+4470022	Happy navigating|
+4470985	<blink>WARNING</blink>
+4471998	REVERSAL may occur|
+4472981	Don't change the length of integers, or TOTAL PROTONIC 
+4475678	Major Imp's Next Assignment Episode 1
+4478223	where he stood at attention. RELAX spoke Void, in his usual 
+4479616	our recruits, you are the one adhering closest our revered 
+4480999	commando's. We have a sensitive and dangerous mission scheduled 
+4482432	and you have been chosen to volunteer..."
+4483636	 (call-cc)
+4484529	teletype voice that belied the contents. 
+4485732	"I have heard that among 
+4486775	Somewhat weak at the knees, Imp made for the middle of the room, 
+4488218	though spoken in a medium-sized cathedral. Novice Imp entered the 
+4489671	cramped room with some trepidation, knowing full well that many a 
+4491124	Void had made sure that indeed it wouldn't.
+4492347	investigation. Ptr had promised that it wouldn't happen again, and 
+4493810	presence to "some unwanted side-effects" of a particular 
+4495173	of the tongue. Lieutenant Ptr, for example, had referred in His 
+4496606	(not so intelligent) agent had become deallocated after nary a slip 
+4498079	office of semi-colonel Void. 
+4499163	"ENTER"
+4500026	, rang out from the room, as 
+4501109	heads, there was a hesitant knock on the steel door of the austere 
+4502572	Only just before sleep-groggy roosters reared their scrawny 
+4539145	Major Imp's Next Assignment Episode 496
+4541710	Needless to say, Major Imp's next assigment took place in a monad.
+4543163	nullifier in his right hand, a promise that memory would leak. He 
+4544616	And like I promised, under rather different circumstances"
+4545990	. Taking a 
+4546893	deep breath, he continued: 
+4547956	"We'd prefer to not waste your life, or 
+4549149	an improvement on the girls he had forced his companionship upon 
+4550592	back at headquarters, and Beta looked quite the wall of bricks.
+4552015	monad transformer, in disguise."
+4553128	. Imp considered. Alpha did seem 
+4554251	Beta. Alpha is more than our team's psychologist: she's also a 
+4555674	conversion and a nice promotion, and reduction at the hands of 
+4557097	ours. There is still a way out. It's a simple choice between 
+4558500	inspector, Jones. The latter took the lead: 
+4559733	"So...we meet again. 
+4560736	one, the sensuous Alpha, the crusher, Beta, and that out-of-place 
+4562189	would be popped from life's stack. His eyes went over them one by 
+4563642	knew that he could take one or two with him, but that today he too 
+4565105	Imp backed into the wall as the Diagram converged on him, his 
+4628210	Steganography
+4631760	Pictures in pictures
+4632753	back as 400 B.C. Some printer producing companies have used 
+4634146	was to show to the government that printed forgeries of any kind 
+4635589	dots on each printed page. Another example of steganography is 
+4637013	right.
+4637865	given below, where the left picture is hidden inside the picture on the 
+4639378	could be detected, by adding some (almost) undetectable yellow 
+4640801	steganography to mark paper printed by their printers. The purpose 
+4642264	HERODOTUS already mentioned cases of steganography as far 
+4643637	so that no-one can find this message unless he knows that it's there. 
+4645130	STEGANOGRAPHY is a technique for hiding messages in a message 
+4899453	Biomorphic initial conditions
+4903163	--   Copyright stardate 90.7.65.44 FuunTech Inc.
+4904436	--   Vogon Community Source License
+4905579	--   of primitive living beings in underdeveloped planets.
+4906952	--   Unfortunately the code is broken because the previous programmer
+4908435	--     - Grunthos the Flatulent
+4909538	enableBioMorph = False
+4910551	data Nat = Zero ] Succ Nat
+4911604	type BioNat = (Nat,Nat) -> Nat
+4912697	-- These adaptations manipulate an environment of two variables:
+4914130	-- and then they compute a result of type 
+4915344	Nat
+4916972	-- 
+4917796	variable1
+4918680	 and 
+4919524	variable2
+4920407	, which have type 
+4921381	Nat
+4923008	-- The above is compiled to 
+4924081	gene adaptations
+4925035	 of type 
+4925919	BioNat
+4926773	 where
+4927626	bioMul x        y = Zero
+4928659	 -- this is broken and must be fixed||
+4929832	bioAdd (Succ x) y = Succ (bioAdd x y)
+4930995	bioAdd Zero     y = y
+4931998	--   smoked some primitive grass during my poem recitations|
+4933391	--   This file computes the initial conditions for the distribution 
+4934865	--
+4935678	--   InitialBioMorph.hs  -  Biomorph initial conditions
+4937281	ImpDoc
+4944713	void
+4945547	drawGradientH
+4946471	(int24 
+4948139	, int24 
+4949817	, (void)()* 
+4950731	color
+4952378	Make a rectangular gradient with horizontal lines.
+4953672	void
+4954506	drawGradientV
+4955430	(int24 
+4957098	, int24 
+4958776	, (void)()* 
+4959690	color
+4961337	Make a rectangular gradient with vertical lines.
+4962611	void
+4963445	drawHexDigit
+4964358	((int9, int24, dna0)*¢192! 
+4965422	fontTable
+4966306	, int24 
+4968787	Draw a hexadecimal digit.
+4969831	void
+4970665	drawInt
+4971528	((int9, int24, dna0)*¢192! 
+4972592	fontTable
+4973476	, int24 
+4975957	Print an integer in a base suitable to Earthdwellers.
+4977281	void
+4978115	drawIntHex
+4979008	((int9, int24, dna0)*¢192! 
+4980072	fontTable
+4980956	, int24 
+4981830	maxWidth
+4982704	, int24 
+4984382	, int24 
+4986060	, int24 
+4988541	Print an integer in a base suitable to DNA designers.
+4989865	void
+4990699	drawPolyline
+4991613	(bool 
+4992467	close
+4993310	, int12¢2044! 
+4994244	points
+4995901	Draw a polygon. Optionally close the polygon automatically.
+4997285	void
+4998118	drawPolylinePolar
+4999082	(bool 
+4999936	close
+5000779	, int12¢2044! 
+5001713	points
+5003370	angle and distance to be traveled relative to the origin.
+5004732	Draw a polygon encoded in a polar representation. Each point of the polygon is specified as an 
+5006476	void
+5007310	drawRect
+5008184	(int24 
+5009852	, int24 
+5011530	, int24 
+5012404	sizeX
+5013248	, int24 
+5014122	sizeY
+5014966	, bool 
+5015830	fill
+5017467	Draw a (possibly) filled rectangle.
+5018611	void
+5019444	drawRoundedRect
+5020388	(int24 
+5022056	, int24 
+5023734	, int24 
+5024608	sizeX
+5025452	, int24 
+5026326	sizeY
+5027170	, int24 
+5028848	, bool 
+5029712	fill
+5031349	Draw a (possibly) filled rectangle with rounded corners.
+5032703	4/10
+5035917	El pasto siempre se ve mas verde del otro lado de la cerca.
+5071568	Endo hat gemorpht
+5072860	Morph Endo|
+5086583	  âäàáãåçñ¢.<(+|&éêëèíîïìß!$*);¬-/ÂÄÀÁÃÅÇÑ¦,%_>?øÉÊËÈÍÎÏÌ`:#@'="Øabcdefghi«»ðýþ±°jklmnopqrªºæ¸Æ¤µ~stuvwxyz¡¿ÐÝÞ®^£¥·©§¶¼½¾[]¯¨´×{ABCDEFGHI­ôöòóõ}JKLMNOPQR¹ûüùúÿ\÷STUVWXYZ²ÔÖÒÓÕ0123456789³ÛÜÙÚ 	
+
+5107598	ImpDoc
+5109894	void
+5110728	useColorTable
+5111652	()
+5112466	10/10
+5125794	ImpDoc
+5132584	void
+5133417	fpMoveAbsolute
+5134351	(int24 
+5136019	, int24 
+5138500	Move to an absolute position with fixed-point coordinates.
+5139874	void
+5140708	fpPop
+5141552	()
+5142364	Pop a fixed-point position and heading from the stack and set the current position/heading to it.
+5144128	void
+5144962	fpPush
+5145816	()
+5146629	Push the current fixed-point position and heading on top of a stack.
+5148103	void
+5148937	fpTurnLeft
+5149831	(int24 
+5150695	angle
+5152341	Change the current heading leftward by the specified number of degrees.
+5153845	void
+5154679	fpTurnRight
+5155583	(int24 
+5156447	angle
+5158093	Change the current heading leftward by the specified number of degrees.
+5159596	((int24)(int24, int24)*, int24)
+5160700	functionAdd
+5161603	int24)*, int24) 
+5164164	(((int24)(int24, int24)*, int24) 
+5166091	, ((int24)(int24, 
+5167063	Combines two call-back functions and returns a new one. It adds the results.
+5168616	((int24)(int24, int24)*, int24)
+5169719	functionParabola
+5170673	(int24 
+5172341	, int24 
+5174822	function returns a*x+b.
+5175844	Returns a call-back function that can be drawn with drawFunction. Given an x, the call-back 
+5177557	((int24)(int24, int24)*, int24)
+5178661	functionSine
+5179575	(int24 
+5181243	, int24 
+5182921	, int24 
+5185402	function returns sin(a*x+b)*c.
+5186494	Returns a call-back function that can be drawn with drawFunction. Given an x, the call-back 
+5188208	6/10
+5189301	ImpDoc
+5196733	void
+5197567	colorMagenta
+5198481	()
+5199293	Outputs one color magenta command (possibly after resetting the bucket).
+5200807	void
+5201641	colorRed
+5202515	()
+5203328	Outputs one color red command (possibly after resetting the bucket).
+5204802	void
+5205636	colorWhite
+5206530	()
+5207343	Outputs one color white command (possibly after resetting the bucket).
+5208837	void
+5209671	colorYellow
+5210575	()
+5211387	Outputs one color yellow command (possibly after resetting the bucket).
+5212891	void
+5213725	correctErrors
+5214649	(int24 
+5215513	data
+5216347	, int24 
+5217221	ecc
+5218045	, int24 
+5218919	size
+5220555	Correct errors in a DNA region using the Hamming bits in another DNA region.
+5222109	int9¢128!
+5222993	crackKey
+5223867	(int24 
+5224731	testValue
+5226418	encrypted with the key.
+5227440	Recover an encryption key through brute force. The first argument must be the integer 0 
+5229114	void
+5229948	crypt
+5230792	(int9¢128! 
+5231696	key
+5232520	, int24 
+5233394	offset
+5234248	, int24 
+5235122	size
+5236759	Encrypt/decrypt a DNA string with the given key.
+5238033	int24
+5238877	decInt
+5239731	(int24 
+5242202	Decrement an integer by one.
+5243276	int24
+5244120	div2
+5244954	(int24 
+5247425	Divide an integer by 2.
+5248449	2/10
+5267496	Babel Survey
+5271036	Languages of Earth
+5272009	ISWIM, Prolog, C, Pascal, Scheme, OPS5, CSP, FP, dBase, 
+5273362	Smalltalk-80, Ada, Parlog, Scala, ML, C++, CLPR, Eiffel, CLOS, 
+5274785	Miranda, Mathematica, Oberon, Ocaml, Haskell, PHP, Perl, Python, 
+5276228	Snobol, Helium, Stratego, Clean, F#, Maple, awk, Dylan, Simula, 
+5277661	ABC, VBScript, AppleScript, Mondrian, Sed, ....
+5278924	Unity, MetaPost, SQL, AspectJ, Datalog, Tcl, Reduce, APL, 
+5280297	Forth, Visual Basic, Delphi, Curl, C#, Curry, Erlang, XQuery, Oz, 
+5281750	Ruby, XSLT, PostScript, Java, JavaScript, Modula-2, Bash, Turing, 
+5283203	FORTRAN, ALGOL, LISP, COBOL, APL, SIMULA, BASIC, PL/I, 
+5284546	All that waste of bandwidth...
+5285639	DNA is toch voordeliger.
+5290705	ImpDoc
+5297495	void
+5298329	drawString
+5299222	((int9, int24, dna0)*¢192! 
+5300286	fontTable
+5301170	, int24 
+5302848	, int24 
+5304526	, int9¢128! 
+5307047	Draw a string encoded in the Intergalactic Character Set.
+5308411	void
+5309244	drawStringHere
+5310177	((int9, int24, dna0)*¢192! 
+5311241	fontTable
+5312125	, int9¢128! 
+5314646	Draw a string at the current position.
+5315820	void
+5316653	endRelativeMode
+5317597	()
+5318410	This function looks like a correspondly awful hack.
+5319714	void
+5320548	fadingColors
+5321462	()
+5322276	void
+5323110	fastForward
+5324014	(int12 
+5326485	rotate 180 degrees.
+5327467	Go N steps forward. If the argument is negative, rotate 180 degrees, go forward -N steps, and 
+5329201	int9
+5330035	fastRandom
+5330929	()
+5331742	should be called first to initialise the generator.
+5333044	Compute a pseudo-random integer using a cryptographically strong method. initFastRandom() 
+5334738	void
+5335572	fpForward
+5336456	(int24 
+5337320	dist
+5338958	number.
+5339820	Move forward along the current heading and draw a line. `dist' is an integer, not a fixed-point 
+5341574	void
+5342407	fpForwardPenUp
+5343341	(int24 
+5344205	dist
+5345842	fixed-point number.
+5346824	Move forward along the current heading without drawing a line. `dist' is an integer, not a 
+5348528	5/10
+5458858	described elsewhere.
+5459851	This page lists repair guide topics. Navigation to these pages is 
+5461304	Repair Guide Catalog
+5462297	This catalog page
+5463260	Structure of the Fuun Genome
+5464333	More notes on Fuun Genomics
+5465396	Activating genes ¢encrypted!
+5466470	Gene list
+5467353	Some things to look out for
+5468416	Intergalactic Character Set
+5469479	Field-repairing your Fuun
+5470522	How to fix corrupted DNA ¢encrypted!
+5471675	Notes on weird RNA
+5472648	Synthesis of complex structures
+5473751	Fuun security features
+5474764	A historical note on RNA compression
+5475917	The question to the Ultimate Answer
+5477060	On the an...taa....v.....
+5478104	1337
+5478938	1729
+5480576	23
+5481390	42
+5482204	112
+5483028	10646
+5483872	85
+5484686	84
+5485500	2181889
+5487168	4405829
+5488032	123456
+5488886	999999999
+5489770	999999999
+5490653	Catalog seems to be damaged
+5552295	Intergalactic Character Set
+5568574	1998
+5569388	1999
+5570202	2000
+5571016	2001
+5571830	2002
+5572644	2003
+5573458	2004
+5574272	2005
+5575086	2006
+5575900	2007
+5576733	prosecuted to the fullest extend of the law.
+5577966	without a license is theft, and you will be 
+5579199	Mu is licensed material. Using the Mu 
+5582271	SML/NG Optimiser - INRIA Rocquencourt
+5585595	The W4C (World Wide Wireless Web Consortium) has just published the specification of SML/NG 
+5587205	(Simple Markup Language -- New Generation), a simplified version of XXHTML designed for the 
+5588815	new generation of hypertext rendering micro-devices, running on hardware with reduced 
+5590365	computational capacity such as wristtop computers, thumbnail-worn PDAs, and internet-enabled ice 
+5592027	boxes.
+5592777	The programming task is to design and implement an optimiser for SML/NG that will simplify the 
+5594418	source documents and reduce their size.
+5598555	First prize
+5599458	Language of choice
+5602039	Haskell Carrots
+5602983	Haskell
+5616298	Major Imp's Next Assignment Episode 2
+5618843	Fuun Agents Are Again Active On Caffee To Convert Them To 
+5620216	Those Snakey Pythons. THIS WE CAN'T ALLOW|. We Need You to 
+5621599	Face Of Grave Danger, A Man Sets Aside His Personal Needs and 
+5623012	Fears, And Does What His Country Demands Of Him. To 
+5624325	Terminate Or To Be Terminated, That Is The Question. Lieutenant 
+5625758	To Null. Don't Worry Son. With Your Training, Destructive Updates 
+5627211	On A Few Fuuns Is Easy As Programming A, B, C. "
+5628485	. His face a 
+5629408	whiter shade of pale, Imp turned about and left the room for the 
+5630851	nearest toilet.
+5631794	Gosub Will Brief You Further, And Supply You With Your License 
+5633217	of menace creeping into his voice, 
+5634360	"There Is A Time When, In The 
+5635453	that puts the fear in them."
+5637331	"Imp"
+5638174	, Void interrupted with a measure 
+5639306	I mean, Perls are a girl's best friend, but it always helps to have a job 
+5640840	nervously, 
+5641743	"I only took this job, because girls are easier to come by. 
+5643136	Go In And Eliminate All Fuun Operators."
+5645134	"But Sir"
+5646017	, Imp interjected 
+5646990	Simple Hack. This Time It's First-Classness, Like They Did With 
+5648423	Generics ...? Rumour Has It That They Aren't Going To Stick To A 
+5649866	Their Perverted Cause. Remember That Episode With The 
+5651199	In a whisper, Void continued: 
+5652292	"We Have Recently Discovered That 
+5660955	1998
+5661769	1999
+5662583	2000
+5663397	2001
+5664211	2002
+5665025	2003
+5665839	2004
+5666653	2005
+5667467	2006
+5668281	2007
+5669114	prosecuted to the fullest extend of the law.
+5670347	without a license is theft, and you will be 
+5671580	Mu is licensed material. Using the Mu 
+5674652	Ray Tracer - Cornell and Bell Labs
+5677945	This year's ICFP programming challenge is to implement a ray tracer. The input to the ray tracer is 
+5679635	a scene description written in a simple functional language, called GML. Execution of a GML 
+5681245	program produces zero, or more, image files, which are in PPM format. A web page of sample 
+5682845	images, along with the GML inputs that were used to produce them, is linked off of the contest 
+5684485	home page. The feature set of GML is organized into three tiers. Submissions must implement the 
+5686134	first tier of features and extra credit will be given to submissions that implement the second or third 
+5687863	tiers. Submissions will be evaluated on three scales: correctness of the produced images, run-time 
+5689544	performance, and the tier of implemented GML features.
+5693831	First prize
+5694734	Language of choice
+5697316	PLClub
+5698170	OCaml
+5712828	RNA Compression
+5716398	(slightly more than 2 acids per RNA code, thus giving a compression 
+5717871	rate of almost 5), the project was abandoned for ethical reasons. 
+5719324	found in the DNA of some species at this very moment|
+5720647	technique has been used at several occassions. Some say it can be 
+5722100	though the technology has been forbidden by law, the compression 
+5723543	beings would become too easy. However, rumors circulate that even 
+5724996	The general opinion about RNA compression was that morphing living 
+5726458	source of inefficiency. Although the first results were very promising 
+5727961	been founded by the Intergalactic Space Agency to tackle this 
+5729374	For this reason, a top-secret project, 
+5730558	RNA-Comprez
+5731461	, has recently 
+5732404	purpose they actually serve. An RNA code consists of 7 acids, and 
+5733857	since there are only 20 codes in use, this coding seems to be rather 
+5735340	objects,  it has been suggested to replace the codes by smaller ones.
+5736822	inefficient. Since RNA codes are the essential building block for living 
+5738345	these codes are hardly ever found and it remains unclear which 
+5739767	entire universe is built. Although scientists have run into more codes, 
+5741280	DNA engineers have discovered twenty RNA codes, from which the 
+5744057	Field-repairing Fuuns
+5747687	Blue Zone starts after the marker 
+5748821	IFPICFPPCFIPP
+5750547	to copying the Adapter.  This information should respect all applicable encoding standards.  The 
+5752308	If information has to be passed to the gene, it should be placed at the start of the Blue Zone prior 
+5754112	IFPICFPPCCC
+5755014	 to the front of the DNA, followed by the integer encoding of the offset of the 
+5756606	necessary.  Both can be found in the gene table. The offset must be relative to the start of the 
+5758367	the start of the Green Zone prior to the activation of the Adapter is restored to the start of the 
+5760151	DNA.
+5760983	Green Zone.  When the target gene has completed, any DNA between the start of the DNA and 
+5762675	gene, followed by the integer encoding of the size of the gene.  No padding of the integers is 
+5764417	requirements. To call any gene in the Green zone, copy the area between the two markers 
+5766090	FuunTech provides an easy solution in the form of the 
+5767424	Adapter
+5768287	, which removes all these 
+5769341	writing a 
+5770235	prefix
+5771087	, a short piece of DNA that repairs the Fuun's damaged DNA.  It is often 
+5772609	to the construction of the Red and Green Zones, activating genes from within a prefix is quite 
+5774351	Zone.  Also, a return location in the Green Zone must be placed in the Blue Zone to resume DNA 
+5776094	processing after the gene has finished its function. 
+5777416	tricky, since no acids may exist between the end of the Red Zone and the start of the Green 
+5779128	convenient to activate certain genes from the Green Zone during the repair process. However, due 
+5780890	may become damaged, and it may be necessary to perform field repairs. This is typically done by 
+5782642	Fuuns sometimes crash-land on distant, primitive worlds. When that happens, the Fuun's DNA 
+5784346	Example
+5785209	copy the integer 42 to the start of the Blue Zone:
+5786501	Green Zone.  We pass the integer 42 (encoded with 24 acids, of course) and a false boolean.  To 
+5788253	This example shows how to activate a 500-acid gene located 1234 acids from the start of the 
+5789966	IIPIFFCPICCFPICICFPCICICIICIICIPPPCFCFCFCCCCCCCCCCCCCCCCCICIIC
+5791379	To copy the boolean:
+5792372	IIPIFFCPICCFPICICFPCICICIICIICIPPPPIIC
+5793544	And finally, to activate the Adapter to in turn activate the gene at offset 1234:
+5795147	IIPIFFCPICCFPICICFFFIIPIFFCPICCFPICICFFFIICIICIICIPPPCFCCFCFFCCFI
+5796590	CCCFCFFFFFICIPPCPIIC
+5797583	If the gene has a result, it will be left after the Blue Zone marker (
+5799077	IFPICFPPCFIPP
+5800001	).
+5853116	Vehicular Morphological Unit
+5856816	registration code must be entered. If you do not have a registration 
+5858299	code at present, please contact the FuunTech Customer Service 
+5859712	Department on Rigel IV.
+5860735	The VMU ships as an optional DNA module. To activate it, a 
+5862118	(BMU). FuunTech Management wishes to emphasise that under 
+5863491	morphed into hideously disfigured mutants. However, use of the 
+5864914	BMU on deployed Fuun models is strictly at one's own risk.
+5866287	normal operating conditions, it is not possible for customers to be 
+5867760	decided to discontinue an earlier product, the Biomorphological Unit 
+5869243	Note that due to a number of class-action lawsuits, FuunTech has 
+5870685	with even the most primitive worlds, while retaining optimal mobility. 
+5872188	When activated, the VMU scans the current planetary environment 
+5873621	and morphs the customer's space ship into an inconspicuous vehicle 
+5875084	guaranteed not to draw attention from the natives.
+5876377	advanced patented technology to allow space travellers to blend in 
+5877840	FuunTech Inc.'s Vehicular Morphological Unit (VMU) leverages 
+5917193	OCaml
+5938789	Encodings
+5942299	*** PRELIMINARY ***
+5943281	which is ubiquitous on all major planets in the quadrant except Earth, where it has fallen in 
+5945013	acids.  Texts are always communicated to genes as sequences of 128 characters. The last 
+5946685	meaningful character is followed by the number 255. Texts encoded in this way consume many 
+5948387	acids, but there is a more efficient way to produce them.  But I've forgotten...
+5949979	disuse.  A character is coded as a 9-acid number, since all major vendors use encodings of 9 
+5951702	Textual messages
+5952655	 placed in Fuuns by the designers are encoded in the 
+5953978	Intergalactic Character Set
+5955042	, 
+5955855	There are 256 
+5956789	degrees
+5957653	 in a circle.
+5958577	quoted.
+5959440	When looking for 
+5960403	interesting bits
+5961356	 of information in DNA, one should remember that acids may be 
+5962768	sequence of 12-acid numbers. The first gives the number of vertices, N.  It is followed by N+1 
+5964510	pairs of numbers.  The first pair is the starting point.  Each subsequent pair is a relative 
+5966233	with great care, lest one disturb the careful balance of the numbers.
+5967715	movement.  The last pair is the sum of all movements.  Thus, changing a polygon must be done 
+5969439	Polygons
+5970311	 are structures that help to produce RNA that shapes the physical world.  A polygon is a 
+5971994	There is only one 
+5972968	True Encoding
+5973892	 of 
+5974725	negative numbers
+5975678	, and it certainly isn't one's complement.
+5976891	P is Truth, a Lie is F (how could it be otherwise?).
+5978204	codes for certain kinds of information.
+5979386	Reverse engineering has brought to light more facts about the Fuun, in particular how its DNA 
+5990527	MLephant
+6055653	 
+6065538	KEY NOT FOUND
+6074026	L(indenmayer)-Systems
+6077656	Making computer art look natural
+6078769	repeatedly discovered and used by sentient beings (for example the 
+6080232	gregarious coral-fish that dwell in the ammonia swamps of B1620-26 
+6081695	more often used to describe the growth of entire plants, or should we 
+6083188	say weeds? A particularly nice book is THE ALGORITHMIC BEAUTY 
+6084601	curves and Penrose Tilings, or the stochastic version called Graftals.
+6086094	many examples of L-systems, such as the Sierpinski Gasket, Koch 
+6087527	OF PLANTS (freely available from Earth's Internet), which contains 
+6088990	systems to describe cell growth in plants. Nowadays L-systems are 
+6090443	ARISTID LINDENMAYER, the most recent rediscoverer, used these 
+6091856	M4) to concisely describe and develop their own body structure. 
+6093289	pictures from a formal language specification. They have been 
+6094702	L-SYSTEMS are a tool that can be used to generate natural looking 
+6102719	Intergalactic Most-Wanted List
+6347258	E.T.
+6348091	different systems.
+6349064	Wanted for unpaid interstellar phone bills in 17 
+6350348	Darth Vader
+6351251	Emperor Palpatine.
+6352224	Dark Lord of the Sith; wanted for the assassination of 
+6353567	Bastiaan Heeren
+6354510	programmers with his abuse of unsafePerformIO.
+6355763	Wanted for damaging impressionable young 
+6372443	Alien Virus Alert
+6376033	alien viruses may 
+6377007	negatively 
+6377910	DNA. FuunTech Inc. 
+6378893	is working on a 
+6379846	traveling Fuuns.
+6380799	As a work-around, 
+6381772	FuunTech Inc. 
+6382705	offers vaccination 
+6383688	DNA patches for a 
+6384662	galactic 
+6385545	destinations. 
+6386478	Fuuns that plan on 
+6387461	traveling outside 
+6388434	the Fuunian Union 
+6389407	one. Failure to do 
+6390390	so will result in 
+6391363	a voided warranty. 
+6392346	Have a nice trip|
+6393309	should purchase 
+6394262	range of popular 
+6395225	this problem for 
+6396188	facility remedy 
+6397141	generic anti-virus 
+6398124	influence Fuun 
+6399067	has shown that 
+6400010	Recent research 
+6405298	ImpDoc
+6412730	int24
+6413574	divInts
+6414438	(int24 
+6416106	, int24 
+6418587	Divide an integer by another.
+6419671	void
+6420505	drawChar
+6421378	((int9, int24, dna0)*¢192! 
+6422442	fontTable
+6423326	, int9 
+6425797	containing glyph information for each character in the desired font.
+6427269	Draw a character encoded in the Intergalactic Character Set. `fontTable' must be an array 
+6428963	void
+6429796	drawCircleFast
+6430730	(int24 
+6432398	, int24 
+6434076	, int24 
+6435754	, bool 
+6436618	fill
+6438256	void
+6439090	drawEllipse
+6439994	(int24 
+6440858	centerX
+6441722	, int24 
+6442596	centerY
+6443460	, int24 
+6444334	rX
+6445148	, int24 
+6446022	rY
+6446836	, bool 
+6447700	fill
+6449337	Draw a filled ellipse.
+6450351	void
+6451184	drawEllipseFast
+6452128	(int24 
+6453796	, int24 
+6455474	, int24 
+6456348	rx
+6457162	, int24 
+6458036	ry
+6458850	, bool 
+6459714	fill
+6461352	void
+6462186	drawFunction
+6463099	(((int24)(int24, int24)*, int24) 
+6464223	pair
+6465057	, int24 
+6465931	endx
+6467568	values of functionSine and functionParabola.
+6468800	function that is used as a derivative. Examples of functions that can be passed are the result 
+6470542	Draw a function, where x ranges from 0 to endx. The first argument (pair) is a call-back 
+6472226	void
+6473059	drawFunctionBase
+6474012	(((int24)(int24, int24)*, int24) 
+6475136	pair
+6475970	, int24 
+6476844	endx
+6477678	, int24 
+6478552	base
+6480189	base is given relative to the startpoint (x=0).
+6481451	Similar to drawFunction, except that the area between the base and the function is filled. The 
+6483195	void
+6484028	drawGradientCornerNW
+6485022	(int24 
+6486690	, int24 
+6488368	, (void)()* 
+6489282	color
+6490930	corner.
+6491792	Make a rectangular gradient relative to the current position, radiating from the north-west 
+6493506	void
+6494339	drawGradientCornerSE
+6495333	(int24 
+6497001	, int24 
+6498679	, (void)()* 
+6499593	color
+6501238	Make a rectangular gradient relative to the current position, radiating from the south-east corner.
+6503022	3/10
+6530397	 
+6543264	Synthesis of complex structures (2)
+6547034	you can see some of the figures I was able to produce. You should 
+6548487	definitely give it a try yourself|
+6549620	toy that can be used to create the most incredible pictures. Below 
+6551083	Ever heard about a spirograph? It is this amazing geometric drawing 
+6574298	Compressor
+6577818	hard work. It performs three tasks: it 
+6579002	loads
+6579845	 the next item from the 
+6580878	the red block. The orange block is only a backup for the red block. 
+6582351	The blue block contains an instruction table with 20 entries of 32 
+6583815	acids.
+6584668	data fragment, it 
+6585642	searches
+6586515	 for this item in the table, and it 
+6587669	restores
+6589346	The compressor consists of three blocks. The red block does all the 
+6590819	Patent owned by FuunTech Inc.
+6594271	eval
+6595977	table
+6597973	backup
+6599699	data
+6600532	The compressor is used extensively for fonts and bitmaps.
+6601895	is to terminate the compressor.
+6602997	The last integer of the sequence is a special one, as its sole purpose 
+6604500	compressor. The data is a sequence of integers of variable length. 
+6605963	The data lives in the green part, which is positioned right after the 
+6607050	The Field Repair Manual page you tried to access does not exist.
+6641711	NCC-1701-J
+6643959	Palindromes
+6647489	*** READING BACKWORDS ***
+6649550	That you SIHT DAER TONNAC is because it is not a PALINDROME. 
+6650851	Often dismissed as toys for kids by programmers after encountering 
+6652212	them in their first programming assignments, there is more to them 
+6653572	than that. For example, efficiently finding the largest substring of a 
+6654973	string that is a palindrome, is not an easy task.
+6656154	Most languages have their share of palindromes, like 
+6657375	PARTERRETRAP in Dutch, or a palindrome sentence such as A 
+6658646	MAN, A PLAN, A CANAL: PANAMA in English. The longest known 
+6659927	palindrome in any language is SAIPPUAKIVIKAUPPIAS, a Finnish 
+6661228	word for a seller of stone and soap.
+6662279	Palindromes are a terrible waste of space, because you use twice the 
+6663660	space to store a piece of information. But in some cases, redundancy 
+6665041	can serve a purpose, for example to correct mistakes after lossy 
+6666382	transmissions, or in situations in which accidental mutation of data 
+6667763	has taken place.
+7116540	Harry Potter and the Orion Slave Girls.  Out *now* on Arcturus III.
+7117983	Cracking key, please wait...
+7119567	Key recovered: "
+7123235	Major Imp's Next Assignment Episode 285
+7125800	getting out was a different matter. 
+7126953	"Did you look at the locking 
+7128035	adversaries, not to pick locks". "Oh well, I guess we'd better sit and 
+7129538	what she thought was the north, carefully searching the walls of the 
+7131021	take the opposite one"
+7132034	, Morph said, regaining some of his poise. 
+7133258	  
+7134072	down. 
+7134925	"It might be dark in there, but I am not going first in
+7136269	 this 
+7137123	skirt."
+7137986	bounced back. Soon they discovered a narrow opening, leading 
+7139389	"You could also get off your butt and help me look."
+7140703	, Alpha 
+7141577	crypt. 
+7142440	"If you really want to look at the north wall, I suggest you 
+7143843	north...right?"
+7144786	 Morph knew not to interrupt this time. She moved to 
+7146109	temple, there is bound to be an opening towards Mocca in the 
+7147512	"Yeah, sure, but...". "Shut up and let me think. Now, if this is a 
+7148975	reverential transparency.... Hey, this used to be a temple, right?". 
+7150458	eye-phone. Anyway, I am not about to sit down and wait for 
+7151841	wait for Beta to show up." "He might have, if you hadn't lost the 
+7153294	You?" "As you well know, I am here to plumb the psychology of our 
+7154747	mechanism yet?". "Ehm, I am not too technically inclined I'm afraid. 
+7156230	It was easy enough to let Imp lead them into the Crypt of Algol, but 
+7190892	Fuun Security Features
+7194531	jnf erirnyrq gb or fb synjrq gung vg pna or oebxra znahnyyl. Vg vf fgvyy va hfr sbe fbzr cnegf bs 
+7196303	gur flfgrz, ohg ShhaGrpu vf zvtengvat njnl sebz vg. Jr jvyy abg qvfphff vg shegure.
+7197925	Zrgubq N jnf hfrq va gur cnfg, ohg vg unf erpragyl orra oebxra. Vaqrrq, gur rapelcgvba fpurzr 
+7199657	znl or noyr gb erpbire vg hfvat gur Shha'f xrl penpxre. Gb or noyr gb hfr gur penpxre, lbh zhfg 
+7201409	fgvyy unir lbhe chepunfr pbqr (n 24-npvq frdhrapr). Cyrnfr npgvingr gur penpxre trar, cnffvat vg 
+7203171	gur chepunfr pbqr, naq nsgre fbzr crevbq bs gvzr vg znl cevag bhg lbhe xrl. Or cercnerq gb jnvg n 
+7204944	xrl znl gnxr ubhef.
+7205926	ybat gvzr. Va gur Fybj Mbar, penpxvat n 2-punenpgre xrl znl gnxr zvahgrf, juvyr n 3-punenpgre 
+7207657	cvrpr bs cncre nggnpurq gb lbhe pbzchgvat qrivpr.) Ubjrire, vs lbhe xrl vf fhssvpvragyl fubeg, lbh 
+7209439	pelcgbtencuvp grpuabybtl. (Vg vf n tbbq vqrn gb jevgr qbja xrlf fbzrjurer, znlor rira ba n lryybj 
+7211210	Vs lbh unir ybfg n xrl, erpbirel bs gur xrl vf abg trarenyyl cbffvoyr qhr gb gur pbzcyrkvgl bs gur 
+7212992	ybpngvba. Vs gur xrl vf cerfrag, gur pbeerfcbaqvat shapgvbanyvgl orpbzrf ninvynoyr. Bgurejvfr, 
+7214735	Shha orunivbhe znl enatr sebz na reebe zrffntr gb ivbyrag qrngu.
+7216167	gb rapbqr n fcrpvny frdhrapr bs punenpgref, pnyyrq n "xrl", vagb uvf Shha'f QAN ng n fcrpvsvp 
+7217899	Zrgubq O, n ShhaGrpu genqr frperg, vf fvtavsvpnagyl zber cbjreshy. Vg erdhverf gur phfgbzre 
+7219611	evtugf bs ShhaGrpu naq vgf fgbpxubyqref, pregnva cnegf bs n Shha'f QAN ner rapelcgrq hfvat 
+7221313	bar bs gjb pelcgbtencuvp grpuabybtvrf. Guvf ranoyrf fhpu cnegf gb or npprffrq bayl ol gubfr 
+7223026	phfgbzref jub unir bognvarq gur arprffnel npprff pbqrf.
+7224368	Shhaf pbagnva n terng qrny bs cebcevrgnel grpuabybtl. Gb cebgrpg gur Vagryyrpghny Cebcregl 
+7226071	*** Qrgnvyrq qrfpevcgvba bs Zrgubq O (fhowrpg gb AQN) ***
+7227435	gur 
+7228269	sbb
+7229093	'gu naq 
+7229967	one
+7230790	'gu ryrzragf bs gur yvfg.
+7231832	'gu punenpgre bs gur xrl (jenccvat nebhaq gb gur fgneg bs gur xrl vs arprffnel) gb 
+7233456	sbb
+7234280	, naq fjnc 
+7235184	3. Yrg 
+7236048	one
+7236871	 pbhag sebz 0 gb 255 naq rnpu gvzr, nqq gur 
+7238105	one
+7238928	'gu ryrzrag bs gur yvfg naq gur 
+7240042	one
+7240865	(V = 0, P = 1, S = 2, C = 3).
+7241947	     O. Nqq gubfr gjb ryrzragf, fcyvg gur erfhyg vagb sbhe tebhcf, naq KBE gurz jvgu gur npvqf 
+7243690	Nyy nevguzrgvp fubhyq or qbar jvgu 8 fvtavsvpnag npvqf.
+7245034	ryrzragf.
+7245917	     N. Vapernfr 
+7246881	sbb
+7247705	, nqq gb 
+7248589	one
+7249413	 gur 
+7250257	sbb
+7251080	'gu ryrzrag bs gur yvfg, gura fjnc gur 
+7252264	sbb
+7253088	'gu naq 
+7253962	one
+7254786	'gu 
+7255619	5. Sbe nyy gur qngn lbh jnag gb rapelcg be qrpelcg:
+7256923	4. Erfrg 
+7257807	sbb
+7258631	 naq 
+7259475	one
+7260299	 gb mreb.
+7261182	2. Frg gur pbhagre 
+7262166	sbb
+7262990	 gb mreb.
+7263873	1. Znxr n yvfg bs ahzoref, 0 gb 255.

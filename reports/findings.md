@@ -114,11 +114,15 @@
 | 7 | G+4318821 | ge, incInt, **init** («растит DNA до нужной длины»), initFastRandom, lsystem-kochisland/sierpinski/weed, lt, **makeDarkness** («Cover the whole world in darkness», это ночной ген) |
 | 8 | G+3399157 | max, modInts, moveTo, moveToPolar, mulInts, negateInt, **printGeneTable(bool integrityCheck)**, randomInt |
 | 9 | G+2525569 | resetOrigin, rotateColor, setGlobalPolarRotation, setOrigin, spirograph, **startup** («DNA entry point»), stringLength, subInts, **terminate** («End the Fuun's suffering», это exit) |
-| 10 | ? | не найдена; возможно, среди генов, упавших по таймауту |
+| 10 | G+5107016 | одна функция: `void useColorTable ()`, без описания |
 
 | стр. 7 | стр. 8 |
 |---|---|
 | ![](img/docs/impdoc_07.png) | ![](img/docs/impdoc_08.png) |
+
+Как нашлась 10-я страница: по статическому графу вызовов (`tools/callgraph.py`, `analysis/callgraph.json`) все страницы ImpDoc вызывают одинаковый набор генов: `2217442` (drawRect), `2333293` (drawString), `5431107`, `5708321`, `7170316`. Среди генов, которых никто не вызывает, таких ровно десять, и десятый — G+5107016.
+
+<img src="img/docs/impdoc_10.png" width="300">
 
 ### FuunDoc: «adaptation»-функции, 3 страницы
 
@@ -127,6 +131,18 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 | | |
 |---|---|
 | ![](img/docs/fuundoc_4024238.png) | ![](img/docs/fuundoc_2259442.png) |
+
+### Ещё страницы (найдены по графу вызовов)
+
+- **«Biomorphic initial conditions»** G+4897777: исходник `InitialBioMorph.hs`. В нём `enableBioMorph = False`, `bioAdd` и **`bioMul x y = Zero -- this is broken and must be fixed!!`**. Сказано, что это «компилируется в gene adaptations типа `BioNat = (Nat,Nat) -> Nat`», то есть в функции двух переменных. Связано с FuunDoc (bioAdd/bioMul/bioSucc/bioZero). Похоже, где-то надо починить `bioMul`.
+- «Babel Survey» G+5265819: «Languages of Earth … DNA is toch voordeliger».
+- «Alien Virus Alert» G+6363166: страница из астрологических значков, возможно, шифр.
+- Фото команды ICFP Contest 2007 G+974948 (675 тыс. оснований — это растровая картинка).
+- История ICFP Contest 1998–2007, по странице на год: G+1727347, 3463698, 5658071, 5565690, 2389131, 2353998, 2806954, 836126, 4413444, 2131193 (2007 — «Morph Endo!», «First prize: you?»).
+
+| | |
+|---|---|
+| ![](img/docs/biomorph_4897777.png) | ![](img/docs/virus_6363166.png) |
 
 ### Прочее
 

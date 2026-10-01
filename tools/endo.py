@@ -131,3 +131,25 @@ if __name__ == '__main__':
     png, info = run(pre)
     print(info)
     print('approx wrong pixels', score(png))
+
+
+G = 13615  # genome start inside endo.dna
+
+
+def jump_instr(n):
+    """pattern !n, empty template: drops n bases from the front (forward jump)"""
+    return 'IP' + nat(n) + 'IIC' + 'IIC'
+
+
+def stub_gene(start, end):
+    """make gene [start,end) (genome coords) return immediately; keeps its length"""
+    at = start + 10  # after III+ID
+    epi = end - 75
+    # instruction length depends on n; iterate to fixed point
+    n = 0
+    for _ in range(5):
+        ins = jump_instr(n)
+        n = epi - (at + len(ins))
+    ins = jump_instr(n)
+    assert at + len(ins) + n == epi
+    return write_at(G + at, ins, len(ins))

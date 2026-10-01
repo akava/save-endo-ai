@@ -96,6 +96,25 @@ class D:
                 raise End
 
 
+RNAN = {'PIPIIIC': 'black', 'PIPIIIP': 'red', 'PIPIICC': 'green', 'PIPIICF': 'yellow', 'PIPIICP': 'blue',
+        'PIPIIFC': 'magenta', 'PIPIIFF': 'cyan', 'PIPIIPC': 'white', 'PIPIIPF': 'transp', 'PIPIIPP': 'opaque',
+        'PIIPICP': 'clear', 'PIIIIIP': 'move', 'PCCCCCP': 'ccw', 'PFFFFFP': 'cw', 'PCCIFFP': 'mark', 'PFFICCP': 'line',
+        'PIIPIIP': 'fill', 'PCCPFFP': 'addbmp', 'PFFPCCP': 'compose', 'PFFICCF': 'clip', 'CFPICFP': 'ret'}
+
+
+def rle(rna):
+    out, prev, n = [], None, 0
+    for r in rna:
+        x = RNAN.get(r, '#' + r)
+        if x == prev:
+            n += 1
+        else:
+            if prev: out.append(prev if n == 1 else '%sx%d' % (prev, n))
+            prev, n = x, 1
+    if prev: out.append(prev if n == 1 else '%sx%d' % (prev, n))
+    return ' '.join(out)
+
+
 def show_lit(t, maxlen=60):
     return t if len(t) <= maxlen else t[:maxlen] + '...(%d)' % len(t)
 
@@ -110,7 +129,7 @@ def disasm(s, start, end, out=sys.stdout):
         except End:
             print('%8d END' % at, file=out)
             return
-        rna = (' rna:%d' % len(d.rna)) if d.rna else ''
+        rna = ('\n          R: ' + rle(d.rna)) if d.rna else ''
         d.rna = []
         print('%8d  P: %s\n          T: %s%s' % (at - G, show_lit(p, 200), show_lit(t, 200), rna), file=out)
 

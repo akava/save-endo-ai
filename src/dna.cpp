@@ -169,6 +169,29 @@ enum TType { TB, TREF, TLEN };
 struct TItem { TType t; char b; u64 n, l; };
 
 static Dec dec;
+static u64 traceFrom = 1, traceTo = 0;
+static FILE* traceOut = stderr;
+
+static std::string showPat(const std::vector<PItem>& p) {
+    std::string o;
+    for (auto& it : p) {
+        if (it.t == PB) o += it.b;
+        else if (it.t == PSKIP) o += "!" + std::to_string(it.n);
+        else if (it.t == PSEARCH) o += "?<" + (it.s.size() > 40 ? it.s.substr(0, 40) + "..(" + std::to_string(it.s.size()) + ")" : it.s) + ">";
+        else if (it.t == POPEN) o += "(";
+        else o += ")";
+    }
+    return o;
+}
+static std::string showTpl(const std::vector<TItem>& t) {
+    std::string o;
+    for (auto& it : t) {
+        if (it.t == TB) o += it.b;
+        else if (it.t == TREF) o += "\\" + std::to_string(it.n) + (it.l ? "^" + std::to_string(it.l) : "");
+        else o += "|" + std::to_string(it.n) + "|";
+    }
+    return o;
+}
 
 static void emitRna() {
     // dec at 'III'
@@ -382,6 +405,12 @@ static bool step() {
             env.push_back({c.back(), i}); c.pop_back();
         }
     }
+    if (iters >= traceFrom && iters < traceTo) {
+        fprintf(traceOut, "#%llu len=%llu p=%llu rna=%llu %s i=%llu\n  P: %s\n  T: %s\n", (unsigned long long)iters,
+                (unsigned long long)dlen, (unsigned long long)p0, (unsigned long long)rnaCount, ok ? "OK" : "FAIL", (unsigned long long)i,
+                showPat(pat).c_str(), showTpl(tpl).c_str());
+        if (ok) { fprintf(traceOut, "  env:"); for (auto& e : env) fprintf(traceOut, " %llu", (unsigned long long)(e.second - e.first)); fprintf(traceOut, "\n"); }
+    }
     if (!ok) {
         int a, b; split(root, p0, a, b); freeTree(a); root = b;
         return true;
@@ -441,6 +470,7 @@ int main(int argc, char** argv) {
         else if (a == "-o") outFile = argv[++k];
         else if (a == "-q") quiet = true;
         else if (a == "--dump") dumpDna = true;
+        else if (a == "-t") { traceFrom = strtoull(argv[++k], 0, 10); traceTo = strtoull(argv[++k], 0, 10); }
         else if (a == "-n") maxIters = strtoull(argv[++k], 0, 10);
         else if (a == "--protect-all") protectCostMode = 1;
         else { fprintf(stderr, "unknown arg %s\n", a.c_str()); return 1; }

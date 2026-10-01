@@ -227,6 +227,25 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 
 ![холмы](img/12_hills.png)
 
+## Улучшение 5: корова (BMU)
+
+- Endo рисует ген **`bmu`** (G+896731, «Biomorphological Unit»; наш сканер слил его с соседним блоком). Логика: если `enableBioMorph`=F, рисуется `endo`. Если P и `weather` ∈ {1, 2}, рисуется **корова**: `cow-*` и `endocow`. Иначе при `ducksShown` рисуется superDuck, при `ocamlrules` — верблюд «OCaml» (поэтому флаг 224914 давал верблюда).
+- `weather`=1 даёт дождь, 2 — молнию, а в target погода ясная. Поэтому литерал сравнения `weather == 2` в `bmu` (G+897064) переделан на `== 0`.
+- Перед `cow-tail` и `cow-spot-middle` стоит `checkIntegrity`. `cow-tail` (G+4892541) зашифрован (это один из блоков с равномерной статистикой), а для `cow-spot-middle` в DNA лежит `cow-spot-middle-ecc` (G+893863): биты Хэмминга для `correctErrors`.
+- Префикс `prefixes/04_cow.dna` (231 основание): **125 112** неверных пикселей. Пока без части пятен.
+
+![корова](img/13_cow.png)
+
+## VMU: НЛО → фургон
+
+`vmu` (G+2342140) при `vmuMode`=51 рисует НЛО, при 31 — фургон: ключом `vmuRegCode` (128 символов, G+210051) расшифровывает `caravan` через `crypt` и вызывает его. Если код пустой, выходит «Please specify your VMU registration code». При других значениях показывается справка `help-vmu`.
+
+## Adapter и подбор ключей
+
+- `tools/endo.py`: `push_arg(bases)` и `adapter_call(offset, size)` — штатный вызов гена через Adapter. Оба побайтно совпадают с примерами на странице 85.
+- Зашифрованные блоки, найденные раньше по статистике, — это `help-beautiful-numbers` (G+941328), `vmu-code` (G+2176355), `help-error-correcting-codes` (G+4377843), `cow-tail` (G+4892541), `caravan` (G+5703332).
+- `crackKeyAndPrint` (G+7115881) с аргументом purchase code должен подобрать и напечатать ключ.
+
 ## Префиксы
 
 | файл | длина | ≈неверных px | что делает |
@@ -236,5 +255,6 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 | `prefixes/01_no_night.dna` | 95 | 215 244 | убирает ночь |
 | `prefixes/02_day.dna` | 38 | 134 188 | флаг `night-or-day` = F |
 | `prefixes/03_day_hills.dna` | 144 | 126 732 | + холмы, обезврежен `surfaceTransform` |
+| `prefixes/04_cow.dna` | 231 | 125 112 | + `enableBioMorph`, корова при ясной погоде |
 
 _(файл обновляется по мере исследования)_

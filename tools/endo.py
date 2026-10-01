@@ -233,3 +233,19 @@ def call_from_exit(frames, off=0):
     code = ''.join(new)
     assert at + len(code) <= e, (len(code), e - at)
     return write_at(G + at, code, len(code), off)
+
+
+# ---------- FuunTech Adapter (Field Repair Manual page 85) ----------
+BLUE_MARK = 'IFPICFPPCFIPP'
+ADAPTER_MARK = 'IFPICFPPCCC'
+
+
+def push_arg(bases):
+    """insert raw bases right after the blue zone marker (arguments are read from there)"""
+    return 'IIP' + 'IFF' + lit(BLUE_MARK) + 'IIC' + 'IIC' + T().ref(0).b(bases).end()
+
+
+def adapter_call(offset, size):
+    """activate gene at green-zone offset with given size via the Adapter"""
+    pat = 'IIP' + 'IFF' + lit(ADAPTER_MARK) + 'IIP' + 'IFF' + lit(ADAPTER_MARK) + 'IIC' + 'IIC' + 'IIC'
+    return pat + T().ref(0).b(nat(offset) + nat(size)).ref(1).end()

@@ -169,6 +169,18 @@ enum TType { TB, TREF, TLEN };
 struct TItem { TType t; char b; u64 n, l; };
 
 static Dec dec;
+static FILE* logOut = nullptr;
+static u64 origLen = 0, prefixLen = 0;
+// arena offset of position k in tree t
+static u64 originAt(int t, u64 k) {
+    while (t) {
+        u64 ls = S(pool[t].l), len = pool[t].len;
+        if (k < ls) t = pool[t].l;
+        else if (k < ls + len) return pool[t].off + (k - ls);
+        else { k -= ls + len; t = pool[t].r; }
+    }
+    return (u64)-1;
+}
 static u64 traceFrom = 1, traceTo = 0;
 static FILE* traceOut = stderr;
 
@@ -371,6 +383,10 @@ static bool step() {
             if (i >= dlen) { ok = false; break; }
             if (rdPos != i) { rd.seek(root, p0 + i); rdPos = i; }
             int ch = rd.get(); rdPos++;
+            if (logOut) {
+                u64 o = originAt(root, p0 + i);
+                if (o >= prefixLen && o < origLen) fprintf(logOut, "B %llu %llu %c %c\n", (unsigned long long)iters, (unsigned long long)(o - prefixLen), it.b, ch);
+            }
             if (ch != it.b) { ok = false; break; }
             i++;
         } else if (it.t == PSKIP) {
@@ -425,6 +441,11 @@ static bool step() {
         } else {
             if (t.n >= env.size()) continue;
             u64 lo = p0 + env[t.n].first, hi = p0 + env[t.n].second;
+            if (logOut && hi > lo && hi - lo < 1000000) {
+                std::vector<Piece> ps; collect(root, lo, hi, ps);
+                for (auto& p : ps) if (p.off + p.len > prefixLen && p.off < origLen && p.len >= 16)
+                    fprintf(logOut, "R %llu %llu %llu %llu\n", (unsigned long long)iters, (unsigned long long)(p.off - prefixLen), (unsigned long long)p.len, (unsigned long long)t.l);
+            }
             if (t.l == 0) {
                 std::vector<Piece> ps; collect(root, lo, hi, ps);
                 for (auto& p : ps) bld.addPiece(p);
@@ -470,6 +491,7 @@ int main(int argc, char** argv) {
         else if (a == "-o") outFile = argv[++k];
         else if (a == "-q") quiet = true;
         else if (a == "--dump") dumpDna = true;
+        else if (a == "-L") logOut = fopen(argv[++k], "w");
         else if (a == "-t") { traceFrom = strtoull(argv[++k], 0, 10); traceTo = strtoull(argv[++k], 0, 10); }
         else if (a == "-n") maxIters = strtoull(argv[++k], 0, 10);
         else if (a == "--protect-all") protectCostMode = 1;
@@ -477,6 +499,7 @@ int main(int argc, char** argv) {
     }
     std::string d = dnaFile == "-" ? std::string() : readDna(dnaFile.c_str());
     std::string all = prefix + d;
+    prefixLen = prefix.size(); origLen = all.size();
     arena.reserve(all.size() + (256 << 20));
     arena.assign(all.begin(), all.end());
     pool.reserve(1 << 20);
@@ -499,6 +522,7 @@ int main(int argc, char** argv) {
         printf("\n");
     }
     double sec = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+    if (logOut) fclose(logOut);
     FILE* f = fopen(outFile.c_str(), "wb");
     fwrite(rna.data(), 1, rna.size(), f); fclose(f);
     if (!quiet)

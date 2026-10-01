@@ -92,14 +92,18 @@ def write_at(pos, bases, oldlen, off=0):
 
 
 # ---------- running ----------
-def run(prefix, name='run', layers=False, extra=()):
+def run(prefix, name='run', layers=False, extra=(), timeout=60):
     os.makedirs(OUT, exist_ok=True)
     pf = os.path.join(OUT, name + '.prefix')
     with open(pf, 'w') as f:
         f.write(prefix)
     rna = os.path.join(OUT, name + '.rna')
     png = os.path.join(OUT, name + '.png')
-    r = subprocess.run([DNA, '-d', os.path.join(ROOT, 'data', 'endo.dna'), '-p', pf, '-o', rna, *extra], capture_output=True, text=True)
+    try:
+        r = subprocess.run([DNA, '-d', os.path.join(ROOT, 'data', 'endo.dna'), '-p', pf, '-o', rna, *extra],
+                           capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return png, 'TIMEOUT'
     info = r.stderr.strip()
     cmd = [BUILD, rna, png]
     if layers:

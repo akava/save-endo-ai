@@ -12,12 +12,19 @@ genes = [(s, e) for s, e in json.load(open(os.path.join(ROOT, 'out', 'genes.json
 called = {s for s, e, *_ in json.load(open(os.path.join(ROOT, 'out', 'functions.json')))}
 which = sys.argv[1] if len(sys.argv) > 1 else 'uncalled'
 todo = [(s, e) for s, e in genes if (which == 'all' or s not in called)]
-res = []
-for s, e in todo:
-    pre = combine(no_night, lambda o, s=s, e=e: call_from_exit([(s, e - s)], o))
-    png, info = run(pre, 'g_%d' % s)
-    res.append((s, e, info))
+from concurrent.futures import ThreadPoolExecutor
+
+
+def one(se):
+    s, e = se
+    pre = combine(no_night, lambda o: call_from_exit([(s, e - s)], o))
+    png, info = run(pre, 'g_%d' % s, timeout=30)
     print(s, e - s, info, flush=True)
+    return (s, e, info)
+
+
+with ThreadPoolExecutor(12) as ex:
+    res = list(ex.map(one, todo))
 W, cols = 150, 8
 rows = (len(res) + cols - 1) // cols
 m = Image.new('RGB', (W * cols, (W + 12) * rows), 'white')

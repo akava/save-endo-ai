@@ -91,6 +91,56 @@
 
 Не получилось: заглушка всего ночного гена ломает выполнение, потому что ген перекладывает значения в памяти.
 
+## Улучшение 2 (черновое): голубое небо
+
+Таблица цветов неба переписывается без изменения длины: каждое 24-слово в закодированном виде занимает ровно 25 оснований. Подмена `[248,0,0,0,48,112,0,0,0,0]` на `[0,0,0,0,2,0,9,0,0,0]` (2 blue + 9 cyan) даёт **≈201 тыс.** неверных пикселей против 215 тыс.
+
+В target и у нас цвет неба меняется одинаковыми полосами: это полупрозрачные слои холмов поверх базового цвета. Но зелёная компонента почти не реагирует на пропорции, значит, градиент смешивает таблицу с чем-то ещё (G+5700298 и G+4231490). **Не доделано**, префикс не сохранён.
+
+## Скрытая документация (самая важная находка)
+
+Чтобы вызвать произвольный ген, переписывается тело гена **exit** G+2248207: вместо «оборвать DNA» он вызывает нужный ген и возвращается через эпилог другого гена (все эпилоги одинаковые). Так прогнаны все 242 гена (`analysis/gene_sweep.txt`, `tools/try_genes.py`). Многие из них рисуют **страницы справки**.
+
+### ImpDoc: справочник функций, 10 страниц (найдено 9)
+
+| стр. | ген | что там |
+|---|---|---|
+| 1 | G+2072120 | addInts, beginRelativeMode, checkIntegrity, checksum (offset относительно **Green Zone**), colorBlack/Blue/ByIndex/Cyan/Green |
+| 2 | G+5188719 | colorMagenta/Red/White/Yellow, **correctErrors** (коды Хэмминга), **crackKey**, **crypt** (шифрование участков DNA), decInt, div2 |
+| 3 | G+6404716 | divInts, drawChar, drawCircleFast, drawEllipse, drawFunction, drawGradientCornerNW/SE |
+| 4 | G+4936699 | **drawGradientH/V** (w, h, color), drawHexDigit, drawInt, drawPolyline, drawRect, drawRoundedRect |
+| 5 | G+5290123 | drawString (Intergalactic Character Set), endRelativeMode, fadingColors, fastForward, fastRandom, fpForward |
+| 6 | G+5125212 | fpMoveAbsolute, fpPop/Push, fpTurnLeft/Right, functionAdd/Parabola/Sine |
+| 7 | G+4318821 | ge, incInt, **init** («растит DNA до нужной длины»), initFastRandom, lsystem-kochisland/sierpinski/weed, lt, **makeDarkness** («Cover the whole world in darkness», это ночной ген) |
+| 8 | G+3399157 | max, modInts, moveTo, moveToPolar, mulInts, negateInt, **printGeneTable(bool integrityCheck)**, randomInt |
+| 9 | G+2525569 | resetOrigin, rotateColor, setGlobalPolarRotation, setOrigin, spirograph, **startup** («DNA entry point»), stringLength, subInts, **terminate** («End the Fuun's suffering», это exit) |
+| 10 | ? | не найдена; возможно, среди генов, упавших по таймауту |
+
+| стр. 7 | стр. 8 |
+|---|---|
+| ![](img/docs/impdoc_07.png) | ![](img/docs/impdoc_08.png) |
+
+### FuunDoc: «adaptation»-функции, 3 страницы
+
+G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offset is given in the adaptation trunk residing in the **blue zone**»), `activateAdaptationTree`, `apply1/2_adaptation`, `bioAdd/Mul/Succ/Zero`, `caseVar1/2`, `compose_adaptation`, `goldenFish_adaptation`, `mkGoldfishL/R`, `mkBeforeAbove`, `mkEmp`, `pictureDescrRenderer_adaptation`, `true`/`false`, `var1/var2`.
+
+| | |
+|---|---|
+| ![](img/docs/fuundoc_4024238.png) | ![](img/docs/fuundoc_2259442.png) |
+
+### Прочее
+
+- Рассказы «Major Imp's Next Assignment Episode …»: G+2438804, 2592290, 3981275, 4474002, 4537469, 7121559.
+- Радиосообщение, похожее на послание Аресибо: «[16420071229 18] Irregular Radio Noise Detected». Ген G+4106138.
+- Карта мира: G+2936200. Ещё текстовые страницы: G+1769818, G+3184016, G+3544833.
+- **Корова: G+5532935** (нужна для target!). Верблюд: G+5878921. Вероятно, фургон: G+7266762. Что-то жёлтое, возможно, утёнок: G+2477217. Большой «?»: G+7308417.
+
+<img src="img/docs/cow_5532935.png" width="250"> <img src="img/docs/radio_4106138.png" width="250">
+
+### Гены, упавшие по таймауту (вероятно, ждут аргументов)
+
+1650329, 2209391, 2211015, 2333293, 2483201, 2490158, 2587000, 4526406, 4891684, 5086510, 5286350, 5562217, 5991078, 5995507, 6055539, 6683544, **6686695 (429 тыс. оснований)**, 7115881, 7178892, 7280963, 7294033. Среди них, вероятно, `printGeneTable` (справка предупреждает, что он долгий) и 10-я страница ImpDoc.
+
 ## Префиксы
 
 | файл | длина | ≈неверных px | что делает |

@@ -1,4 +1,4 @@
-CXX=clang++
+CXX?=clang++
 CXXFLAGS=-O2 -std=c++17
 all: build/dna build/build
 build/dna: src/dna.cpp

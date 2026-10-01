@@ -8,8 +8,8 @@ from PIL import Image, ImageDraw
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from endo import OUT, ROOT, call_from_exit, combine, no_night, run  # noqa: E402
 
-genes = [(s, e) for s, e in json.load(open(os.path.join(ROOT, 'out', 'genes.json'))) if s is not None]
-called = {s for s, e, *_ in json.load(open(os.path.join(ROOT, 'out', 'functions.json')))}
+genes = [(s, e) for s, e in json.load(open(os.path.join(ROOT, 'analysis', 'genes.json'))) if s is not None]
+called = {s for s, e, *_ in json.load(open(os.path.join(ROOT, 'analysis', 'functions.json')))}
 which = sys.argv[1] if len(sys.argv) > 1 else 'uncalled'
 todo = [(s, e) for s, e in genes if (which == 'all' or s not in called)]
 from concurrent.futures import ThreadPoolExecutor

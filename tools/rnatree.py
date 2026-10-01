@@ -7,7 +7,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KNOWN = set('PIPIIIC PIPIIIP PIPIICC PIPIICF PIPIICP PIPIIFC PIPIIFF PIPIIPC PIPIIPF PIPIIPP PIIPICP '
             'PIIIIIP PCCCCCP PFFFFFP PCCIFFP PFFICCP PIIPIIP PCCPFFP PFFPCCP PFFICCF'.split())
 RET = 'CFPICFP'
-IDS = json.load(open(os.path.join(ROOT, 'out', 'gene_ids.json')))
+IDS = json.load(open(os.path.join(ROOT, 'analysis', 'gene_ids.json')))
 
 
 class Node:

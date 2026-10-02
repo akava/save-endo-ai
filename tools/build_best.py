@@ -5,6 +5,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from endo import *  # noqa
+_WRITE_AT, _SET_BASE = write_at, set_base   # real writers (build_merged temporarily records the patches' calls)
 
 dna = open(os.path.join(ROOT, 'data', 'endo.dna')).read()
 M23 = (1 << 23) - 1
@@ -97,7 +98,7 @@ def P_caravan():      # vmuMode=31, registration code, position
 def cheapest_spans(good, cur, need):
     """group the positions `need` (where cur must become good) into writes of minimal total prefix length (DP)"""
     def cost(a, b):
-        return len(set_base(a, good[a], off=5000)) if a == b else len(write_at(a, good[a:b + 1], b - a + 1, 5000))
+        return len(_SET_BASE(a, good[a], off=5000)) if a == b else len(_WRITE_AT(a, good[a:b + 1], b - a + 1, 5000))
     n = len(need); best = [0] + [10 ** 9] * n; prev = [0] * (n + 1)
     for j in range(1, n + 1):
         for i in range(j):
@@ -258,7 +259,7 @@ def P_text():         # "Endo has morphed!": German branch with the string rewri
     diff = [k for k in range(240) if ob[k] != nb[k]]; i, j = diff[0], diff[-1] + 1
     R0, R1 = 5070888, 5071099
     N = 826012 - 240 + i - (R1 - 5070997)            # 5070921's write (ends 5070997) reaches rotateColorVar = colorTable+240
-    tw = write_at(N, nb[i:j], j - i)
+    tw = _WRITE_AT(N, nb[i:j], j - i)
     X = R1 - len(tw)
     reg = (jmp_at(R0, X, 33) + dna[G + R0 + 33:G + X] if X - R0 >= 33 else jmp_at(R0, X, X - R0)) + tw
     assert len(reg) == R1 - R0
@@ -504,9 +505,94 @@ def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
     return out
 
 
+
+
+NOMERGE = False
+
+
+def build_merged(names=ORDER, adapters=('tail', 'ecc', 'mu'), plain=()):
+    """build() with all same-length replacements merged globally: the patches are recorded, overlaid on the original
+    DNA, and the changed bases are written as spans chosen by DP over the real write cost."""
+    import endo as E
+    rec = []
+    real_w, real_s = E.write_at, E.set_base
+
+    def w_rec(pos, bases, oldlen, off=0):
+        rec.append((pos, bases, oldlen)); return ''
+
+    def s_rec(pos, base, old=None, off=0):
+        rec.append((pos, base, 1)); return ''
+    g = globals()
+    others = []
+    E.write_at, E.set_base, g['write_at'], g['set_base'] = w_rec, s_rec, w_rec, s_rec
+    try:
+        for n in names:
+            if n in plain:
+                continue
+            for p in g['P_' + n]():
+                k = len(rec)
+                out = p(0)
+                if out:
+                    others.append(p)
+                if out and len(rec) > k:
+                    raise Exception('mixed patch ' + n)
+    finally:
+        E.write_at, E.set_base, g['write_at'], g['set_base'] = real_w, real_s, real_w, real_s
+    final = {}
+    keep = []
+    for pos, bases, oldlen in rec:
+        if len(bases) != oldlen:
+            keep.append((pos, bases, oldlen)); continue
+        for i, c in enumerate(bases):
+            final[pos + i] = c
+    prot = [(G + 4892541, G + 4892541 + 5212), (G + 502139, G + 502139 + 3665)]   # decrypted by the adapters first
+    ch = sorted(p for p, c in final.items() if dna[p] != c or any(a <= p < b for a, b in prot))
+    runs = []
+    for p in ch:
+        if runs and p == runs[-1][1] + 1:
+            runs[-1][1] = p
+        else:
+            runs.append([p, p])
+
+    def seg(a, b):
+        return ''.join(final.get(i, dna[i]) for i in range(a, b + 1))
+    # cost of writing [a, b] = fixed part (depends on a and the length) + quoted length of the bases
+    R = len(runs)
+    pc = {}                                   # quoted extra per run interval via cumulative counts over run bounds
+    lo, hi = (runs[0][0], runs[-1][1]) if runs else (0, 0)
+    content = seg(lo, hi) if runs else ''
+    cum = [0]
+    for c in content:
+        cum.append(cum[-1] + (2 if c == 'P' else 1))
+
+    def cost(a, b):
+        return len(real_w(a, '', b - a + 1, 20000)) - 3 + (cum[b - lo + 1] - cum[a - lo]) + 3
+    barrier = [NOMERGE or any(a <= runs[k + 1][0] - 1 and runs[k][1] + 1 < b for a, b in prot) for k in range(R - 1)]
+    best = [0] + [10 ** 9] * R; prev = [0] * (R + 1)
+    for j in range(1, R + 1):
+        for i in range(j - 1, -1, -1):
+            if runs[j - 1][1] - runs[i][0] > 3000 or (i < j - 1 and barrier[i]):
+                break
+            c = best[i] + cost(runs[i][0], runs[j - 1][1])
+            if c < best[j]:
+                best[j], prev[j] = c, i
+    spans = []; j = R
+    while j > 0:
+        i = prev[j]; spans.append((runs[i][0], runs[j - 1][1])); j = i
+    pats = [lambda o, a=a, b=b: real_w(a, seg(a, b), b - a + 1, o) for a, b in spans[::-1]]
+    pats += [lambda o, pos=pos, bases=bases, oldlen=oldlen: real_w(pos, bases, oldlen, o) for pos, bases, oldlen in keep]
+    pats += others
+    for n in plain:
+        pats += g['P_' + n]()
+    out = combine(*pats)
+    for a in reversed(adapters):
+        out = g['ADAPTER_' + a](len(out)) + out
+    return out
+
+
 if __name__ == '__main__':
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'out', 'best.prefix')
     names = [n for n in ORDER if '-' + n not in sys.argv[2:]]
-    pre = build(names)
+    pre = build_merged(names)  # build(names) writes each patch separately
     open(out, 'w').write(pre)
     print(len(pre))

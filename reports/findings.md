@@ -332,6 +332,12 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 
 ![облака](img/23_clouds_pos.png)
 
+## Улучшение 16: надпись «Endo has morphed!»
+
+- В конце `scenario` две ветки по `cloudy`: «Endo hat gemorpht» с немецкой окраской и «Morph Endo!» с обычной. Шрифт у обеих одинаковый (`fontTable_Cyperus`). Различаются функция окраски `charColorCallback` и `colorTable`, которую задаёт только вторая ветка.
+- Сделано так: переход на вторую ветку нейтрализован, немецкая строка переписана в «Endo has morphed|» (`|` в этом шрифте рисуется как `!`), слова `charColorCallback` первой ветки заменены на слова второй. `colorTable` к этому моменту остаётся от `balloon`, поэтому таблица `balloon` переписана на таблицу второй ветки (29 black, 28 green, 46 white).
+- `prefixes/19_text.dna` (5410): **62 036**.
+
 ## Префиксы
 
 | файл | длина | ≈неверных px | что делает |
@@ -356,5 +362,6 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 | `prefixes/16_balloon.dna` | 4270 | 85 360 | + облачко с λ сдвинуто: `setOrigin(255,305)` → `(155,324)` |
 | `prefixes/17_blades.dna` | 4342 | 71 140 | + поворот лопастей `polarAngleIncr`=5 |
 | `prefixes/18_clouds_pos.dna` | 4792 | 62 328 | + позиции и размеры облаков |
+| `prefixes/19_text.dna` | 5410 | 62 036 | + надпись «Endo has morphed!» |
 
 _(файл обновляется по мере исследования)_

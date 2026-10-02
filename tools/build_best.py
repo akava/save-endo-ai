@@ -218,6 +218,10 @@ def P_hill2():        # surfaceTransform hill parameters (moveTo / functionSine 
     return out
 
 
+def P_seed():        # randomInt seed (G+818624) = 8128, the 'fourth perfect number' of help-beautiful-numbers: weeds as in target
+    return [lambda o: write_at(G + 818624, word(8128), 24, o)]
+
+
 def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
@@ -228,7 +232,7 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 
 import json  # noqa: E402
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc')):

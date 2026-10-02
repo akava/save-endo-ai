@@ -708,3 +708,14 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 | `prefixes/55_merged.dna` | 14124 | — | — | **0** | все правки склеиваются глобально (DP по длине записи) |
 
 _(файл обновляется по мере исследования)_
+
+## Аудит: находки после решения
+
+Подробно — в `reports/audit_search.md`. Новое по сравнению с разделами выше:
+
+- **`transmission-buffer`** (G+4106138, никто не вызывает) рисует перехваченную передачу: «Irregular Radio Noise Detected», послание в духе Arecibo (23×73) с подписями, «Bored; ignoring transmission». Пасхалка, ключей нет.
+- **Чаша кита** подсказана текстом: эпизод 222 («put their cups outdoors, when it pours») и эпизод 285 («take the opposite one»).
+- **Цвета µ и надписи** — исходные пропорции DNA (7:1 у шарика; 29:28:46 у второй ветки надписи), изменён только масштаб.
+- **`sunflower`** — испорченная копия `sun` той же длины (старшие биты совпадают на 74%), восстановить нечем, для target не нужна.
+
+![transmission-buffer](img/transmission_buffer.png)

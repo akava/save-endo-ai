@@ -49,7 +49,9 @@ def tab(vals):
 
 # tuned numbers (positions etc.), overridable for re-tuning
 PARAMS = dict(caravan=(267, 211), chick=(170, 410), whale=(410, 200), balloon=(155, 324), blades=5,
-              cloud1=(20, 26, 15), cloud2=(176, 52, 11), cloud3=(340, 30, 20))
+              cloud1=(20, 26, 15), cloud2=(176, 52, 11), cloud3=(340, 30, 20),
+              h2=(224, 209), h3=(350, 257), h3s=(104, 60, 8),
+              h1y=(240,), h1p=(-30, 3348), h2p=(-21, 1848))
 
 # ---------------- patches ----------------
 def P_day():          # night-or-day = F (the official "turn to the sun" prefix does the same)
@@ -202,6 +204,20 @@ def P_tailalpha():   # target tail is translucent (~2/3): skip bmu's checkIntegr
             lambda o: write_at(a, 'IIIPIPIIPP' + 'IIIPIPIIPF' + 'IIIPIPIIPP', 30, o)]
 
 
+HILL_LITS = dict(h2=((7164867, 200), (7164943, 209)), h3=((7168555, 350), (7168631, 257)),
+                 h3s=((7168957, 104), (7169033, 65), (7169109, 8)), h1y=((7161155, 242),),
+                 h1p=((7161480, -28), (7161556, 3348)), h2p=((7165268, -21), (7165344, 1848)))
+
+
+def P_hill2():        # surfaceTransform hill parameters (moveTo / functionSine literals), fitted to the target ridges
+    out = []
+    for k, lits in HILL_LITS.items():
+        for (at, old), new in zip(lits, PARAMS[k]):
+            if new != old:
+                out.append(lit_word_patch(at, old, new))
+    return out
+
+
 def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
@@ -212,7 +228,7 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 
 import json  # noqa: E402
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc')):

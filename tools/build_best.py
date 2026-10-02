@@ -51,7 +51,7 @@ def tab(vals):
 PARAMS = dict(caravan=(267, 210), chick=(171, 410), whale=(410, 200), balloon=(160, 324), blades=5,
               cloud1=(20, 25, 15), cloud2=(180, 55, 10), cloud3=(340, 30, 20),
               h2=(224, 208), h3=(350, 257), h3s=(104, 60, 8),
-              h1y=(237,), h1p=(-32, 3348), h2p=(-21, 1848), h1s=(480, 9, 5), h2s=(344, 13, 3), h1x=(0,))
+              h1y=(235,), h1p=(-33, 3348), h2p=(-21, 1848), h1s=(496, 9, 5), h2s=(344, 13, 3), h1x=(0,))
 
 # ---------------- patches ----------------
 def P_day():          # night-or-day = F (the official "turn to the sun" prefix does the same)

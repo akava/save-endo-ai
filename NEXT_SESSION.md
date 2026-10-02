@@ -38,20 +38,18 @@ python3 -m venv .venv && .venv/bin/pip install pillow numpy
 - `analysis/genes.json` (250 генов, [start,end] в G-координатах), `analysis/gene_ids.json` (RNA-ID → ген), `analysis/functions.json`, `analysis/gene_sweep.txt`.
 - `build/dna` флаги: `-p/-s` префикс, `-n N`, `-t FROM TO` трасса, `-L file` журнал происхождения (`B` — сравнения, `R` — копирования в координатах исходной DNA), `--dump`.
 
-## Текущее состояние (облачная сессия, 2026-10-01)
+## Текущее состояние (облачная сессия, 2026-10-02)
 
-Работа шла в ветке `claude/optimistic-planck-aos46z`, все находки в `reports/findings.md`.
+Ветка `claude/optimistic-planck-aos46z`. Лучший префикс **`prefixes/19_text.dna`** (5410 оснований), около **62 036** неверных пикселей. История улучшений и таблица — в `reports/findings.md`.
 
-- Лучший префикс: **`prefixes/09_pears.dna`** (3268 оснований), ≈**105 148** неверных пикселей (исходно 359 204). Таблица всех префиксов в findings.md.
-- Есть таблица генов (`analysis/gene_table.json`, 400 имён), карта проверок флагов (`analysis/flagrefs.txt`) и инструменты `tools/flow.py`, `tools/strings.py`, `tools/genetable.py`, `tools/fcrypt.py` (RC4), `tools/c/rc4crack.c`.
-- Ключи: help-error-correcting-codes = «42», vmu-code = «OPE», регистрационный код VMU / ключ `caravan` = «Out_of_Band_II». Ключ `help-beautiful-numbers` (purchase code в G+211251) — длиннее 4 символов. Цифры до 8 знаков не подошли; перебор букв до 6 был запущен, но не завершён.
+Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/fcrypt.py`, `tools/c/rc4crack.c` (по purchase code), `tools/c/rc4crack2.c` (известный текст с масками), `out/tune.py` (перебор числовых литералов; при запуске указывать *исходные* значения).
 
-## Следующие шаги (по приоритету)
+Ключи: «42» (error-correcting-codes), «OPE» (vmu-code), «Out_of_Band_II» (caravan), «9546» (cow-tail). Не найдены: `help-beautiful-numbers` (не короче 6 символов, не цифры до 8, не строчные до 6) и глиф µ `charInfo_Tempus-Bold-Huge_M` (по предполагаемому открытому тексту до 5 символов не нашёлся).
 
-1. **Корова** (около 22 тыс. px): в target она правее, вместо жёлтой «шапки» Endo котелок (`cow-holy`?), пятна другие. Посмотреть `bmu`/`endocow` и аргументы `setOrigin`. Не забыть, что `cow-tail` зашифрован.
-2. **Утки** (около 14 тыс.): в `scenario` перед `motherDuckWithChicks` код сам ставит `__bool`=P, патч `noop` на переход G+5043225 их включает, но позиция не та, и мешает «λxx». Убрать `lambda-id` (в target его нет) и подогнать `setOrigin`.
-3. **µ вместо λ** (около 6 тыс.): глиф `charInfo_Tempus-Bold-Huge_M` (G+502139) зашифрован RC4. Нужен ключ; вероятно, он на странице `help-beautiful-numbers` (8128), а её ключ ещё не найден. Расширить перебор (`rc4crack` с другими алфавитами, длина 5–7) или найти ключ в текстах.
-4. **Кит в капле** (около 8 тыс.): в target кит в объекте `water` (G+5428065, его вызывает `ufo`) с фонтаном (`whale` проверяет булев аргумент, переход G+2516373).
-5. **Солнце**: ген `sun` починен по `lightningBolt` (10 оснований, findings.md), но цвет (251, 236, 73) и узор `sunflower` (G+2126895) не совпадают.
-6. **Надпись** «Endo has morphed!» белым: строка «Endo hat gemorpht» и условие `cloudy` в `scenario` (G+5070888), цвет зависит от `cloudy`/`germanColors`.
-7. Точная подгонка позиций облаков (в target выше примерно на 15 px) и фургона.
+## Следующие шаги
+
+1. **Солнце** (около 3,8 тыс. px): ген починен (10 оснований, findings), но ведро повреждено: в target цвет (255, 247, 87) = yellow×20 + white×11 + red×1, а в гене только `clear yellow`. Нужно место для 31 RNA-команды внутри гена той же длины.
+2. **Кит** (около 5 тыс.): в target чаша-капля (167, 213, 243) другой формы и фонтан.
+3. **Облачко и хвостик** (около 7 тыс.): форма хвостика облачка другая. Цвет λ сейчас бледный из-за подмены `colorTable` в `balloon` (сделано ради надписи); возможно, лучше задавать таблицу иначе.
+4. **µ**: ключ к глифу; возможно, он на странице beautiful-numbers.
+5. Мелочи: параметры холмов (`surfaceTransform`: парабола −28/3348 при G+7161500, синус 408/7/4 около G+7162050), сорняки (L-система, случайные), хвост коровы полупрозрачный (ключ есть, расшифровка стоит 1544 основания и пока не окупается).

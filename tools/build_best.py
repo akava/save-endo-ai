@@ -47,6 +47,10 @@ def tab(vals):
     return lit(''.join(word(v) for v in vals))
 
 
+# tuned numbers (positions etc.), overridable for re-tuning
+PARAMS = dict(caravan=(267, 211), chick=(170, 410), whale=(410, 200), balloon=(155, 324), blades=5,
+              cloud1=(20, 26, 15), cloud2=(176, 52, 11), cloud3=(340, 30, 20))
+
 # ---------------- patches ----------------
 def P_day():          # night-or-day = F (the official "turn to the sun" prefix does the same)
     return [lambda o: set_base(G + 1295, 'F', off=o)]
@@ -66,7 +70,7 @@ def P_bio():          # BMU cow branch: enableBioMorph + weather==2 -> ==0
 def P_caravan():      # vmuMode=31, registration code, position
     k = key128('Out_of_Band_II')[:15 * 9]
     return [lambda o: write_at(G + 210027, word(31), 24, o), lambda o: write_at(G + 210051, k, len(k), o),
-            lit_word_patch(5048483, 390, 265), lit_word_patch(5048559, 230, 215)]
+            lit_word_patch(5048483, 390, PARAMS['caravan'][0]), lit_word_patch(5048559, 230, PARAMS['caravan'][1])]
 
 
 def P_clouds():       # cloud gene repaired from reversed duolc (minimal set), clouds on, no cloudy side effect
@@ -80,9 +84,15 @@ def P_clouds():       # cloud gene repaired from reversed duolc (minimal set), c
 
 
 def P_cloudpos():
-    return [lit_word_patch(6066484, 46, 28),
-            lit_word_patch(6067326, 180, 176), lit_word_patch(6067402, 46, 54), lit_word_patch(6067725, 15, 11),
-            lit_word_patch(6068330, 46, 32), lit_word_patch(6068653, 15, 20)]
+    out = []
+    for (xa, ya, sa), (x0, y0, s0), key in (((6066408, 6066484, 6066807), (20, 46, 15), 'cloud1'),
+                                           ((6067326, 6067402, 6067725), (180, 46, 15), 'cloud2'),
+                                           ((6068254, 6068330, 6068653), (340, 46, 15), 'cloud3')):
+        x, y, sz = PARAMS[key]
+        for a, old, new in ((xa, x0, x), (ya, y0, y), (sa, s0, sz)):
+            if old != new:
+                out.append(lit_word_patch(a, old, new))
+    return out
 
 
 def P_box():          # cargobox decompressor table: magenta->yellow, green->blue
@@ -106,7 +116,7 @@ def P_nolambda():
 def P_ducks():        # ducks branch on, motherDuck wing fix, chick position
     wing = G + 2921222 + len(lit('ICCIIIIIIIIP' + 'CIIIICCIIIIP' + 'CCIIICIIIIIP')) + 1
     return [lambda o: kill_instr(G + 5043225, 33, o), lambda o: set_base(wing, 'C', off=o),
-            lit_word_patch(5045845, 525, 170), lit_word_patch(5045921, 260, 410)]
+            lit_word_patch(5045845, 525, PARAMS['chick'][0]), lit_word_patch(5045921, 260, PARAMS['chick'][1])]
 
 
 def P_whale():        # smiling whale: skip the eye-cross branch, keep the RNA before the check
@@ -114,7 +124,7 @@ def P_whale():        # smiling whale: skip the eye-cross branch, keep the RNA b
 
 
 def P_whale_pos():
-    return [lit_word_patch(5067562, 391, 410), lit_word_patch(5067638, 176, 206)]
+    return [lit_word_patch(5067562, 391, PARAMS['whale'][0]), lit_word_patch(5067638, 176, PARAMS['whale'][1])]
 
 
 def sun_tail_fixed(shift=None):
@@ -163,11 +173,11 @@ def P_sun():          # repair sun; paint it with colorSoftYellow (called instea
 
 
 def P_balloon():
-    return [lit_word_patch(5070089, 255, 155), lit_word_patch(5070165, 305, 324)]
+    return [lit_word_patch(5070089, 255, PARAMS['balloon'][0]), lit_word_patch(5070165, 305, PARAMS['balloon'][1])]
 
 
 def P_blades():
-    return [lambda o: write_at(G + 823776, word(5), 24, o)]
+    return [lambda o: write_at(G + 823776, word(PARAMS['blades']), 24, o)]
 
 
 def P_text():         # "Endo has morphed!" with the non-cloudy styling

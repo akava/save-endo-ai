@@ -122,12 +122,16 @@ def target():
     return _target
 
 
-def score(png, tol=24):
-    """approximate number of wrong 600x600 pixels: compare 2x2-averaged render with the 300x300 target"""
+def score(png, tol=24, dy=2):
+    """approximate number of wrong 600x600 pixels: compare 2x2-averaged render with the 300x300 target.
+    The given 300x300 images are offset by 2 render pixels vertically (our render of the source DNA matches
+    Source-image.png exactly only after shifting down by 2), so the render is shifted by dy before comparing;
+    the first target row is ignored (wrap-around)."""
     img = np.array(Image.open(png).convert('RGB')).astype(int)
+    img = np.roll(img, dy, axis=0)
     small = img.reshape(300, 2, 300, 2, 3).mean(axis=(1, 3))
     d = np.abs(small - target()).max(axis=2)
-    return int((d > tol).sum() * 4)
+    return int((d[1:] > tol).sum() * 4)
 
 
 if __name__ == '__main__':

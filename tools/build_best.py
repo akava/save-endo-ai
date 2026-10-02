@@ -51,7 +51,7 @@ def tab(vals):
 PARAMS = dict(caravan=(267, 210), chick=(171, 410), whale=(410, 200), balloon=(160, 324), blades=5,
               cloud1=(20, 25, 15), cloud2=(180, 55, 10), cloud3=(340, 30, 20),
               h2=(224, 208), h3=(350, 257), h3s=(104, 60, 8),
-              h1y=(239,), h1p=(-30, 3348), h2p=(-21, 1848), h1s=(488, 7, 5))
+              h1y=(239,), h1p=(-30, 3348), h2p=(-21, 1848), h1s=(488, 7, 5), h2s=(344, 13, 3), h1x=(0,))
 
 # ---------------- patches ----------------
 def P_day():          # night-or-day = F (the official "turn to the sun" prefix does the same)
@@ -223,7 +223,7 @@ def P_tailalpha():   # target tail is translucent (alpha 178 = 7:3): skip bmu's 
 HILL_LITS = dict(h2=((7164867, 200), (7164943, 209)), h3=((7168555, 350), (7168631, 257)),
                  h3s=((7168957, 104), (7169033, 65), (7169109, 8)), h1y=((7161155, 242),),
                  h1p=((7161480, -28), (7161556, 3348)), h2p=((7165268, -21), (7165344, 1848)),
-                 h1s=((7162007, 408), (7162083, 7), (7162159, 4)))
+                 h1s=((7162007, 408), (7162083, 7), (7162159, 4)), h2s=((7165795, 328), (7165871, 13), (7165947, 3)), h1x=((7161079, 0),))
 
 
 def P_hill2():        # surfaceTransform hill parameters (moveTo / functionSine literals), fitted to the target ridges
@@ -304,7 +304,7 @@ def rna_moves(dx, dy):
     return out
 
 
-CUP = dict(s=(0, -24), w=(0, 12))
+CUP = dict(s=(20, -24), w=(-10, 12))
 
 
 def P_cup():          # whale in a cup of water: instead of `crater`, call ufo's rain branch (water clipped into the

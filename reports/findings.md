@@ -163,7 +163,7 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 
 ![строка в начале RNA](img/26_early_prefix.png)
 
-`IIPIFFCPICFPPICIICIICIPPPFIIC` = `(?IFPCFFP)I → \0 C`. Это `helpScreen` = 1, и показывается страница **«Fuun Field Repair Guide»**: вступление FuunTech и два префикса.
+`IIPIFFCPICFPPICIICCIICIPPPFIIC` = `(?IFPCFFP)I → \0 C`. Это `helpScreen` = 1, и показывается страница **«Fuun Field Repair Guide»**: вступление FuunTech и два префикса.
 - `IIPIFFCPICFPPICIICCCIICIPPPCFIIC` → `helpScreen` = 2, страница навигации. Дальше по ней задуманно идут к каталогу 1337.
 - `IIPIFFCPICPCIICICIICIPPPPIIC` = `(?IFPFI)P → \0 F`, «повернуться к звезде». Это ровно наш флаг `night-or-day` (G+1295), **134 188** пикселей, всего 28 оснований (наш патч `set_base` был 38).
 

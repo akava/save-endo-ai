@@ -48,8 +48,8 @@ def tab(vals):
 
 
 # tuned numbers (positions etc.), overridable for re-tuning
-PARAMS = dict(caravan=(267, 211), chick=(170, 410), whale=(410, 200), balloon=(155, 324), blades=5,
-              cloud1=(20, 26, 15), cloud2=(176, 52, 11), cloud3=(340, 30, 20),
+PARAMS = dict(caravan=(267, 211), chick=(170, 410), whale=(410, 200), balloon=(159, 324), blades=5,
+              cloud1=(20, 24, 15), cloud2=(176, 54, 11), cloud3=(340, 30, 20),
               h2=(224, 209), h3=(350, 257), h3s=(104, 60, 8),
               h1y=(238,), h1p=(-30, 3348), h2p=(-21, 1848), h1s=(488, 7, 5))
 
@@ -256,6 +256,24 @@ def P_spiro():        # help page 180878 ('Synthesis of complex structures (2)':
     return pats
 
 
+FISH_DX = 18
+
+
+def P_fish():         # river fish (goldenFish adaptation tree): left fish coloured like the right ones (yellow:red 1:1,
+    # one 'black' -> 'red' in both buckets of goldfishLeft), L/R drawings swapped, mkEmp(0,24) -> mkEmp(FISH_DX,24),
+    # threeFish(R, emptyBox) -> threeFish(R, L): our threeFish draws its 2nd argument twice, then the first
+    oL = GENES['mkGoldfishL_adaptation'][0]; oR = GENES['mkGoldfishR_adaptation'][0]
+    wL = dna[G + oL + 24:G + oL + 48]; wR = dna[G + oR + 24:G + oR + 48]
+    o = GENES['goldenFish_adaptation'][0]
+    seq = ''.join(word(x) for x in [7327388, GENES['mkEmp_adaptation'][0], 48, 7325992, 0, 48, 7325992, 24])
+    zero = dna.index(seq, G + o) + 24 * 4
+    box = dna.index(''.join(word(x) for x in [7327388, GENES['emptyBox_adaptation'][0]]), G + o) + 24
+    return [lambda off: write_at(box, word(GENES['mkGoldfishL_adaptation'][0]), 24, off),   # threeFish(R, L)
+            lambda off: set_base(G + 2626409 + 89, 'P', None, off), lambda off: set_base(G + 2627598 + 89, 'P', None, off),
+            lambda off: write_at(G + oL + 24, wR, 24, off), lambda off: write_at(G + oR + 24, wL, 24, off),
+            lambda off: write_at(zero, word(FISH_DX), 24, off)]
+
+
 def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
@@ -265,8 +283,9 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 
 
 import json  # noqa: E402
+GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc')):

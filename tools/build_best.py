@@ -414,39 +414,45 @@ def rna_moves(dx, dy):
 
 
 CUP = dict(s=(26, -20), w=(-13, 10))
-FOUNTAIN = (52, -64)    # moveTo of the fountain picture, relative to the cup's origin
+FOUNTAIN = (199, -375)    # moveTo of the fountain picture, relative to the origin of that tuft (231, 575)
 
 PGT_END = 2640835 + 160449           # end of printGeneTable
 FOUNT_B0, FOUNT_B1 = 2734743, 2787365  # jump over the hidden picture / its final jump onwards into printGeneTable
 
 
 def fountain_block():   # the fountain: a compressed RNA picture hidden as dead code in printGeneTable (a jump skips it).
-    # It is called as a gene from its skip instruction (now a no-op) to the gene end; its final jump is replaced by a
-    # `ret`. It is stored upside down: swapping the dictionary entries ccw <-> cw mirrors every turn of the picture.
+    # It is called as a gene (scenario's last call of `grass1`, right before the whale, now leads here) from its skip
+    # instruction (now a no-op) to the gene end; its final jump is replaced by a call of `grass1` (no arguments) and a
+    # `ret`, so the whale is drawn over the fountain's stem, as in the target.
+    # and a `ret`. It is stored upside down: swapping the dictionary entries ccw <-> cw mirrors every turn.
     ret = dna[G + 7293764:G + 7293934][47:]                               # tail of a plain 'ret' (balloon's)
-    endi = 'IP' + natfix(PGT_END - (FOUNT_B1 + 2 + 25 + len(ret)), 25) + ret
+    WH, WL = 5451660, 3186                                                # grass1 (the last fixed tuft before the whale)
+    ci = ''
+    for _ in range(6):                                                    # the call's length depends on itself
+        r = FOUNT_B1 + len(ci)
+        new = call_instr(PGT_END - r, WH, WL, r, PGT_END - r)
+        done = len(new) == len(ci); ci = new
+        if done:
+            break
+    r = FOUNT_B1 + len(ci)
+    endi = ci + 'IP' + natfix(PGT_END - (r + 2 + 25 + len(ret)), 25) + ret
     dic = dna[G + 2735354:G + 2735354 + 320]
     assert dic[246:256] == 'IIIPCCCCCP' and dic[310:320] == 'IIIPFFFFFP'
     sw = dic[:246] + dic[310:320] + dic[256:310] + dic[246:256]
     return [lambda o: write_at(G + FOUNT_B0, jmp_at(0, 33, 33), 33, o), lambda o: write_at(G + FOUNT_B1, endi, len(endi), o),
-            lambda o: wdiff(G + 2735354, sw, o),
+            lambda o: wdiff(G + 2735354, sw, o), retarget_call(5067109, FOUNT_B0, PGT_END - FOUNT_B0),
             lit_word_patch(2734839, 550, FOUNTAIN[0]), lit_word_patch(2734915, 595, FOUNTAIN[1])]
 
 
 def P_cup():          # whale in a cup of water: instead of `crater`, call ufo's rain branch (water clipped into the
     # ufo dome + translucent dome) with the RNA turtle turned by 180 degrees for the dome (it becomes a cup).
     # The turn makes the real turtle position differ from the one the DNA believes: compensated by RNA moves.
-    # At the end the fountain picture is called, which returns into ufo's 'compose ret'.
     UFO, UEND = 6630730, 6630730 + 11528
     sx, sy = CUP['s']; wx, wy = CUP['w']
     start = jmp_at(6632760, 6632760 + 128, 33)                            # jump over the weather checks
     head = 'IIIPIIPIIP' + 'IIIPFFPCCP' + RNA_CW * 2 + rna_moves(-14 - 2 * wx, 34 - 2 * wy)  # fill compose, turn back
-    endi = head
-    for _ in range(6):                                                    # call length depends on its own length
-        new = head + call_instr(UEND - (6637926 + len(endi)), FOUNT_B0, PGT_END - FOUNT_B0, 6642013, UEND - 6642013)
-        done = len(new) == len(endi); endi = new
-        if done:
-            break
+    L = len(head) + 2 + 24 + 6
+    endi = head + 'IP' + natfix(6642013 - (6637926 + L), 24) + 'IICIIC'  # ...and jump to ufo's 'compose ret'
     a = G + 6633668                                                       # 'addbmp clear white' before the dome mask
     return [lambda o: wdiff(G + 6632760, start, o), lambda o: write_at(G + 6637926, endi, len(endi), o),
             lambda o: write_at(a + 10, RNA_CW * 2, 20, o),                # clear white -> cw cw (mask needs only alpha)

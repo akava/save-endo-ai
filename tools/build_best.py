@@ -257,6 +257,15 @@ def P_nopatch():      # no random grass patch (target's tufts differ in layout a
     return [lambda o: kill_instr(G + 5035669, 5036709 - 5035669, o)]
 
 
+def P_grass():         # grass patch of the target without its key: initFastRandom jumps straight to its `ret` (no
+    # key schedule), and the RC4 state frs is written by the prefix. The state is built by tools/rc4craft.py so that
+    # the stream draws the target tufts (analysis/target_patch_tufts.json); count = number of byte triples used.
+    st = json.load(open(os.path.join(ROOT, 'analysis', 'grass_rc4_state.json')))
+    frs = ''.join(''.join('C' if (v >> k) & 1 else 'I' for k in range(8)) + 'P' for v in st['S0'])
+    return [lambda o: write_at(G + 4526406, jmp_at(4526406, 4532360, 98), 98, o),
+            lambda o: write_at(G + 818666, frs, 2304, o), lit_word_patch(5035767, 70, st['count'])]
+
+
 TAIL_ALPHA = (4, 3, 2, 1, 7, 3)   # removed white, cyan, blue, black; added opaque, transparent
 
 
@@ -393,7 +402,7 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 import json  # noqa: E402
 GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'grass', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):

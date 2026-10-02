@@ -194,8 +194,9 @@ def P_text():         # "Endo has morphed!" with the non-cloudy styling
             lambda o: write_at(p, w2, len(w2), o), lambda o: write_at(q, nt, len(bt), o)]
 
 
-def P_nopatch():      # no random grass patch (target's tufts differ in layout and colour; key unknown)
-    return [lambda o: kill_instr(G + 5036524, 185, o)]
+def P_nopatch():      # no random grass patch (target's tufts differ in layout and colour; key unknown).
+    # Skip the argument pushes too, otherwise the leftover blue-zone args break scenario's return into main.
+    return [lambda o: kill_instr(G + 5035669, 5036709 - 5035669, o)]
 
 
 def P_tailalpha():   # target tail is translucent (~2/3): skip bmu's checkIntegrity(cow-tail) jump and turn
@@ -223,6 +224,27 @@ def P_seed():        # randomInt seed (G+818624) = 8128, the 'fourth perfect num
     return [lambda o: write_at(G + 818624, word(8128), 24, o)]
 
 
+def jmp_at(pos, target, L):
+    """jump instruction of exactly L bases at genome address pos to genome address target"""
+    return 'IP' + natfix(target - (pos + L), L - 8) + 'IICIIC'
+
+
+SPIRO_SUN = (530, 70)
+
+
+def P_spiro():        # help page 180878 ('Synthesis of complex structures (2)': 'give it a try yourself'):
+    # after scenario, main jumps into the page's three yellow spirographs, drawn small (arg0 4->1) at the sun's centre
+    pats = [lambda o: write_at(G + 6536833, jmp_at(6536833, 6558851, 33), 33, o),
+            lambda o: write_at(G + 6564817, jmp_at(6564817, 6570038, 32), 32, o)]
+    at = G + 6558851
+    for sp in [(4, 11, 9, 939, 0, 4), (4, 12, 8, 768, 0, 1), (4, 12, 8, 768, 128, 1)]:
+        p1 = dna.index(lit(word(271)), at); p2 = dna.index(lit(word(293)), p1); p3 = dna.index(lit(word(4)), p2 + 10)
+        for p, old, new in ((p1, 271, SPIRO_SUN[0]), (p2, 293, SPIRO_SUN[1]), (p3, 4, 1)):
+            pats.append(lambda o, p=p, old=old, new=new: write_at(p, lit(word(new)), len(lit(word(old))), o))
+        at = p3 + 10
+    return pats
+
+
 def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
@@ -233,7 +255,7 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 
 import json  # noqa: E402
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc')):

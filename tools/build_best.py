@@ -49,7 +49,7 @@ def tab(vals):
 
 # tuned numbers (positions etc.), overridable for re-tuning
 PARAMS = dict(caravan=(267, 210), chick=(171, 410), whale=(410, 200), balloon=(160, 324), blades=5,
-              cloud1=(20, 25, 15), cloud2=(176, 54, 11), cloud3=(340, 30, 20),
+              cloud1=(20, 25, 15), cloud2=(180, 55, 10), cloud3=(340, 30, 20),
               h2=(224, 208), h3=(350, 257), h3s=(104, 60, 8),
               h1y=(239,), h1p=(-30, 3348), h2p=(-21, 1848), h1s=(488, 7, 5))
 

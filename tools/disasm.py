@@ -1,4 +1,5 @@
 """Linear disassembler: decode (pattern, template) pairs from a DNA string."""
+import os
 import sys
 
 G = 13615  # genome start in endo.dna
@@ -115,7 +116,7 @@ def rle(rna):
     return ' '.join(out)
 
 
-def show_lit(t, maxlen=60):
+def show_lit(t, maxlen=int(os.environ.get("LITMAX", 60))):
     return t if len(t) <= maxlen else t[:maxlen] + '...(%d)' % len(t)
 
 

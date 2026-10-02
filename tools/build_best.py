@@ -117,6 +117,51 @@ def P_whale_pos():
     return [lit_word_patch(5067562, 391, 410), lit_word_patch(5067638, 176, 206)]
 
 
+def sun_tail_fixed(shift=None):
+    """sun's mutated tail rebuilt from lightningBolt's identical tail (830 bases), keeping sun's own words"""
+    S = G + 2126041; L = G + 4305372; n = 830
+    a = dna[S:S + n]; b = dna[L:L + n]
+    fix = list(b)
+    for i in range(100, 185): fix[i] = a[i]
+    for base in (248, 324):
+        for i in range(base + 40, base + 76): fix[i] = a[i]
+    if shift:  # moveTo(x, y) before the fill, shifted when the origin is not set by the caller
+        for base, d in ((248, shift[0]), (324, shift[1])):
+            blk = ''.join(fix[base:base + 76]); import re as _re
+            m = list(_re.finditer(r'(?:[CF]{23}IC)', blk))[-1]
+            raw = blk[m.start():m.end()]
+            dec = ''.join({'C': 'I', 'F': 'C'}[c] for c in raw[:23])
+            v = sum(1 << k for k, c in enumerate(dec) if c == 'C') + d
+            newraw = lit(word(v))
+            fix[base + m.start():base + m.end()] = list(newraw)
+    lbw = lit(word(4305957)) + lit(word(245)); sw = lit(word(2126626)) + lit(word(245))
+    blk = ''.join(fix[400:585]); k = blk.find(lbw); blk = blk[:k] + sw + blk[k + len(lbw):]
+    fix[400:585] = list(blk)
+    return ''.join(fix)
+
+
+def P_sun():          # repair sun; paint it with colorSoftYellow (called instead of setOrigin in sky-day-bodies)
+    pats = []
+    p3 = dna.index('FFCCCCCCCCCCCCCCCCCCCCCIC', G + 7316761)
+    pats.append(lambda o: write_at(p3, 'CC', 2, o))                       # sun block: weather==3 -> ==0
+    good = sun_tail_fixed((480, 20)); S = 2126041
+    pats += fix_bases(G + S, good, dna[G + S:G + S + 830])
+    pats.append(lambda o: set_base(G + 2125111 + 19, 'I', off=o))         # sun's own 'clear' -> unknown RNA
+    pats.append(lambda o: set_base(G + 2125111 + 29, 'I', off=o))         # sun's own 'yellow' -> unknown RNA
+    def n12(v): return ''.join('C' if (v >> k) & 1 else 'I' for k in range(11)) + 'P'
+    q = dna.index(lit(n12(25) + n12(100) + n12(50)), G + 2125262)
+    q += len(lit(n12(25)))
+    new = lit(n12(580) + n12(70)); old = lit(n12(100) + n12(50))
+    if len(new) == len(old):
+        pats.append(lambda o: write_at(q, new, len(old), o))
+    else:
+        raise Exception('polygon start length %d %d' % (len(old), len(new)))
+    pats.append(lambda o: kill_instr(G + 7316909, 215, o))                # no setOrigin args frame
+    pats.append(retarget_call(7317124, 6069368, 690))                     # setOrigin -> colorSoftYellow
+    pats.append(lambda o: kill_instr(G + 7317494, 185, o))                # no resetOrigin
+    return pats
+
+
 def P_balloon():
     return [lit_word_patch(5070089, 255, 155), lit_word_patch(5070165, 305, 324)]
 
@@ -143,7 +188,7 @@ def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs bef
 
 import json  # noqa: E402
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun']
 
 
 def build(names=ORDER, adapters=('ecc',)):

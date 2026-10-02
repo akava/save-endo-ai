@@ -274,6 +274,12 @@ def P_fish():         # river fish (goldenFish adaptation tree): left fish colou
             lambda off: write_at(zero, word(FISH_DX), 24, off)]
 
 
+def P_flowers():      # flowerbed: yellow and lilac flowers are swapped vs target: swap positions 1<->2 and 3<->4
+    return [lit_word_patch(4566269, 0, 34), lit_word_patch(4567420, 34, 0),
+            lit_word_patch(4568581, 17, 58), lit_word_patch(4568657, 24, 12),
+            lit_word_patch(4569742, 58, 17), lit_word_patch(4569818, 12, 24)]
+
+
 def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
@@ -285,7 +291,7 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 import json  # noqa: E402
 GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc')):

@@ -40,7 +40,7 @@ python3 -m venv .venv && .venv/bin/pip install pillow numpy
 
 ## Текущее состояние (облачная сессия, 2026-10-02)
 
-Работаем прямо в `main`. Лучший префикс **`prefixes/27_weeds_seed.dna`** (8718 оснований, `tools/build_best.py` собирает его из именованных патчей), около **18 012** неверных пикселей по точной метрике (сдвиг 2 px, см. findings). История улучшений и таблица — в `reports/findings.md`.
+Работаем прямо в `main`. Лучший префикс **`prefixes/28_left_hill.dna`** (8868 оснований, `tools/build_best.py` собирает его из именованных патчей), около **17 768** неверных пикселей по точной метрике (сдвиг 2 px, см. findings). История улучшений и таблица — в `reports/findings.md`.
 
 Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/fcrypt.py`, `tools/c/rc4crack.c` (по purchase code), `tools/c/rc4crack2.c` (известный текст с масками), `tools/tune.py` (перебор числовых литералов; при запуске указывать *исходные* значения).
 

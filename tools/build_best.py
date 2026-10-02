@@ -51,7 +51,7 @@ def tab(vals):
 PARAMS = dict(caravan=(267, 211), chick=(170, 410), whale=(410, 200), balloon=(155, 324), blades=5,
               cloud1=(20, 26, 15), cloud2=(176, 52, 11), cloud3=(340, 30, 20),
               h2=(224, 209), h3=(350, 257), h3s=(104, 60, 8),
-              h1y=(240,), h1p=(-30, 3348), h2p=(-21, 1848))
+              h1y=(238,), h1p=(-30, 3348), h2p=(-21, 1848), h1s=(488, 7, 5))
 
 # ---------------- patches ----------------
 def P_day():          # night-or-day = F (the official "turn to the sun" prefix does the same)
@@ -206,7 +206,8 @@ def P_tailalpha():   # target tail is translucent (~2/3): skip bmu's checkIntegr
 
 HILL_LITS = dict(h2=((7164867, 200), (7164943, 209)), h3=((7168555, 350), (7168631, 257)),
                  h3s=((7168957, 104), (7169033, 65), (7169109, 8)), h1y=((7161155, 242),),
-                 h1p=((7161480, -28), (7161556, 3348)), h2p=((7165268, -21), (7165344, 1848)))
+                 h1p=((7161480, -28), (7161556, 3348)), h2p=((7165268, -21), (7165344, 1848)),
+                 h1s=((7162007, 408), (7162083, 7), (7162159, 4)))
 
 
 def P_hill2():        # surfaceTransform hill parameters (moveTo / functionSine literals), fitted to the target ridges

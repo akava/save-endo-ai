@@ -200,12 +200,16 @@ def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs bef
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
 
+def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before everything else
+    return crypt_call('9546', 4892541, 5212)
+
+
 import json  # noqa: E402
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
          'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch']
 
 
-def build(names=ORDER, adapters=('ecc',)):
+def build(names=ORDER, adapters=('tail', 'ecc')):
     pats = []
     for n in names:
         pats += globals()['P_' + n]()

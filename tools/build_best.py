@@ -266,6 +266,14 @@ def P_grass():         # grass patch of the target without its key: initFastRand
             lambda o: write_at(G + 818666, frs, 2304, o), lit_word_patch(5035767, 70, st['count'])]
 
 
+def P_biomorph():      # InitialBioMorph.hs: "enableBioMorph = False", "bioMul x y = Zero -- this is broken and must be
+    # fixed!!". With enableBioMorph_adaptation -> true and bioMul repaired, `biomorph` fills bioMorphPerturb (59 words),
+    # which drawGrassPatch adds to the 59 characters of its key: the grass patch of the target, no key search needed.
+    from adapt_build import bases, bioMul_fixed
+    fix = bases(bioMul_fixed())
+    return [lambda o: wdiff(G + 7442771 + 24, fix, o), lambda o: wdiff(G + 7455983 + 24, word(7340337), o)]
+
+
 TAIL_ALPHA = (4, 3, 2, 1, 7, 3)   # removed white, cyan, blue, black; added opaque, transparent
 
 
@@ -402,7 +410,7 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 import json  # noqa: E402
 GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'grass', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'biomorph', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):

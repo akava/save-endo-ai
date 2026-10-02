@@ -40,16 +40,16 @@ python3 -m venv .venv && .venv/bin/pip install pillow numpy
 
 ## Текущее состояние (облачная сессия, 2026-10-02)
 
-Работаем прямо в `main`. Перед каждым коммитом — `CHECKLIST.md` (что обновить: сборка, findings, process, обе истории, картинки, README, NEXT_SESSION). Лучший префикс **`prefixes/48_grass33.dna`** (18 105 оснований, `tools/build_best.py` собирает его из именованных патчей и адаптеров `tail`, `ecc`, `mu`), **946** неверных пикселей, точно по полноразмерному target `doc/Target-image-600.png` (`score()` в tools/endo.py). История улучшений и таблица — в `reports/findings.md`.
+Работаем прямо в `main`. Перед каждым коммитом — `CHECKLIST.md` (что обновить: сборка, findings, process, обе истории, картинки, README, NEXT_SESSION). Лучший префикс **`prefixes/49_biomorph.dna`** (16 083 основания, `tools/build_best.py` собирает его из именованных патчей и адаптеров `tail`, `ecc`, `mu`), **872** неверных пикселя, точно по полноразмерному target `doc/Target-image-600.png` (`score()` в tools/endo.py). История улучшений и таблица — в `reports/findings.md`.
 
 Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/build_best.py` (`wdiff`, `lit_word_patch`, `retarget_call`, `jmp_at`, `rna_moves`), `tools/polyfit.py` (контур многоугольника по маске, растеризация как у RNA), `tools/hillmodel.py` + `tools/hillridge.py` (точная модель гребней холмов), `tools/polylit.py`, `tools/disasm.py` (`LITMAX`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/c/rc4crack2.c`, `tools/grass_emu.py`.
 
-Ключи: «42» (error-correcting-codes), «OPE» (vmu-code), «Out_of_Band_II» (caravan), «9546» (cow-tail), `]` для `goodVibrations` (аудио в `hitWithTheClueStick`), **`no1@Ax3`** (глиф µ, жёлтая записка в гене `sticky`). Не найден: ключ фразы для пучков травы `drawGrassPatch`.
+Ключи: «42» (error-correcting-codes), «OPE» (vmu-code), «Out_of_Band_II» (caravan), «9546» (cow-tail), `]` для `goodVibrations` (аудио в `hitWithTheClueStick`), **`no1@Ax3`** (глиф µ, жёлтая записка в гене `sticky`). Ключ травы — исходная фраза плюс `bioMorphPerturb`, который считает биоморф (нужны `enableBioMorph_adaptation` = true и починенный `bioMul`).
 
 Подсказки, которые нашлись в данных: ROT13 на странице безопасности (ключи на жёлтой бумажке), `sticky` (записка), `hitWithTheClueStick` (картинка, PNG, MP3), `shoutOut` (послание пленников: «переставили несколько парабол» — параболы холмов 1 и 2, исправлено), страница Palindromes (зеркальные копии).
 
-## Где остались ошибки (946 px)
+## Где остались ошибки (872 px)
 
-1. **Пучки травы** (готово, все 33): ключа нет; `P_grass` пропускает KSA и пишет готовое состояние RC4 (`tools/rc4craft.py`, `analysis/grass_rc4_state.json`), все 33 пучка. Улучшить построитель — или всё же найти подсказку к ключу (тогда KSA и 2304 основания состояния не нужны).
+1. **Пучки травы** — готово по задуманному пути: `P_biomorph` (`enableBioMorph_adaptation` → `true`, починенный `bioMul`); биоморф пишет `bioMorphPerturb`, который прибавляется к ключу. Обходной `P_grass` (построенное состояние RC4, `tools/rc4craft.py`) больше не нужен.
 2. **Фонтан над китом** (~760 px): форма и цвета не найдены ни в одном ведре.
 3. **Край воды в чаше** (~120 px).

@@ -196,6 +196,12 @@ def P_nopatch():      # no random grass patch (target's tufts differ in layout a
     return [lambda o: kill_instr(G + 5036524, 185, o)]
 
 
+def P_tailalpha():   # target tail is translucent (~2/3): skip bmu's checkIntegrity(cow-tail) jump and turn
+    a = G + 4892541 + 20 + 69 * 10   # last cyan, first blue, second blue of the tail bucket -> opaque, transp, opaque
+    return [lambda o: kill_instr(G + 899780, 33, o),
+            lambda o: write_at(a, 'IIIPIPIIPP' + 'IIIPIPIIPF' + 'IIIPIPIIPP', 30, o)]
+
+
 def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
@@ -206,7 +212,7 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 
 import json  # noqa: E402
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc')):

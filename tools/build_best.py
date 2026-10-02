@@ -192,13 +192,17 @@ def P_text():         # "Endo has morphed!" with the non-cloudy styling
             lambda o: write_at(p, w2, len(w2), o), lambda o: write_at(q, nt, len(bt), o)]
 
 
+def P_nopatch():      # no random grass patch (target's tufts differ in layout and colour; key unknown)
+    return [lambda o: kill_instr(G + 5036524, 185, o)]
+
+
 def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
 
 import json  # noqa: E402
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch']
 
 
 def build(names=ORDER, adapters=('ecc',)):

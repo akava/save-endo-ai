@@ -339,5 +339,6 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 | `prefixes/12_no_lambda.dna` | 3792 | 92 624 | − «λxx», дешёвые пустые инструкции |
 | `prefixes/13_ducks.dna` | 3903 | 91 036 | + утки (починено крыло `motherDuck`) |
 | `prefixes/14_chick.dna` | 4053 | 90 532 | + утёнок у мельницы |
+| `prefixes/15_whale_face.dna` | 4120 | 90 180 | + кит с улыбкой (ветка `whale` без глаза-крестика) |
 
 _(файл обновляется по мере исследования)_

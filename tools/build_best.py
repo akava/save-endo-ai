@@ -11,9 +11,25 @@ M23 = (1 << 23) - 1
 
 def lit_word_patch(instr_at, old, new):
     """rewrite a 24-bit word literal (template literal) found at/after genome address instr_at"""
-    p = dna.index(lit(word(old & M23)), G + instr_at)
-    L = len(lit(word(old & M23)))
-    return lambda o: write_at(p, lit(word(new & M23)), L, o)
+    a, b = lit(word(old & M23)), lit(word(new & M23))
+    p = dna.index(a, G + instr_at)
+    if len(a) != len(b):
+        return lambda o: write_at(p, b, len(a), o)
+    diff = [k for k in range(len(a)) if a[k] != b[k]]
+    if not diff:
+        return lambda o: ''
+    i, j = diff[0], diff[-1] + 1                       # rewrite only the changed span
+    return lambda o: write_at(p + i, b[i:j], j - i, o)
+
+
+def wdiff(pos, new, off):
+    """write `new` at absolute position pos (original DNA there), rewriting only the changed span"""
+    old = dna[pos:pos + len(new)]
+    diff = [k for k in range(len(new)) if old[k] != new[k]]
+    if not diff:
+        return ''
+    i, j = diff[0], diff[-1] + 1
+    return write_at(pos + i, new[i:j], j - i, off)
 
 
 def natfix(n, L):
@@ -71,7 +87,7 @@ def P_bio():          # BMU cow branch: enableBioMorph + weather==2 -> ==0
 
 def P_caravan():      # vmuMode=31, registration code, position
     k = key128('Out_of_Band_II')[:15 * 9]
-    return [lambda o: write_at(G + 210027, word(31), 24, o), lambda o: write_at(G + 210051, k, len(k), o),
+    return [lambda o: wdiff(G + 210027, word(31), o), lambda o: wdiff(G + 210051, k, o),
             lit_word_patch(5048483, 390, PARAMS['caravan'][0]), lit_word_patch(5048559, 230, PARAMS['caravan'][1])]
 
 
@@ -169,7 +185,7 @@ def P_sun():          # repair sun; paint it with colorSoftYellow (called instea
     q += len(lit(n12(25)))
     new = lit(n12(580) + n12(70)); old = lit(n12(100) + n12(50))
     if len(new) == len(old):
-        pats.append(lambda o: write_at(q, new, len(old), o))
+        pats.append(lambda o: wdiff(q, new, o))
     else:
         raise Exception('polygon start length %d %d' % (len(old), len(new)))
     pats.append(lambda o: kill_instr(G + 7316909, 215, o))                # no setOrigin args frame
@@ -183,7 +199,7 @@ def P_balloon():
 
 
 def P_blades():
-    return [lambda o: write_at(G + 823776, word(PARAMS['blades']), 24, o)]
+    return [lambda o: wdiff(G + 823776, word(PARAMS['blades']), o)]
 
 
 def P_text():         # "Endo has morphed!" with the non-cloudy styling
@@ -236,7 +252,7 @@ def P_hill2():        # surfaceTransform hill parameters (moveTo / functionSine 
 
 
 def P_seed():        # randomInt seed (G+818624) = 8128, the 'fourth perfect number' of help-beautiful-numbers: weeds as in target
-    return [lambda o: write_at(G + 818624, word(8128), 24, o)]
+    return [lambda o: wdiff(G + 818624, word(8128), o)]
 
 
 def jmp_at(pos, target, L):
@@ -251,15 +267,15 @@ def P_spiro():        # help page 180878 ('Synthesis of complex structures (2)':
     # after scenario, main jumps into the page's three yellow spirographs, drawn small (arg0 4->1) at the sun's centre
     # the target's spirographs are drawn before anticompressant (its faint overlay tints them): main's anticompressant
     # call jumps to the spirographs; after them a spare setOrigin call slot calls anticompressant, then main's end
-    pats = [lambda o: write_at(G + 6536648, jmp_at(6536648, 6558851, 185), 185, o),
-            lambda o: write_at(G + 6564817, jmp_at(6564817, 6564969, 32), 32, o),
+    pats = [lambda o: wdiff(G + 6536648, jmp_at(6536648, 6558851, 185), o),
+            lambda o: wdiff(G + 6564817, jmp_at(6564817, 6564969, 32), o),
             retarget_call(6564969, 5603524, 11074),
-            lambda o: write_at(G + 6565154, jmp_at(6565154, 6570038, 65), 65, o)]
+            lambda o: wdiff(G + 6565154, jmp_at(6565154, 6570038, 65), o)]
     at = G + 6558851
     for sp in [(4, 11, 9, 939, 0, 4), (4, 12, 8, 768, 0, 1), (4, 12, 8, 768, 128, 1)]:
         p1 = dna.index(lit(word(271)), at); p2 = dna.index(lit(word(293)), p1); p3 = dna.index(lit(word(4)), p2 + 10)
         for p, old, new in ((p1, 271, SPIRO_SUN[0]), (p2, 293, SPIRO_SUN[1]), (p3, 4, 1)):
-            pats.append(lambda o, p=p, old=old, new=new: write_at(p, lit(word(new)), len(lit(word(old))), o))
+            pats.append(lambda o, p=p, old=old, new=new: wdiff(p, lit(word(new)), o) if len(lit(word(new))) == len(lit(word(old))) else write_at(p, lit(word(new)), len(lit(word(old))), o))
         at = p3 + 10
     return pats
 
@@ -276,9 +292,9 @@ def P_fish():         # river fish (goldenFish adaptation tree): L/R drawings sw
     seq = ''.join(word(x) for x in [7327388, GENES['mkEmp_adaptation'][0], 48, 7325992, 0, 48, 7325992, 24])
     zero = dna.index(seq, G + o) + 24 * 4
     box = dna.index(''.join(word(x) for x in [7327388, GENES['emptyBox_adaptation'][0]]), G + o) + 24
-    return [lambda off: write_at(box, word(GENES['mkGoldfishL_adaptation'][0]), 24, off),   # threeFish(R, L)
-            lambda off: write_at(G + oL + 24, wR, 24, off), lambda off: write_at(G + oR + 24, wL, 24, off),
-            lambda off: write_at(zero, word(FISH_DX), 24, off)]
+    return [lambda off: wdiff(box, word(GENES['mkGoldfishL_adaptation'][0]), off),   # threeFish(R, L)
+            lambda off: wdiff(G + oL + 24, wR, off), lambda off: wdiff(G + oR + 24, wL, off),
+            lambda off: wdiff(zero, word(FISH_DX), off)]
 
 
 def P_flowers():      # flowerbed: yellow and lilac flowers are swapped vs target: swap positions 1<->2 and 3<->4
@@ -317,7 +333,7 @@ def P_cup():          # whale in a cup of water: instead of `crater`, call ufo's
     L = len(head) + 2 + 24 + 6
     endi = head + 'IP' + natfix(6642013 - (6637926 + L), 24) + 'IICIIC'  # ...and jump to ufo's 'compose ret'
     a = G + 6633668                                                       # 'addbmp clear white' before the dome mask
-    return [lambda o: write_at(G + 6632760, start, 128, o), lambda o: write_at(G + 6637926, endi, len(endi), o),
+    return [lambda o: wdiff(G + 6632760, start, o), lambda o: write_at(G + 6637926, endi, len(endi), o),
             lambda o: write_at(a + 10, RNA_CW * 2, 20, o),                # clear white -> cw cw (mask needs only alpha)
             retarget_call(5068846, 6632760, UEND - 6632760),
             lit_word_patch(6632961, 55, 55 + wx), lit_word_patch(6633037, 42, -9 + wy),

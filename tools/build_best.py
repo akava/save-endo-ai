@@ -259,8 +259,8 @@ def P_spiro():        # help page 180878 ('Synthesis of complex structures (2)':
 FISH_DX = 18
 
 
-def P_fish():         # river fish (goldenFish adaptation tree): left fish coloured like the right ones (yellow:red 1:1,
-    # one 'black' -> 'red' in both buckets of goldfishLeft), L/R drawings swapped, mkEmp(0,24) -> mkEmp(FISH_DX,24),
+def P_fish():         # river fish (goldenFish adaptation tree): L/R drawings swapped (this also explains the colours:
+    # goldfishLeft is yellow9 red8 black, goldfishRight yellow:red 1:1), mkEmp(0,24) -> mkEmp(FISH_DX,24),
     # threeFish(R, emptyBox) -> threeFish(R, L): our threeFish draws its 2nd argument twice, then the first
     oL = GENES['mkGoldfishL_adaptation'][0]; oR = GENES['mkGoldfishR_adaptation'][0]
     wL = dna[G + oL + 24:G + oL + 48]; wR = dna[G + oR + 24:G + oR + 48]
@@ -269,7 +269,6 @@ def P_fish():         # river fish (goldenFish adaptation tree): left fish colou
     zero = dna.index(seq, G + o) + 24 * 4
     box = dna.index(''.join(word(x) for x in [7327388, GENES['emptyBox_adaptation'][0]]), G + o) + 24
     return [lambda off: write_at(box, word(GENES['mkGoldfishL_adaptation'][0]), 24, off),   # threeFish(R, L)
-            lambda off: set_base(G + 2626409 + 89, 'P', None, off), lambda off: set_base(G + 2627598 + 89, 'P', None, off),
             lambda off: write_at(G + oL + 24, wR, 24, off), lambda off: write_at(G + oR + 24, wL, 24, off),
             lambda off: write_at(zero, word(FISH_DX), 24, off)]
 

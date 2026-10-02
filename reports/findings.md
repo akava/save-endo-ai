@@ -326,6 +326,12 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 
 ![лопасти](img/22_blades.png)
 
+## Улучшение 15: облака по местам
+
+`clouds` трижды вызывает `setOrigin(x, 46)` и `cloud(15)`, где 15 — размер. Подобраны значения: (20, 28, 15), (176, 54, 11), (340, 32, 20). `out/tune.py` — общий перебор числовых литералов. `prefixes/18_clouds_pos.dna` (4792): **62 328**.
+
+![облака](img/23_clouds_pos.png)
+
 ## Префиксы
 
 | файл | длина | ≈неверных px | что делает |
@@ -349,5 +355,6 @@ G+2259442, G+4024238, G+4255241: `activateGene` («Activates the gene whose offs
 | `prefixes/15_whale_face.dna` | 4120 | 90 180 | + кит с улыбкой (ветка `whale` без глаза-крестика) |
 | `prefixes/16_balloon.dna` | 4270 | 85 360 | + облачко с λ сдвинуто: `setOrigin(255,305)` → `(155,324)` |
 | `prefixes/17_blades.dna` | 4342 | 71 140 | + поворот лопастей `polarAngleIncr`=5 |
+| `prefixes/18_clouds_pos.dna` | 4792 | 62 328 | + позиции и размеры облаков |
 
 _(файл обновляется по мере исследования)_

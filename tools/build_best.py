@@ -64,7 +64,7 @@ def tab(vals):
 
 
 # tuned numbers (positions etc.), overridable for re-tuning
-PARAMS = dict(caravan=(267, 210), chick=(171, 410), whale=(410, 200), balloon=(160, 324), blades=5,
+PARAMS = dict(caravan=(267, 210), chick=(171, 410), whale=(410, 200), balloon=(198, 324), blades=5,
               cloud1=(20, 25, 15), cloud2=(180, 55, 10), cloud3=(340, 30, 20),
               h2=(224, 208), h3=(350, 257), h3s=(104, 60, 8),
               h1y=(235,), h1p=(-33, 3348), h2p=(-21, 1848), h1s=(496, 9, 5), h2s=(344, 13, 3), h1x=(0,))
@@ -202,16 +202,52 @@ def P_blades():
     return [lambda o: wdiff(G + 823776, word(PARAMS['blades']), o)]
 
 
-def P_text():         # "Endo has morphed!" with the non-cloudy styling
+BALLOON_TABLE = [35, 0, 0, 0, 5, 0, 0, 0, 0, 0]   # 35 black + 5 blue = (0, 0, 31): the navy mu of the target
+TEXT_TABLE = [35, 0, 34, 0, 0, 0, 0, 55, 0, 0]     # (113, 183, 113): the bottom text; same black count as the balloon
+
+
+def P_text():         # "Endo has morphed!": German branch with the string rewritten, coloured by useColorTable.
+    # The German branch writes rotateColorVar and charColorCallback (germanColors). Both writes are dropped:
+    # `balloon` has just set charColorCallback = useColorTable. Their 211 bases (with the jump to the second
+    # branch) now hold one write into colorTable. It changes only entries 2..7 of the balloon's table, so the
+    # two tables are chosen with the same black count; the balloon keeps its own colours for the mu.
     S = G + 5071568
     old = enc_str('Endo hat gemorpht'); new = enc_str('Endo has morphed|')
     a = next(i for i in range(len(old)) if old[i] != new[i]); b = max(i for i in range(len(old)) if old[i] != new[i]) + 1
-    w1 = lit('ICCCCICCCCCICCCIICCIICIP' + 'ICCCIIIIIIICIIIIIIIIIIIP'); w2 = lit('IIICCIIIIICCIICCCIIIIICP' + 'CICICCIIICICCIIIIIIIIIIP')
-    p = dna.index(w1, G + 5070997)
-    bt = tab([7, 0, 0, 0, 1, 0, 0, 0, 0, 0]); nt = tab([29, 0, 28, 0, 0, 0, 0, 46, 0, 0])
-    q = dna.index(bt, G + 7292625)
-    return [lambda o: kill_instr(G + 5070888, 33, o), lambda o: write_at(S + a, new[a:b], b - a, o),
-            lambda o: write_at(p, w2, len(w2), o), lambda o: write_at(q, nt, len(bt), o)]
+    ob = ''.join(word(v) for v in BALLOON_TABLE); nb = ''.join(word(v) for v in TEXT_TABLE)
+    diff = [k for k in range(240) if ob[k] != nb[k]]; i, j = diff[0], diff[-1] + 1
+    R0, R1 = 5070888, 5071099
+    N = 826012 - 240 + i - (R1 - 5070997)            # 5070921's write (ends 5070997) reaches rotateColorVar = colorTable+240
+    tw = write_at(N, nb[i:j], j - i)
+    X = R1 - len(tw)
+    reg = (jmp_at(R0, X, 33) + dna[G + R0 + 33:G + X] if X - R0 >= 33 else jmp_at(R0, X, X - R0)) + tw
+    assert len(reg) == R1 - R0
+    q = dna.index(tab([7, 0, 0, 0, 1, 0, 0, 0, 0, 0]), G + 7292625)
+    return [lambda o: write_at(S + a, new[a:b], b - a, o), lambda o: wdiff(G + R0, reg, o),
+            lambda o: wdiff(q, tab(BALLOON_TABLE), o)]
+
+
+def P_bubble():       # balloon outline of the target: polygon traced from the target (analysis/balloon_target_polygon.json,
+    # tools/polyfit.py), the gradient sized to its bounding box, fill point and text inside the new circle.
+    v = [tuple(p) for p in json.load(open(os.path.join(ROOT, 'analysis', 'balloon_target_polygon.json')))]
+    nums = [86, v[0][0], v[0][1]]                   # the count must stay 86 (literal length): pad with zero steps
+    for p0, p1 in zip(v, v[1:] + v[:1]):
+        nums += [p1[0] - p0[0], p1[1] - p0[1]]
+    nums += [0, 0] * (86 - len(v))
+    new = lit(''.join(''.join('C' if (x & 0x7ff) >> k & 1 else 'I' for k in range(11)) + 'P' for x in nums))
+    p = G + 7289758                                  # the polygon literal of `balloon` (drawPolyline argument)
+    assert len(new) <= 2275
+    W, H = BUBBLE['wh']; FX, FY = BUBBLE['fill']; TX, TY = BUBBLE['text']
+    return [lambda o: wdiff(p, new, o), lit_word_patch(7288815, 145, W), lit_word_patch(7288891, 116, H),
+            lit_word_patch(7292288, 106, FX), lit_word_patch(7292364, 37, FY),
+            lit_word_patch(7293325, 98, TX), lit_word_patch(7293401, 20, TY)]
+
+
+BUBBLE = dict(wh=(101, 169), fill=(64, 19), text=(56, 2))
+
+
+def P_mu():           # balloon character L (lambda) -> M (mu); the glyph itself is decrypted by ADAPTER_mu
+    return [lambda o: wdiff(G + 7292625 + 927, 'CCFCFCCFIC', o)]
 
 
 def P_nopatch():      # no random grass patch (target's tufts differ in layout and colour; key unknown).
@@ -344,6 +380,10 @@ def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs bef
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
 
+def ADAPTER_mu():     # decrypt charInfo_Tempus-Bold-Huge_M (RC4 key 'no1@Ax3' from the sticky note on the monitor)
+    return crypt_call('no1@Ax3', 502139, 3665)
+
+
 def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before everything else
     return crypt_call('9546', 4892541, 5212)
 
@@ -351,10 +391,10 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 import json  # noqa: E402
 GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu']
 
 
-def build(names=ORDER, adapters=('tail', 'ecc')):
+def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
     pats = []
     for n in names:
         pats += globals()['P_' + n]()

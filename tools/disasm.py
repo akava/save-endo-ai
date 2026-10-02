@@ -132,7 +132,7 @@ def disasm(s, start, end, out=sys.stdout):
             return
         rna = ('\n          R: ' + rle(d.rna)) if d.rna else ''
         d.rna = []
-        print('%8d  P: %s\n          T: %s%s' % (at - G, show_lit(p, 200), show_lit(t, 200), rna), file=out)
+        print('%8d  P: %s\n          T: %s%s' % (at - G, show_lit(p), show_lit(t), rna), file=out)
 
 
 if __name__ == '__main__':

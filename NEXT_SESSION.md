@@ -40,16 +40,17 @@ python3 -m venv .venv && .venv/bin/pip install pillow numpy
 
 ## Текущее состояние (облачная сессия, 2026-10-02)
 
-Работаем прямо в `main`. Перед каждым коммитом — `CHECKLIST.md` (что обновить: сборка, findings, process, обе истории, картинки, README, NEXT_SESSION). Лучший префикс **`prefixes/43_compact.dna`** (11276 оснований, `tools/build_best.py` собирает его из именованных патчей), **8 541** неверных пикселей, точно по полноразмерному target `doc/Target-image-600.png` (`score()` в tools/endo.py). История улучшений и таблица — в `reports/findings.md`.
+Работаем прямо в `main`. Перед каждым коммитом — `CHECKLIST.md` (что обновить: сборка, findings, process, обе истории, картинки, README, NEXT_SESSION). Лучший префикс **`prefixes/44_balloon_mu.dna`** (15 432 основания, `tools/build_best.py` собирает его из именованных патчей и адаптеров `tail`, `ecc`, `mu`), **3 668** неверных пикселей, точно по полноразмерному target `doc/Target-image-600.png` (`score()` в tools/endo.py). История улучшений и таблица — в `reports/findings.md`.
 
-Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/fcrypt.py`, `tools/c/rc4crack.c` (по purchase code), `tools/c/rc4crack2.c` (известный текст с масками), `tools/tune.py` (перебор числовых литералов; при запуске указывать *исходные* значения).
+Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/build_best.py` (`wdiff`, `lit_word_patch`, `retarget_call`, `jmp_at`, `rna_moves`), `tools/polyfit.py` (контур многоугольника по маске, растеризация как у RNA), `tools/polylit.py`, `tools/disasm.py` (`LITMAX`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/c/rc4crack2.c`, `tools/grass_emu.py`.
 
-Ключи: «42» (error-correcting-codes), «OPE» (vmu-code), «Out_of_Band_II» (caravan), «9546» (cow-tail). Не найдены: `help-beautiful-numbers` (не короче 6 символов, не цифры до 8, не строчные до 6) и глиф µ `charInfo_Tempus-Bold-Huge_M` (по предполагаемому открытому тексту до 5 символов не нашёлся).
+Ключи: «42» (error-correcting-codes), «OPE» (vmu-code), «Out_of_Band_II» (caravan), «9546» (cow-tail), `]` для `goodVibrations` (аудио в `hitWithTheClueStick`), **`no1@Ax3`** (глиф µ, жёлтая записка в гене `sticky`). Не найден: ключ фразы для пучков травы `drawGrassPatch`.
 
-## Следующие шаги
+Подсказки, которые нашлись в данных: ROT13 на странице безопасности (ключи на жёлтой бумажке), `sticky` (записка), `hitWithTheClueStick` (картинка, PNG, MP3), `shoutOut` (послание пленников: «переставили несколько парабол»), страница Palindromes (зеркальные копии).
 
-1. **Солнце** (около 3,8 тыс. px): ген починен (10 оснований, findings), но ведро повреждено: в target цвет (255, 247, 87) = yellow×20 + white×11 + red×1, а в гене только `clear yellow`. Нужно место для 31 RNA-команды внутри гена той же длины.
-2. **Кит** (около 5 тыс.): в target чаша-капля (167, 213, 243) другой формы и фонтан.
-3. **Облачко и хвостик** (около 7 тыс.): форма хвостика облачка другая. Цвет λ сейчас бледный из-за подмены `colorTable` в `balloon` (сделано ради надписи); возможно, лучше задавать таблицу иначе.
-4. **µ**: ключ к глифу; возможно, он на странице beautiful-numbers.
-5. Мелочи: параметры холмов (`surfaceTransform`: парабола −28/3348 при G+7161500, синус 408/7/4 около G+7162050), сорняки (L-система, случайные), хвост коровы полупрозрачный (ключ есть, расшифровка стоит 1544 основания и пока не окупается).
+## Где остались ошибки (3 668 px)
+
+1. **Пучки травы** (~2 200 px внизу): target-раскладка известна (`analysis/target_tufts.json`), ключ RC4 не найден. Перебор пользователь запретил: «должна быть подсказка».
+2. **Фонтан над китом** (~760 px): форма и цвета не найдены ни в одном ведре.
+3. **Гребни холмов** (~590 px): подогнаны, но не точно. Подсказка `shoutOut` про «переставленные параболы» может относиться к ним; простой обмен парабол холмов 1 и 2 хуже.
+4. **Край воды в чаше** (~120 px).

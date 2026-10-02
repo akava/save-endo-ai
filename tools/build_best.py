@@ -280,6 +280,43 @@ def P_flowers():      # flowerbed: yellow and lilac flowers are swapped vs targe
             lit_word_patch(4569742, 58, 17), lit_word_patch(4569818, 12, 24)]
 
 
+RNA_CW, RNA_CCW, RNA_MOVE = 'IIIPFFFFFP', 'IIIPCCCCCP', 'IIIPIIIIIP'
+
+
+def rna_moves(dx, dy):
+    """RNA turtle moves by (dx, dy) starting and ending with heading east"""
+    out = ''
+    if dx > 0:
+        out += RNA_MOVE * dx
+    elif dx < 0:
+        out += RNA_CW * 2 + RNA_MOVE * -dx + RNA_CW * 2
+    if dy > 0:
+        out += RNA_CW + RNA_MOVE * dy + RNA_CCW
+    elif dy < 0:
+        out += RNA_CCW + RNA_MOVE * -dy + RNA_CW
+    return out
+
+
+CUP = dict(s=(0, -24), w=(0, 12))
+
+
+def P_cup():          # whale in a cup of water: instead of `crater`, call ufo's rain branch (water clipped into the
+    # ufo dome + translucent dome) with the RNA turtle turned by 180 degrees for the dome (it becomes a cup).
+    # The turn makes the real turtle position differ from the one the DNA believes: compensated by RNA moves.
+    UFO, UEND = 6630730, 6630730 + 11528
+    sx, sy = CUP['s']; wx, wy = CUP['w']
+    start = 'IP' + 'I' * (128 - 9) + 'P' + 'IICIIC'                       # neutralise the weather checks
+    head = 'IIIPIIPIIP' + 'IIIPFFPCCP' + RNA_CW * 2 + rna_moves(-14 - 2 * wx, 34 - 2 * wy)  # fill compose, turn back
+    L = len(head) + 2 + 24 + 6
+    endi = head + 'IP' + natfix(6642013 - (6637926 + L), 24) + 'IICIIC'  # ...and jump to ufo's 'compose ret'
+    a = G + 6633668                                                       # 'addbmp clear white' before the dome mask
+    return [lambda o: write_at(G + 6632760, start, 128, o), lambda o: write_at(G + 6637926, endi, len(endi), o),
+            lambda o: write_at(a + 10, RNA_CW * 2, 20, o),                # clear white -> cw cw (mask needs only alpha)
+            retarget_call(5068846, 6632760, UEND - 6632760),
+            lit_word_patch(6632961, 55, 55 + wx), lit_word_patch(6633037, 42, -9 + wy),
+            lit_word_patch(5068509, 392, 352 + sx), lit_word_patch(5068585, 230, 284 + sy)]
+
+
 def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
@@ -291,7 +328,7 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 import json  # noqa: E402
 GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc')):

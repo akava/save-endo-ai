@@ -1,4 +1,5 @@
 """Build the best prefix from named patches (reproducible). usage: build_best.py [OUT] [-patch ...] [+name=...]"""
+import json
 import os
 import sys
 
@@ -93,14 +94,48 @@ def P_caravan():      # vmuMode=31, registration code, position
             lit_word_patch(5048483, 390, PARAMS['caravan'][0]), lit_word_patch(5048559, 230, PARAMS['caravan'][1])]
 
 
+def cheapest_spans(good, cur, need):
+    """group the positions `need` (where cur must become good) into writes of minimal total prefix length (DP)"""
+    def cost(a, b):
+        return len(set_base(a, good[a], off=5000)) if a == b else len(write_at(a, good[a:b + 1], b - a + 1, 5000))
+    n = len(need); best = [0] + [10 ** 9] * n; prev = [0] * (n + 1)
+    for j in range(1, n + 1):
+        for i in range(j):
+            c = best[i] + cost(need[i], need[j - 1])
+            if c < best[j]:
+                best[j], prev[j] = c, i
+    segs = []; j = n
+    while j > 0:
+        i = prev[j]; segs.append((need[i], need[j - 1])); j = i
+    return segs[::-1]
+
+
+def _cloud_need():
+    t = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
+    co, cl = t['cloud']; do, dl = t['duolc']
+    good = dna[G + do:G + do + dl][::-1]; cur = dna[G + co:G + co + cl]
+    groups = []
+    for i in (i for i in range(cl) if good[i] != cur[i]):
+        if groups and i - groups[-1][1] <= 12:
+            groups[-1][1] = i
+        else:
+            groups.append([i, i])
+    keep = [g for k, g in enumerate(groups) if k not in (2, 3, 6, 20, 30, 36)]   # minimal set found by ablation
+    return [i for a, b in keep for i in range(a, b + 1) if good[i] != cur[i]]
+
+
 def P_clouds():       # cloud gene repaired from reversed duolc (minimal set), clouds on, no cloudy side effect
     t = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
     co, cl = t['cloud']; do, dl = t['duolc']
     good = dna[G + do:G + do + dl][::-1]
-    pats = fix_bases(G + co, good, dna[G + co:G + co + cl])
-    pats = [p for i, p in enumerate(pats) if i not in (2, 3, 6, 20, 30, 36)]
+    cur = dna[G + co:G + co + cl]
+    pats = [lambda o, a=a, b=b: (set_base(G + co + a, good[a], off=o) if a == b else
+                                 write_at(G + co + a, good[a:b + 1], b - a + 1, o)) for a, b in cheapest_spans(good, cur, CLOUD_FIX)]
     p1 = dna.index('CFCCCCCCCCCCCCCCCCCCCCCIC', G + 7314955)
     return [lambda o: set_base(p1 + 1, 'C', off=o), lambda o: set_base(G + 6356797 + 5, 'I', off=o)] + pats
+
+
+CLOUD_FIX = _cloud_need()
 
 
 def P_cloudpos():
@@ -375,8 +410,8 @@ def rna_moves(dx, dy):
     return out
 
 
-CUP = dict(s=(20, -24), w=(-10, 12))
-FOUNTAIN = (58, -60)    # moveTo of the fountain picture, relative to the cup's origin
+CUP = dict(s=(26, -20), w=(-13, 10))
+FOUNTAIN = (52, -64)    # moveTo of the fountain picture, relative to the cup's origin
 
 PGT_END = 2640835 + 160449           # end of printGeneTable
 FOUNT_B0, FOUNT_B1 = 2734743, 2787365  # jump over the hidden picture / its final jump onwards into printGeneTable

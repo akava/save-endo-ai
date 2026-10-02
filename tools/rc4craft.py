@@ -57,8 +57,17 @@ def craft(tufts, seed=0, width=6, budget=2000000, max_dummies=40):
             cands_i = [cur[i2]]
         else:
             fv = [v for v in range(256) if not used[v]]; rnd.shuffle(fv)
+            cheap = []
+            for v in fv:
+                jj = (j + v) % 256
+                if jj == i2 or cur[jj] is None:
+                    continue
+                t = (v + cur[jj]) % 256
+                ov = cur[jj] if t == i2 else (v if t == jj else cur[t])
+                if ov is not None and ov in pref:
+                    cheap.append(v)
             freej = [v for v in fv if cur[(j + v) % 256] is None and (j + v) % 256 != i2]
-            cands_i = (freej + [v for v in fv if v not in freej])[:width]
+            cands_i = (cheap[:max(1, width // 2)] + freej + [v for v in fv if v not in freej])[:width]
         for vi in cands_i:
             newi = cur[i2] is None
             if newi:

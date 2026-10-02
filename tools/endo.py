@@ -298,3 +298,16 @@ def fix_bases(start, good, cur, gap=12):
         else:
             pats.append(lambda o, a=a, b=b: write_at(start + a, good[a:b + 1], b - a + 1, o))
     return pats
+
+
+def kill_instr(pos, n, off=0):
+    """neutralize the n-base instruction at absolute pos by overwriting its head with a jump over the rest"""
+    for k in range(1, 40):
+        j = jump_instr(k)
+        if len(j) + k == n:
+            return write_at(pos, j, len(j), off)
+    m = n
+    for _ in range(5):
+        j = jump_instr(m); m = n - len(j)
+    j = jump_instr(m); assert len(j) + m == n
+    return write_at(pos, j, len(j), off)

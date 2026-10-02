@@ -48,7 +48,7 @@ def tab(vals):
 
 
 # tuned numbers (positions etc.), overridable for re-tuning
-PARAMS = dict(caravan=(267, 211), chick=(170, 410), whale=(410, 200), balloon=(159, 324), blades=5,
+PARAMS = dict(caravan=(267, 210), chick=(170, 410), whale=(410, 200), balloon=(159, 324), blades=5,
               cloud1=(20, 24, 15), cloud2=(176, 54, 11), cloud3=(340, 30, 20),
               h2=(224, 209), h3=(350, 257), h3s=(104, 60, 8),
               h1y=(238,), h1p=(-30, 3348), h2p=(-21, 1848), h1s=(488, 7, 5))

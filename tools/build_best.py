@@ -66,8 +66,10 @@ def tab(vals):
 # tuned numbers (positions etc.), overridable for re-tuning
 PARAMS = dict(caravan=(267, 210), chick=(171, 410), whale=(410, 200), balloon=(198, 324), blades=5,
               cloud1=(20, 25, 15), cloud2=(180, 55, 10), cloud3=(340, 30, 20),
-              h2=(224, 208), h3=(350, 257), h3s=(104, 60, 8),
-              h1y=(235,), h1p=(-33, 3348), h2p=(-21, 1848), h1s=(496, 9, 5), h2s=(344, 13, 3), h1x=(0,))
+              h2=(200, 235), h3=(350, 257), h3s=(104, 60, 8),
+              h1y=(218,), h1p=(-21, 1848), h2p=(-28, 3348), h1s=(408, 7, 4), h2s=(328, 13, 3), h1x=(0,))
+# hills: the parabolas of hills 1 and 2 are swapped back (shoutOut: "we sabotaged the Fuun DNA by swapping some
+# parabolas"); with tools/hillmodel.py the target ridges then fit exactly with the original sines and x positions
 
 # ---------------- patches ----------------
 def P_day():          # night-or-day = F (the official "turn to the sun" prefix does the same)

@@ -40,17 +40,16 @@ python3 -m venv .venv && .venv/bin/pip install pillow numpy
 
 ## Текущее состояние (облачная сессия, 2026-10-02)
 
-Работаем прямо в `main`. Перед каждым коммитом — `CHECKLIST.md` (что обновить: сборка, findings, process, обе истории, картинки, README, NEXT_SESSION). Лучший префикс **`prefixes/44_balloon_mu.dna`** (15 432 основания, `tools/build_best.py` собирает его из именованных патчей и адаптеров `tail`, `ecc`, `mu`), **3 668** неверных пикселей, точно по полноразмерному target `doc/Target-image-600.png` (`score()` в tools/endo.py). История улучшений и таблица — в `reports/findings.md`.
+Работаем прямо в `main`. Перед каждым коммитом — `CHECKLIST.md` (что обновить: сборка, findings, process, обе истории, картинки, README, NEXT_SESSION). Лучший префикс **`prefixes/45_parabolas.dna`** (15 357 оснований, `tools/build_best.py` собирает его из именованных патчей и адаптеров `tail`, `ecc`, `mu`), **3 074** неверных пикселя, точно по полноразмерному target `doc/Target-image-600.png` (`score()` в tools/endo.py). История улучшений и таблица — в `reports/findings.md`.
 
-Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/build_best.py` (`wdiff`, `lit_word_patch`, `retarget_call`, `jmp_at`, `rna_moves`), `tools/polyfit.py` (контур многоугольника по маске, растеризация как у RNA), `tools/polylit.py`, `tools/disasm.py` (`LITMAX`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/c/rc4crack2.c`, `tools/grass_emu.py`.
+Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/build_best.py` (`wdiff`, `lit_word_patch`, `retarget_call`, `jmp_at`, `rna_moves`), `tools/polyfit.py` (контур многоугольника по маске, растеризация как у RNA), `tools/hillmodel.py` + `tools/hillridge.py` (точная модель гребней холмов), `tools/polylit.py`, `tools/disasm.py` (`LITMAX`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/c/rc4crack2.c`, `tools/grass_emu.py`.
 
 Ключи: «42» (error-correcting-codes), «OPE» (vmu-code), «Out_of_Band_II» (caravan), «9546» (cow-tail), `]` для `goodVibrations` (аудио в `hitWithTheClueStick`), **`no1@Ax3`** (глиф µ, жёлтая записка в гене `sticky`). Не найден: ключ фразы для пучков травы `drawGrassPatch`.
 
-Подсказки, которые нашлись в данных: ROT13 на странице безопасности (ключи на жёлтой бумажке), `sticky` (записка), `hitWithTheClueStick` (картинка, PNG, MP3), `shoutOut` (послание пленников: «переставили несколько парабол»), страница Palindromes (зеркальные копии).
+Подсказки, которые нашлись в данных: ROT13 на странице безопасности (ключи на жёлтой бумажке), `sticky` (записка), `hitWithTheClueStick` (картинка, PNG, MP3), `shoutOut` (послание пленников: «переставили несколько парабол» — параболы холмов 1 и 2, исправлено), страница Palindromes (зеркальные копии).
 
-## Где остались ошибки (3 668 px)
+## Где остались ошибки (3 074 px)
 
-1. **Пучки травы** (~2 200 px внизу): target-раскладка известна (`analysis/target_tufts.json`), ключ RC4 не найден. Перебор пользователь запретил: «должна быть подсказка».
+1. **Пучки травы** (~2 200 px внизу): target-раскладка известна (`analysis/target_tufts.json`), ключ RC4 не найден. Перебор пользователь запретил: «должна быть подсказка». Важно: в target есть пучки `grass4`, а наш код берёт тип как `b₃ & 3` и `grass4` нарисовать не может; значит, в target отличается и сам код выбора типа, не только ключ.
 2. **Фонтан над китом** (~760 px): форма и цвета не найдены ни в одном ведре.
-3. **Гребни холмов** (~590 px): подогнаны, но не точно. Подсказка `shoutOut` про «переставленные параболы» может относиться к ним; простой обмен парабол холмов 1 и 2 хуже.
-4. **Край воды в чаше** (~120 px).
+3. **Край воды в чаше** (~120 px).

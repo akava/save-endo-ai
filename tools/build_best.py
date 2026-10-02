@@ -121,7 +121,7 @@ def _cloud_need():
         else:
             groups.append([i, i])
     keep = [g for k, g in enumerate(groups) if k not in (2, 3, 6, 20, 30, 36)]   # minimal set found by ablation
-    return [i for a, b in keep for i in range(a, b + 1) if good[i] != cur[i]]
+    return [i for a, b in keep for i in range(a, b + 1) if good[i] != cur[i] and i not in (1111, 1693, 5440)]  # +ablation
 
 
 def P_clouds():       # cloud gene repaired from reversed duolc (minimal set), clouds on, no cloudy side effect
@@ -214,7 +214,10 @@ def P_sun():          # repair sun; paint it with colorSoftYellow (called instea
     p3 = dna.index('FFCCCCCCCCCCCCCCCCCCCCCIC', G + 7316761)
     pats.append(lambda o: write_at(p3, 'CC', 2, o))                       # sun block: weather==3 -> ==0
     good = sun_tail_fixed((480, 20)); S = 2126041
-    pats += fix_bases(G + S, good, dna[G + S:G + S + 830])
+    cur = dna[G + S:G + S + 830]
+    pats += [lambda o, a=a, b=b: (set_base(G + S + a, good[a], off=o) if a == b else
+                                  write_at(G + S + a, good[a:b + 1], b - a + 1, o))
+             for a, b in cheapest_spans(good, cur, [i for i in range(830) if good[i] != cur[i]])]
     pats.append(lambda o: set_base(G + 2125111 + 19, 'I', off=o))         # sun's own 'clear' -> unknown RNA
     pats.append(lambda o: set_base(G + 2125111 + 29, 'I', off=o))         # sun's own 'yellow' -> unknown RNA
     def n12(v): return ''.join('C' if (v >> k) & 1 else 'I' for k in range(11)) + 'P'
@@ -436,7 +439,7 @@ def P_cup():          # whale in a cup of water: instead of `crater`, call ufo's
     # At the end the fountain picture is called, which returns into ufo's 'compose ret'.
     UFO, UEND = 6630730, 6630730 + 11528
     sx, sy = CUP['s']; wx, wy = CUP['w']
-    start = 'IP' + 'I' * (128 - 9) + 'P' + 'IICIIC'                       # neutralise the weather checks
+    start = jmp_at(6632760, 6632760 + 128, 33)                            # jump over the weather checks
     head = 'IIIPIIPIIP' + 'IIIPFFPCCP' + RNA_CW * 2 + rna_moves(-14 - 2 * wx, 34 - 2 * wy)  # fill compose, turn back
     endi = head
     for _ in range(6):                                                    # call length depends on its own length
@@ -452,16 +455,31 @@ def P_cup():          # whale in a cup of water: instead of `crater`, call ufo's
             lit_word_patch(5068509, 392, 352 + sx), lit_word_patch(5068585, 230, 284 + sy)] + fountain_block()
 
 
-def ADAPTER_ecc():    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
+def push_key(key, off):
+    """push an int9[128] key argument: its characters as a literal, the rest (terminators) copied from
+    giveMeAPresent (G+93: 128 x 255) instead of 1100+ literal bases"""
+    k = key128(key)[:9 * len(key)]
+    rest = 1152 - len(k)
+    p = P().open().skip(off + G + 93 + len(k)).close().open().skip(rest).close().open().search(BLUE_MARK).close().end()
+    return p + T().ref(0).ref(1).ref(2).b(k).ref(1).end()
+
+
+def crypt_call2(key, offset, size, off=0):
+    """crypt_call with the cheap key push (order key, offset, size as in crypt_call); off = prefix length after it"""
+    tail = push_arg(word(offset)) + push_arg(word(size)) + adapter_call(5086510, 20482)
+    return push_key(key, len(tail) + off) + tail
+
+
+def ADAPTER_ecc(off=0):    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
 
-def ADAPTER_mu():     # decrypt charInfo_Tempus-Bold-Huge_M (RC4 key 'no1@Ax3' from the sticky note on the monitor)
-    return crypt_call('no1@Ax3', 502139, 3665)
+def ADAPTER_mu(off=0):     # decrypt charInfo_Tempus-Bold-Huge_M (RC4 key 'no1@Ax3' from the sticky note on the monitor)
+    return crypt_call2('no1@Ax3', 502139, 3665, off)
 
 
-def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before everything else
-    return crypt_call('9546', 4892541, 5212)
+def ADAPTER_tail(off=0):   # decrypt the cow tail (RC4 key '9546') in place, before everything else
+    return crypt_call2('9546', 4892541, 5212, off)
 
 
 import json  # noqa: E402
@@ -474,8 +492,10 @@ def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
     pats = []
     for n in names:
         pats += globals()['P_' + n]()
-    head = ''.join(globals()['ADAPTER_' + a]() for a in adapters)
-    return head + combine(*pats)
+    out = combine(*pats)
+    for a in reversed(adapters):
+        out = globals()['ADAPTER_' + a](len(out)) + out
+    return out
 
 
 if __name__ == '__main__':

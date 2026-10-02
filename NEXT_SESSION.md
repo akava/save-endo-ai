@@ -40,7 +40,7 @@ python3 -m venv .venv && .venv/bin/pip install pillow numpy
 
 ## Текущее состояние (облачная сессия, 2026-10-02)
 
-Работаем прямо в `main`. Перед каждым коммитом — `CHECKLIST.md` (что обновить: сборка, findings, process, обе истории, картинки, README, NEXT_SESSION). Лучший префикс **`prefixes/51_water.dna`** (16 746 оснований, `tools/build_best.py` собирает его из именованных патчей и адаптеров `tail`, `ecc`, `mu`), **18** неверных пикселей, точно по полноразмерному target `doc/Target-image-600.png` (`score()` в tools/endo.py). История улучшений и таблица — в `reports/findings.md`.
+Работаем прямо в `main`. Перед каждым коммитом — `CHECKLIST.md` (что обновить: сборка, findings, process, обе истории, картинки, README, NEXT_SESSION). Лучший префикс **`prefixes/53_cheap_keys.dna`** (14 249 оснований, `tools/build_best.py` собирает его из именованных патчей и адаптеров `tail`, `ecc`, `mu`), **18** неверных пикселей, точно по полноразмерному target `doc/Target-image-600.png` (`score()` в tools/endo.py). История улучшений и таблица — в `reports/findings.md`.
 
 Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/build_best.py` (`wdiff`, `lit_word_patch`, `retarget_call`, `jmp_at`, `rna_moves`), `tools/polyfit.py` (контур многоугольника по маске, растеризация как у RNA), `tools/hillmodel.py` + `tools/hillridge.py` (точная модель гребней холмов), `tools/polylit.py`, `tools/disasm.py` (`LITMAX`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/c/rc4crack2.c`, `tools/grass_emu.py`.
 
@@ -53,4 +53,4 @@ python3 -m venv .venv && .venv/bin/pip install pillow numpy
 1. **Пучки травы** — готово по задуманному пути: `P_biomorph` (`enableBioMorph_adaptation` → `true`, починенный `bioMul`); биоморф пишет `bioMorphPerturb`, который прибавляется к ключу. Обходной `P_grass` (построенное состояние RC4, `tools/rc4craft.py`) больше не нужен.
 2. **Фонтан** — готово: сжатая картинка из мёртвого кода `printGeneTable`, зеркальная (словарь cw ↔ ccw); осталось 18 px.
 3. **Край воды** — готово (сдвиг только воды: w −= d, s += 2d, фонтан −= 2d).
-4. **Длина префикса** (16 746) — почти весь риск (пиксели дают 180): сжимать патчи. Самые дорогие: шарик 2613, облака ~1940, чашка ~1700, два адаптера расшифровки по 1544.
+4. **Длина префикса** (14 249) — почти весь риск (пиксели дают 180). Самые дорогие патчи: шарик ~2600 (литерал многоугольника), облака ~1770, чашка ~1600, `spiro` ~1070, `sun` ~1000. Ключи `crypt` уже копируются из `giveMeAPresent`.

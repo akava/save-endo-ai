@@ -122,8 +122,25 @@ def target():
     return _target
 
 
-def score(png, tol=24, dy=2):
-    """approximate number of wrong 600x600 pixels: compare 2x2-averaged render with the 300x300 target.
+_target600 = None
+
+
+def target600():
+    """full-size 600x600 target (aligned with our render, no shift)"""
+    global _target600
+    if _target600 is None:
+        _target600 = np.array(Image.open(os.path.join(ROOT, 'doc', 'Target-image-600.png')).convert('RGB')).astype(int)
+    return _target600
+
+
+def score(png):
+    """exact number of wrong pixels against the 600x600 target"""
+    img = np.array(Image.open(png).convert('RGB')).astype(int)
+    return int((img != target600()).any(axis=2).sum())
+
+
+def score300(png, tol=24, dy=2):
+    """old approximate number of wrong 600x600 pixels: compare 2x2-averaged render with the 300x300 target.
     The given 300x300 images are offset by 2 render pixels vertically (our render of the source DNA matches
     Source-image.png exactly only after shifting down by 2), so the render is shifted by dy before comparing;
     the first target row is ignored (wrap-around)."""

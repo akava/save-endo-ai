@@ -115,10 +115,14 @@ def P_nolambda():
     return [lambda o: kill_instr(G + 5050400, 185, o)]
 
 
-def P_ducks():        # ducks branch on, motherDuck wing fix, chick position
+def P_ducks():        # ducks branch on, motherDuck wing fix; the chick is drawn over the windmill in the target:
+    # its call is killed (the argument pushes stay on the blue-zone stack, all calls in between are balanced) and the
+    # unused lambda-id call slot after the windmill calls `chick` instead, with the chick's origin
     wing = G + 2921222 + len(lit('ICCIIIIIIIIP' + 'CIIIICCIIIIP' + 'CCIIICIIIIIP')) + 1
     return [lambda o: kill_instr(G + 5043225, 33, o), lambda o: set_base(wing, 'C', off=o),
-            lit_word_patch(5045845, 525, PARAMS['chick'][0]), lit_word_patch(5045921, 260, PARAMS['chick'][1])]
+            lambda o: kill_instr(G + 5046450, 185, o),
+            lit_word_patch(5050063, 45, PARAMS['chick'][0]), lit_word_patch(5050139, 275, PARAMS['chick'][1]),
+            retarget_call(5050400, 5512462, 12361)]
 
 
 def P_whale():        # smiling whale: skip the eye-cross branch, keep the RNA before the check
@@ -326,7 +330,7 @@ def ADAPTER_tail():   # decrypt the cow tail (RC4 key '9546') in place, before e
 
 import json  # noqa: E402
 GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
-ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'nolambda', 'ducks', 'whale',
+ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'ducks', 'whale',
          'whale_pos', 'balloon', 'blades', 'text', 'sun', 'nopatch', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup']
 
 

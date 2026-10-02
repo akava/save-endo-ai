@@ -199,10 +199,21 @@ def P_nopatch():      # no random grass patch (target's tufts differ in layout a
     return [lambda o: kill_instr(G + 5035669, 5036709 - 5035669, o)]
 
 
-def P_tailalpha():   # target tail is translucent (~2/3): skip bmu's checkIntegrity(cow-tail) jump and turn
-    a = G + 4892541 + 20 + 69 * 10   # last cyan, first blue, second blue of the tail bucket -> opaque, transp, opaque
-    return [lambda o: kill_instr(G + 899780, 33, o),
-            lambda o: write_at(a, 'IIIPIPIIPP' + 'IIIPIPIIPF' + 'IIIPIPIIPP', 30, o)]
+TAIL_ALPHA = (4, 3, 2, 1, 7, 3)   # removed white, cyan, blue, black; added opaque, transparent
+
+
+def P_tailalpha():   # target tail is translucent (alpha 178 = 7:3): skip bmu's checkIntegrity(cow-tail) jump and
+    # replace colour commands of the tail bucket (w50 c20 b22 k15) by alpha ones, keeping the premultiplied colour
+    rw, rc, rb, rk, O, T = TAIL_ALPHA
+    base = G + 4892541 + 20
+    al = ['IIIPIPIIPP'] * O + ['IIIPIPIIPF'] * T
+    w1 = ''.join(al[:rw + rc]); w2 = ''.join(al[rw + rc:])
+    pats = [lambda o: kill_instr(G + 899780, 33, o)]
+    if w1:
+        pats.append(lambda o: write_at(base + (50 - rw) * 10, w1, len(w1), o))
+    if w2:
+        pats.append(lambda o: write_at(base + (92 - rb) * 10, w2, len(w2), o))
+    return pats
 
 
 HILL_LITS = dict(h2=((7164867, 200), (7164943, 209)), h3=((7168555, 350), (7168631, 257)),

@@ -42,7 +42,7 @@ python3 -m venv .venv && .venv/bin/pip install pillow numpy
 
 Ветка `claude/optimistic-planck-aos46z`. Лучший префикс **`prefixes/19_text.dna`** (5410 оснований), около **62 036** неверных пикселей. История улучшений и таблица — в `reports/findings.md`.
 
-Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/fcrypt.py`, `tools/c/rc4crack.c` (по purchase code), `tools/c/rc4crack2.c` (известный текст с масками), `out/tune.py` (перебор числовых литералов; при запуске указывать *исходные* значения).
+Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/fcrypt.py`, `tools/c/rc4crack.c` (по purchase code), `tools/c/rc4crack2.c` (известный текст с масками), `tools/tune.py` (перебор числовых литералов; при запуске указывать *исходные* значения).
 
 Ключи: «42» (error-correcting-codes), «OPE» (vmu-code), «Out_of_Band_II» (caravan), «9546» (cow-tail). Не найдены: `help-beautiful-numbers` (не короче 6 символов, не цифры до 8, не строчные до 6) и глиф µ `charInfo_Tempus-Bold-Huge_M` (по предполагаемому открытому тексту до 5 символов не нашёлся).
 

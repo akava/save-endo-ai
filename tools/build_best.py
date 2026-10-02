@@ -249,8 +249,12 @@ SPIRO_SUN = (530, 70)
 
 def P_spiro():        # help page 180878 ('Synthesis of complex structures (2)': 'give it a try yourself'):
     # after scenario, main jumps into the page's three yellow spirographs, drawn small (arg0 4->1) at the sun's centre
-    pats = [lambda o: write_at(G + 6536833, jmp_at(6536833, 6558851, 33), 33, o),
-            lambda o: write_at(G + 6564817, jmp_at(6564817, 6570038, 32), 32, o)]
+    # the target's spirographs are drawn before anticompressant (its faint overlay tints them): main's anticompressant
+    # call jumps to the spirographs; after them a spare setOrigin call slot calls anticompressant, then main's end
+    pats = [lambda o: write_at(G + 6536648, jmp_at(6536648, 6558851, 185), 185, o),
+            lambda o: write_at(G + 6564817, jmp_at(6564817, 6564969, 32), 32, o),
+            retarget_call(6564969, 5603524, 11074),
+            lambda o: write_at(G + 6565154, jmp_at(6565154, 6570038, 65), 65, o)]
     at = G + 6558851
     for sp in [(4, 11, 9, 939, 0, 4), (4, 12, 8, 768, 0, 1), (4, 12, 8, 768, 128, 1)]:
         p1 = dna.index(lit(word(271)), at); p2 = dna.index(lit(word(293)), p1); p3 = dna.index(lit(word(4)), p2 + 10)

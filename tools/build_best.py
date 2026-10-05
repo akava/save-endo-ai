@@ -78,11 +78,15 @@ def P_day():          # night-or-day = F (the official "turn to the sun" prefix 
     return [lambda o: set_base(G + 1295, 'F', off=o)]
 
 
-def P_hills():        # hillsEnabled + neutralize surfaceTransform's clear->PIPIPIF search literal
+HILLS_HINT = 'IIPIFFCPICPFFIICPIICIPPPICIIC'   # yellow letters of contest-1998..2002, read from our renders:
+# (?IFPFCC)F -> \0 P, i.e. hillsEnabled (G+210026, right after the first IFPFCC) := P
+
+
+def P_hills():        # hillsEnabled (the hint prefix itself) + neutralize surfaceTransform's clear->PIPIPIF search literal
     s = G + 7159733
     def q(x): return ''.join({'I': 'C', 'C': 'F', 'F': 'P', 'P': 'IC'}[c] for c in x)
     c2 = q(q('IIIPIIPICP')); d2 = q(q('IIIPIIPICF'))
-    return [lambda o: set_base(G + 210026, 'P', off=o), lambda o: write_at(s + 119, d2, len(c2), o)]
+    return [lambda o: HILLS_HINT, lambda o: write_at(s + 119, d2, len(c2), o)]
 
 
 def P_bio():          # BMU cow branch: enableBioMorph + weather==2 -> ==0
@@ -187,14 +191,18 @@ def P_whale_pos():
     return [lit_word_patch(5067562, 391, PARAMS['whale'][0]), lit_word_patch(5067638, 176, PARAMS['whale'][1])]
 
 
+def sun_restored():
+    """the intended repair: sun = sunflower XOR flower (I=0, C=1, F=2, P=3), the name 'sun+flower' is the hint"""
+    V = {'I': 0, 'C': 1, 'F': 2, 'P': 3}
+    sf = dna[G + GENES['sunflower'][0]:][:GENES['sun'][1]]; fl = dna[G + GENES['flower'][0]:][:GENES['sun'][1]]
+    return ''.join('ICFP'[V[a] ^ V[b]] for a, b in zip(sf, fl))
+
+
 def sun_tail_fixed(shift=None):
-    """sun's mutated tail rebuilt from lightningBolt's identical tail (830 bases), keeping sun's own words"""
-    S = G + 2126041; L = G + 4305372; n = 830
-    a = dna[S:S + n]; b = dna[L:L + n]
-    fix = list(b)
-    for i in range(100, 185): fix[i] = a[i]
-    for base in (248, 324):
-        for i in range(base + 40, base + 76): fix[i] = a[i]
+    """sun's tail (830 bases from G+2126041) as restored from sunflower XOR flower; the moveTo before the fill is
+    optionally shifted (the sun is painted via colorSoftYellow, which does not set the origin)"""
+    S = G + 2126041; n = 830
+    fix = list(sun_restored()[S - G - GENES['sun'][0]:][:n])
     if shift:  # moveTo(x, y) before the fill, shifted when the origin is not set by the caller
         for base, d in ((248, shift[0]), (324, shift[1])):
             blk = ''.join(fix[base:base + 76]); import re as _re
@@ -204,9 +212,6 @@ def sun_tail_fixed(shift=None):
             v = sum(1 << k for k, c in enumerate(dec) if c == 'C') + d
             newraw = lit(word(v))
             fix[base + m.start():base + m.end()] = list(newraw)
-    lbw = lit(word(4305957)) + lit(word(245)); sw = lit(word(2126626)) + lit(word(245))
-    blk = ''.join(fix[400:585]); k = blk.find(lbw); blk = blk[:k] + sw + blk[k + len(lbw):]
-    fix[400:585] = list(blk)
     return ''.join(fix)
 
 
@@ -485,7 +490,8 @@ def ADAPTER_mu(off=0):     # decrypt charInfo_Tempus-Bold-Huge_M (RC4 key 'no1@A
     return crypt_call2('no1@Ax3', 502139, 3665, off)
 
 
-def ADAPTER_tail(off=0):   # decrypt the cow tail (RC4 key '9546') in place, before everything else
+def ADAPTER_tail(off=0):   # decrypt the cow tail in place, before everything else; key '9546' is written in the
+    # least significant bit of E.T.'s portrait on help page 112 (steganography, help page 3)
     return crypt_call2('9546', 4892541, 5212, off)
 
 

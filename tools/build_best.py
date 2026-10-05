@@ -366,10 +366,14 @@ def P_spiro():        # help page 180878 ('Synthesis of complex structures (2)':
     # after scenario, main jumps into the page's three yellow spirographs, drawn small (arg0 4->1) at the sun's centre
     # the target's spirographs are drawn before anticompressant (its faint overlay tints them): main's anticompressant
     # call jumps to the spirographs; after them a spare setOrigin call slot calls anticompressant, then main's end
-    pats = [lambda o: wdiff(G + 6536648, jmp_at(6536648, 6558851, 185), o),
+    # order by return addresses (a call pushes 'continue at A, rest length L' of the caller): scenario returns into
+    # the spirograph block instead of main's anticompressant call; the spare setOrigin slot after the third spirograph
+    # calls anticompressant and returns to the spirograph page's final 'compose' and jump to main's end
+    END = GENES['main'][0] + GENES['main'][1]
+    pats = [lit_word_patch(6536463, 6536648, 6558851), lit_word_patch(6536463, END - 6536648, END - 6558851),
             lambda o: wdiff(G + 6564817, jmp_at(6564817, 6564969, 32), o),
             retarget_call(6564969, 5603524, 11074),
-            lambda o: wdiff(G + 6565154, jmp_at(6565154, 6570038, 65), o)]
+            lit_word_patch(6564969, 6565154, 6570038), lit_word_patch(6564969, END - 6565154, END - 6570038)]
     at = G + 6558851
     for sp in [(4, 11, 9, 939, 0, 4), (4, 12, 8, 768, 0, 1), (4, 12, 8, 768, 128, 1)]:
         p1 = dna.index(lit(word(271)), at); p2 = dna.index(lit(word(293)), p1); p3 = dna.index(lit(word(4)), p2 + 10)

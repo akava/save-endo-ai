@@ -424,6 +424,8 @@ def rna_moves(dx, dy):
 
 
 CUP = dict(s=(26, -20), w=(-13, 10))
+CUP_FIX = 1                # 'moves', or +1/-1: fix curX/curY (y sign) instead of RNA moves
+CUP_BELIEVED = (84, 41)    # curX/curY when the cup's tail runs (dump with build/dna --stop-rna)
 FOUNTAIN = (199, -375)    # moveTo of the fountain picture, relative to the origin of that tuft (231, 575)
 
 PGT_END = 2640835 + 160449           # end of printGeneTable
@@ -460,7 +462,20 @@ def P_cup():          # whale in a cup of water: instead of `crater`, call ufo's
     UFO, UEND = 6630730, 6630730 + 11528
     sx, sy = CUP['s']; wx, wy = CUP['w']
     start = jmp_at(6632760, 6632760 + 128, 33)                            # jump over the weather checks
-    head = 'IIIPIIPIIP' + 'IIIPFFPCCP' + RNA_CW * 2 + rna_moves(-14 - 2 * wx, 34 - 2 * wy)  # fill compose, turn back
+    if CUP_FIX == 'moves':
+        head = 'IIIPIIPIIP' + 'IIIPFFPCCP' + RNA_CW * 2 + rna_moves(-14 - 2 * wx, 34 - 2 * wy)  # fill compose, turn back
+    else:   # tell the DNA where the turtle really is instead of moving it: curX/curY := believed - (dx, dy)
+        dx, dy = -14 - 2 * wx, 34 - 2 * wy
+        head = 'IIIPIIPIIP' + 'IIIPFFPCCP' + RNA_CW * 2
+        for gaddr, v in ((804464, CUP_BELIEVED[0] - dx), (804488, CUP_BELIEVED[1] - dy * CUP_FIX)):
+            ins = ''
+            for _ in range(6):
+                nxt = 6637926 + len(head) + len(ins)
+                new = P().open().skip(6642258 - nxt + gaddr).close().skip(24).end() + T().ref(0).b(word(v & M23)).end()
+                done = len(new) == len(ins); ins = new
+                if done:
+                    break
+            head += ins
     L = len(head) + 2 + 24 + 6
     endi = head + 'IP' + natfix(6642013 - (6637926 + L), 24) + 'IICIIC'  # ...and jump to ufo's 'compose ret'
     a = G + 6633668                                                       # 'addbmp clear white' before the dome mask

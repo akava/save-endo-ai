@@ -487,7 +487,7 @@ int main(int argc, char** argv) {
     // usage: dna [-p prefixfile | -s prefixstring] [-d dnafile] [-o rnafile] [-q]
     std::string prefix, dnaFile = "data/endo.dna", outFile = "out/out.rna";
     bool quiet = false, dumpDna = false;
-    u64 maxIters = 0;
+    u64 maxIters = 0, stopRna = 0;
     for (int k = 1; k < argc; k++) {
         std::string a = argv[k];
         if (a == "-p") prefix += readDna(argv[++k]);
@@ -496,6 +496,7 @@ int main(int argc, char** argv) {
         else if (a == "-o") outFile = argv[++k];
         else if (a == "-q") quiet = true;
         else if (a == "--dump") dumpDna = true;
+        else if (a == "--stop-rna") stopRna = strtoull(argv[++k], 0, 10);
         else if (a == "-L") logOut = fopen(argv[++k], "w");
         else if (a == "-t") { traceFrom = strtoull(argv[++k], 0, 10); traceTo = strtoull(argv[++k], 0, 10); }
         else if (a == "-n") maxIters = strtoull(argv[++k], 0, 10);
@@ -519,6 +520,7 @@ int main(int argc, char** argv) {
             iters++;
             u64 L = totalLen(); if (L > maxLen) maxLen = L;
             if (maxIters && iters >= maxIters) break;
+            if (stopRna && rnaCount >= stopRna) break;
         }
     } catch (Finish&) {}
     if (dumpDna) {

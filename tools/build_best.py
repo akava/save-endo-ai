@@ -490,6 +490,16 @@ def ADAPTER_mu(off=0):     # decrypt charInfo_Tempus-Bold-Huge_M (RC4 key 'no1@A
     return crypt_call2('no1@Ax3', 502139, 3665, off)
 
 
+def P_tailmain():     # cow tail decrypted by main itself: its vmu-code branch runs crypt(giveMeAPresent, offset, size)
+    # when giveMeAPresent is not empty. Key '9546' (from E.T.) into giveMeAPresent, the branch's offset/size literals
+    # -> cow-tail, and the branch's 'CALL vmu-code' (draws the registration page) and its 'ret' are disabled, so main
+    # goes on to the scene with the tail already decrypted.
+    k = key128('9546')[:9 * 4]
+    return [lambda o: wdiff(G + 93, k, o),
+            lit_word_patch(6530931, 2176355, 4892541), lit_word_patch(6530931, 33012, 5212),
+            lambda o: kill_instr(G + 6531739, 185, o), lambda o: kill_instr(G + 6531981, 160, o)]
+
+
 def ADAPTER_tail(off=0):   # decrypt the cow tail in place, before everything else; key '9546' is written in the
     # least significant bit of E.T.'s portrait on help page 112 (steganography, help page 3)
     return crypt_call2('9546', 4892541, 5212, off)
@@ -498,7 +508,7 @@ def ADAPTER_tail(off=0):   # decrypt the cow tail in place, before everything el
 import json  # noqa: E402
 GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'biomorph', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'biomorph', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu', 'tailmain']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
@@ -516,7 +526,7 @@ def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
 NOMERGE = False
 
 
-def build_merged(names=ORDER, adapters=('tail', 'ecc', 'mu'), plain=()):
+def build_merged(names=ORDER, adapters=('ecc', 'mu'), plain=()):
     """build() with all same-length replacements merged globally: the patches are recorded, overlaid on the original
     DNA, and the changed bases are written as spans chosen by DP over the real write cost."""
     import endo as E
@@ -556,15 +566,37 @@ def build_merged(names=ORDER, adapters=('tail', 'ecc', 'mu'), plain=()):
             per.setdefault(n, set()).update(range(pos, pos + oldlen))
         else:
             per.setdefault(n, set()).update(pos + i for i, c in enumerate(bases) if dna[pos + i] != c)
-    global LAST_STATS
-    LAST_STATS = dict(changed={n: len(v) for n, v in per.items()}, raw=raw,
-                      adapters={a: len(g['ADAPTER_' + a](0)) for a in adapters})
+    last = {}
+    for (pos, bases, oldlen), n in zip(rec, owner):
+        for i in range(oldlen):
+            last[pos + i] = n
     for pos, bases, oldlen in rec:
         if len(bases) != oldlen:
             keep.append((pos, bases, oldlen)); continue
         for i, c in enumerate(bases):
             final[pos + i] = c
-    prot = [(G + 4892541, G + 4892541 + 5212), (G + 502139, G + 502139 + 3665)]   # decrypted by the adapters first
+    TA, TL = G + 4892541, 5212
+    if 'tail' not in adapters:                 # tail decrypted later by main: store our plaintext edits encrypted
+        from fcrypt import crypt as rc4
+        tplain = list(rc4('9546', dna[TA:TA + TL]))
+        hit = False
+        for p in list(final):
+            if TA <= p < TA + TL:
+                tplain[p - TA] = final[p]; hit = True
+        if hit:
+            enc = rc4('9546', ''.join(tplain))
+            for i, c in enumerate(enc):
+                if dna[TA + i] != c:
+                    final[TA + i] = c
+                elif TA + i in final:
+                    del final[TA + i]
+    prot = ([(TA, TA + TL)] if 'tail' in adapters else []) + [(G + 502139, G + 502139 + 3665)]   # adapters decrypt first
+    chg = {}
+    for p_, c in final.items():
+        if dna[p_] != c:
+            chg[last.get(p_, '?')] = chg.get(last.get(p_, '?'), 0) + 1
+    global LAST_STATS
+    LAST_STATS = dict(changed=chg, raw=raw, adapters={a: len(g['ADAPTER_' + a](0)) for a in adapters})
     ch = sorted(p for p, c in final.items() if dna[p] != c or any(a <= p < b for a, b in prot))
     runs = []
     for p in ch:

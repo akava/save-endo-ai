@@ -512,6 +512,31 @@ def P_tailmain():     # cow tail decrypted by main itself: its vmu-code branch r
             lambda o: kill_instr(G + 6531739, 185, o), lambda o: kill_instr(G + 6531981, 160, o)]
 
 
+TAIL_KEEP_FRAME = (lambda o: kill_instr(G + 6531924, 57, o))   # the branch's cleanup deletes main's whole frame
+
+
+def P_mumain():       # mu glyph decrypted by main's second crypt branch (help-beautiful-numbers, entered when
+    # goodVibrations != 0). Its key is built from goodVibrations, so instead the branch's key push reads a second key
+    # stored in giveMeAPresent right after the tail's: '9546' 255 'no1@Ax3' 255 (crypt reads up to the terminator).
+    # Offset/size literals -> charInfo_Tempus-Bold-Huge_M; drawString(key), makeDarkness, the page call and 'ret' off.
+    # Both branches end main: their cleanup (!1233 at the blue zone start) deletes main's whole frame, which the
+    # second branch's entry check and the scene path still need, so both cleanups are disabled too.
+    def nat_fixed(v, n):
+        b = ''
+        while v:
+            b += 'C' if v & 1 else 'I'; v >>= 1
+        return b + 'I' * (n - 1 - len(b)) + 'P'
+    end = GENES['main'][0] + GENES['main'][1]
+    k = 93 + 45 + (end - 6535093)            # skip of the key push at +6534930 (relative to main's end)
+    return [lambda o: wdiff(G + 93 + 45, key128('no1@Ax3')[:9 * 7], o),
+            lambda o: wdiff(G + 6534930 + 5, nat_fixed(k, 25), o),
+            lit_word_patch(6534760, 941328, 502139), lit_word_patch(6534760, 32301, 3665),
+            lambda o: wdiff(G + 1281, key128(']')[:9], o),
+            lambda o: kill_instr(G + 6534390, 185, o), lambda o: kill_instr(G + 6534575, 185, o),
+            lambda o: kill_instr(G + 6535568, 185, o), lambda o: kill_instr(G + 6535753, 57, o),
+            lambda o: kill_instr(G + 6535810, 160, o), TAIL_KEEP_FRAME]
+
+
 def ADAPTER_tail(off=0):   # decrypt the cow tail in place, before everything else; key '9546' is written in the
     # least significant bit of E.T.'s portrait on help page 112 (steganography, help page 3)
     return crypt_call2('9546', 4892541, 5212, off)
@@ -520,7 +545,7 @@ def ADAPTER_tail(off=0):   # decrypt the cow tail in place, before everything el
 import json  # noqa: E402
 GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'biomorph', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu', 'tailmain', 'ecc']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'biomorph', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu', 'tailmain', 'ecc', 'mumain']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
@@ -538,7 +563,7 @@ def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
 NOMERGE = False
 
 
-def build_merged(names=ORDER, adapters=('mu',), plain=()):
+def build_merged(names=ORDER, adapters=(), plain=()):
     """build() with all same-length replacements merged globally: the patches are recorded, overlaid on the original
     DNA, and the changed bases are written as spans chosen by DP over the real write cost."""
     import endo as E

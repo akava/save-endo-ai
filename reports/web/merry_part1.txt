@@ -1,0 +1,479 @@
+
+
+Entropy always increases: Disassembling Endo, part 1
+
+Entropy always increases
+
+Wednesday, April 21, 2021
+
+Disassembling Endo, part 1
+
+Since it was recently Easter, I decided to revisit what's probably my favourite easter egg hunt / programming contest ever: ICFP 2007. It's a problem where you are given a description of a strange virtual machine together with a large and slightly damaged program for it, and have to modify it to make it produce the right output, with reward for the most minimal modifications. The original contest was 72 hours, but this time around I'm spending a lot more time on it because I really wanted to investigate all the intricacies and solve all the puzzles.I'm going to make a walkthrough on this blog since I find it interesting to look back at the chain of clues to see just how much depth the problem authors put into it. At the time our team wrote a blog post which described how far we got, and it has links to a lot of similar writeups, but I'm not aware of a complete walkthough. The link above has a report from the authors that briefly describes a few of the puzzles, but not everything. Jochen Hoenicke also has a page listing a highly optimised solution which perfectly reproduces the target image, but it's not a walkthrough: without having tackled the problem yourself the explanation will not make much sense.Like any walkthrough, this blog is going to be full of spoilers. If you want to try the problem yourself, stop reading now and have a go, and come back when you get stuck.I plan to write this in 2-3 parts. Part 1 will find most of the hidden clues you need. Part 2 will dive deeper into the internals of the code to understand what it does and how we can write new code to achieve our goals, aiming to finish up by perfectly creating the target scene. If I still have the energy I'll write a Part 3 to look at optimising the prefix to improve Endo's chances of survival.Ok, onwards! I assume you've read the problem statement. I'll be writing a lot of pattern matching rules, so I should explain my syntax. It's basically the syntax used in the problem statement, but tweaked to make it plain ASCII that can be parsed unambiguously:*xxxxxxx* is RNA (IIIxxxxxxx in the DNA)?[xxx] is search for xxx![n] is skip n() in patterns for bracketing subexpressions(n,l) in templates for a reference to the nth element of the environment at protection level l (note: they appear in the opposite order in the DNA)(n) is shorthand for (n,0)|n| for the length of the nth element of the environment.So clearly there are two things you'll need to implement: the DNA → RNA conversion, and the rendering of RNA. The first is by far the trickier of the two. Conceptually it's not too hard, but it needs to be implemented carefully or it'll take hours to run. They're not kidding when they say you need to be able to do large jumps in sub-linear time, as well as pasting large strings when expanding the template. You're going to be running the simulator a lot, so if it's taking more than 30 seconds then it's going to be worth doing some optimisation early on. Here are a few hints:The search operator (?) is fairly rare, and the strings searched for tend to be quite short (less than 20 characters). Don't spend time implementing fancy string searches like Boyer-Moore. There are a few puzzles which will take much longer to run if this is horribly inefficient.It's quite common that the template ends with an (unquoted) substitution of a subexpression that ends at the end of the pattern, for example, (![123456](![100])) -> (0)(1). In that case you don't need to remove it and add it back again.The specification doesn't put an upper bound on integer size. You won't need more than 32 bits (although some have more than 32 bases, but with zeros in the high bits). I've actually found it quite useful to crash out when this is violated, since it indicates that I've done something wrong.Don't worry if you get some RNA that doesn't match any of the valid combinations. It's normal. I ended up implementing strings as a binary tree of string views, pointing at either the original DNA, or dynamically allocated strings (basically a rope). I also tried ensuring balance of the tree by using a treap, but it didn't make much difference except in a few special cases. A useful optimisation was to collapse trees with fewer than a certain number of characters, since it's cheaper to do the copy once than to walk through the tree each time.Ok, so assuming you've implemented your simulator correctly, you should see the starting output:What now? The problem statement gives you a hint that you should try a particular sequence. I suggest also working out what each of these sequences does, as it'll give insight into the machine You can do it by hand, but it's also useful to have some disassembler functionality in your simulator. In this case it translates to (?[IFPP])F -> (0)P. In other words, find the sequence IFPP, and if there is an F after it, change it to a P. And now we get:Or of course, you might get some failures. Note that just become something says OK, it might be broken. My initial implementation had messed up some of the alpha processing so the alpha composition didn't look right.This is one of the points where it is quite easy to get stuck, just because you haven't yet reached a point where clues start branching out. Probably the easiest way to find the next clue is to slow down the drawing process so that you can see how the image is built up. For example, just before each compose or clip operation, dump the two bitmaps involved. You'll be able to see how each element of the image is first drawn on its own layer before compositing it onto the main image. But you'll also see something else right at the start:Another way to find that clue was to notice that the DNA starts with a big chunk of RNA; if you decided to try that out while someone was implementing the DNA → RNA program, you would probably see the above. Type that in (carefully!) and let's see what happens. For reference, it decompiles as (?[IFPCFFP])I -> (0)C, so once again we're searching for some marker string and changing the character after it.Ah, now we're making progress. A field repair guide sounds useful, but I'll show the result of the second clue first, just because it doesn't immediately lead to more clues. The prefix is (?[IFPFI])P -> (0)F, so again, replacing one base (or "acid", as the repair guide calls them) after a marker.So as promised, it's rotated the earth to face the sun (although the sun itself isn't visible). This looks like good progress! We probably now have a lot more correct pixels than we started with. If you have ImageMagick installed, the compare program is useful to visually check how close one is getting:Ok, let's get back to the field repair guide. This time the prefix is (?[IFPCFFP])II -> (0)IC. That's pretty similar to a previous one: the same search pattern, but now we're replacing II with IC. And it gives this:Thankfully from now on we'll see more of that font, which is a lot more readable than the last one. It's also time to start writing our own prefix! While at this stage one can do things by hand, it's worth investing in some tooling as you're going to use it a lot. So I recommend writing something that will take human-readable pattern rules and turn them into DNA. It doesn't need to be super-efficient; I put something together with Python and the pyparsing package.How do we get to other pages? We've already seen two repair guide pages, both of which skip ahead to a particular pattern and then replace some acids after it. If you open up the DNA in a text editor and find the pattern, you'll see the next few acids are IIIIIIIIIIIIIIIIIIIIIIIP. So according to this encoding description, that's zero, and we've been to pages 1 and 2. At this point one could just edit the DNA directly (either with a text editor or with code), but let's practice writing a pattern to get page 1337: (?[IFPCFFP])IIIIIIIIIII -> (0)CIICCCIICIC:Now we're really getting somewhere! We can repeat for each of those page numbers (although it won't work for the encrypted ones:1729 (a taxicab number):8:42 (the answer to life, the universe and everything):112 (I guess because it's the international emergency number?):10646 (the joke is that ISO 10646 defines the Universal Character Set):85:2181889 (not sure what the reference is to):5:4405829 (apparently the patent number for RSA encryption):123456:That opens up a whole lot of parallel threads to explore, so I'm just going to pick an order. I'm going to start by learning as much about the machine as possible before doing anything much about trying to match the target image. In practice one probably wants to work on both in parallel.The red/green/zone explanation tells us something about how this crazy machine is programmed. Since the blue zone grows and shrinks at one end, it sounds like a stack, and it is. The green zone sounds more like a code or data segment: it can be edited, but you can't go shuffling things around without breaking code that expects to know where things are. And the red zone is "born" from the green zone in the sense that code is copied from the green zone to the red zone to be executed. That makes sense, because once a pattern rule is executed, it disappears from the DNA, so if you want to have reusable code you need to copy it before executing it.We also have the first page of what looks like a symbol table, and it tells us how to find the green zone: it starts with IFPICFPPCFFPP. Incidentally, how can one be sure that such markers won't accidentally match in the wrong place? You might have noticed when implementing the simulator that in a pattern, IF can be followed by any character; in a template, IF is equivalent to IP; and in both, IIF is equivalent to IIC. It's thus possible to avoid using the sequence IFP in producing any rule (unless you want it in some RNA, but none of the defined RNA sequences need that), and it's a good idea to avoid it in your code too to avoid accidentally messing up patterns that search for such markers.Can we get the rest of the symbol table? The first symbol (AAA_geneTablePageNr) is a bit of a clue. If we go find the green zone marker (it's 13615 acids into the download), go forward 0x510 acids, and then look at the next 0x18 acids, they're IIIIIIIIIIIIIIIIIIIIIIIP. We've seen before that this encodes 0, so what happens if we change the first acid to a C to encode 1? We'll use (?[IFPICFPPCFFPP]![1283])![1] -> (0)C, (combined with the rule to show the gene table). Note that 1283 is not 0x510: we have to subtract 13 to account for the ? operator taking us to the end of the green zone marker. If you've done it right, you'll get:And we can continue in the same way (for larger numbers you'll obviously need to replace more bits):It seems like some of the entries are damanged; we'll eventually want to fix that.You'll want to start capturing some of this information so that you can pull symbols out to examine or automate modifying them, but don't bother typing in the whole table; later on we'll be able to extract it automatically. But it's worth reading over to look for clues. Some interesting symbols are hitWithTheClueStick, blueZoneStart (which tells you how big the green zone is), and of course all the help-* functions (which suggests there might be more help pages we haven't seen yet). You can also confirm that the value we changed to bring up the sun corresponds to night-or-day, and that the repair guide page number is helpScreen.The character set page was less than totally helpful, being just a grid of dots. One of the symbols was called fontTable_Dots, so maybe it shows the characters but the font is just dots? We have no idea how font tables work yet, but they're all the same size, so maybe we can just replace it with another one? To do that we'll need to advance to the source font (say, fontTable_Messenger), advance over it (in parentheses, to capture it), advance to the target, and skip over it to consume it, then put back everything else we consumed plus the replacement:(?[IFPICFPPCFFPP]![610254](![9216])![42728])![9216] -> (1)(0)Don't forget to add this to the previous prefix that set the repair guide page number (incidentally, you can see this is called helpScreen in the gene list).Voila! Now we can interpret any text we find. There is another way you could have figured this out: we're told the intergalactic character set has fallen into disuse on Earth, which if you know some history, describes EBCDIC. One look at the Wikipedia page should show you a pattern similar to the dot pattern, although everything is shifted up by 4 lines (and ICS text only goes up to 0xbf). But there are a lot of variations on EBCDIC, so it's helpful to confirm how the punctuation is laid out.We've also been given a clue that one can go searching for text. We'll start simple by ignoring quoting, and just search for sequences of 9-acid (8-bit) numbers, ending with 255. Regular expressions are good for that, and here's what pops out:                                                                  bcdefghij       klmnopqrs        tuvwxyzA                       BCDEFGHIJ       KLMNOPQRS        TUVWXYZ0      123456789a      Help!  We are a group of computer scientists held prisoner on the remote planet of Utrecht in the Orion nebula by the evil Fuun.  The Fuun have already conquered thousands of worlds, and it appears that Earth is next.  Their modus operandi is always the same: they organize a fake `programming contest' on the victim world to repair a supposedly disabled Fuun. This enables them to identify that planet's best and brightest minds, who are then eliminated in advance of the actual invasion, leaving the planet defenseless against the Fuun's superior weaponry.  You must not, under any circumstances, repair the Endo creature, as he - when reactivated - will surely destroy his `rescuers' and give the attack signal to the Fuun invasion force massing near Sullust.  Do not give in to the lure of rewards, monetary or otherwise! * * * It is too late for us, but in the unlikely event that Earth manages to stave off the Fuun invasion, we would appreciate a monument of some sort to honour us (especially since we sabotaged the Fuun DNA by swapping some parabolas).  We are: Alexey Rodriguez * Andres Loeh * Arie Middelkoop * Bastiaan Heeren * Chris Eidhof * Clara Loeh * Eelco Dolstra * Eelco Lempsink * Jeroen Leeuwestein * Johan Jeuring * John van Schie * Jurriaan Hage * Maaike Gerritsen * Mark Stobbe * Martijn van Steenbergen * Stefan HoldermansWell, that's fun ☺. And eventually we'll use the clue about swapped parabolas.We can also start searching for text that's been quoted (I -> C, C -> F, P -> IC). That turns up a huge amount of stuff: what looks like some function documentation, some of the text we've already seen (including the gene table, plus we can see names for the damaged entries), a story about Major Imp, some history of previous ICFP contests, and some help pages we haven't seen yet. It's all a bit fragmented and out-of-order, and a lot of it we'll see in more readable form later anyway, so I'm not going to delve into it here. If you're attempting the problem yourself, however, I recommend going through it, as you may find clues that you otherwise struggle to unlock.Now let's tackle the gibberish on the Fuun security features page. It looks encrypted, but there are clearly patterns that suggests it's not good encryption. What's the worst encryption around? ROT13 of course. Typing it all in to decrypt (or decrypting by hand) is pretty tedious, but having bits of the text available as raw text (albeit incomplete and out-of-order) will help. When you get it decrypted, you can see it describes an encryption algorithm. If you've studied encryption, you'll recognise that this is a stream cipher, the best known of which is RC4, and indeed the description matches RC4. There is unfortunately a bug on this page (one of the very few actual mistakes the problem authors made): Step 5B is missing a lookup of the sum into the table before using the result. This also gives us a hint that we might be able to crack some of the encrypted items by using the purchase codes we can see in the symbol table and the crackKey gene.But maybe we're not done with ROT13 just yet. We can see that help-activating-genes doesn't have a corresponding purchase code in the symbol table, so maybe it's encrypted with the simple encryption? Since there are only four characters in the DNA alphabet, it's going to be ROT2 (I → F, C → P, F → I, P → C). Trying to implement that transformation as a prefix will be challenging at this point, but we can just pull out the current value, transform it in a normal language, and then write a prefix that stuffs the replacement into the right place (or just do everything on the host system). That gives us this:So this tells us a bit more about how to call "genes" (functions) and pass them "adaptations" (arguments). It also tells us something about how returns work. But recall that help page 85 also told us how to use the "adapter" to simplify making function calls.Let's see if we can crack some of the other encryption. There is one other repair guide page we're told is encrypted (page 84, "How to fix corrupted DNA") and we can see a symbol called help-error-correcting-codes_purchase_code. Let's read it out, then follow the instructions for the adapter to run this pair of rules:(?[IFPICFPPCFIPP]) -> (0)CPCPFPPCFCIIPFICCFCFIFCC(?[IFPICFPPCCC](?[IFPICFPPCCC])) -> (0)CIICICCIIICICIICIICCICCPICCICIIIICCICP(1)The first rule pushes the purchase code (which we've extracted externally) onto the stack, and the second calls the gene crackKeyAndPrint. This will run for quite a long time (minutes) and eventually produces:Ok, but now how do we apply it? There is a crypt function in the symbol table (and RC4 is symmetric, so the same process will work for decryption), but we don't know what parameters it takes. We won't actually need the information this key unlocks until much later, so you could just wait, or you could take some guesses, or you could implement RC4 in your language of choice and do the decryption outside of the Fuun machine. You'll need to make a guess about how the 8-bit values are split into groups of 4 (little-endian, just like Fuun numbers). If you want to check that it's implemented correctly, just decrypt the purchase key: it should decrypt to III...IIIP i.e., zero. Now we can view page 84:There isn't a whole lot we can do with this for now. We can try cracking other keys using the other purchase codes in the table, but in fact only one of them is short enough to be practical to crack with brute force (3 characters, which can be quickly cracked with brute force in C++), and in fact we won't need to (one thing I felt was really well-designed in this contest is that a lot of clues can be solved in more than one way).Now that we've seen how to call one function, maybe we should try to call some others to see what they do? But first, let's see if we can extract the symbol table, rather than having to type in addresses. We already saw that the symbol names all appear (quoted) in the raw DNA; maybe the addresses and sizes are too? Let's take some symbol (it might as well be crackKeyAndPrint), find it in the DNA, and dump the surrounding acids. Incidentally, by this point it is highly worth having a library of routines to do text encoding, quoting, unquoting, number parsing and so on. You'll see that the previous 50 acids are:FCCFCFFCCCFCFCCFCCFFCFFICCFFCFCCCCFFCFCCCCCCCCCCICwhich when unquoted and interpreted as numbers are 0x6c9469 and 0x1616 — just what we needed. So we can modify our text-finding regular expression to hunt for symbols, consisting of two quoted 24-base numbers followed by a quoted string. Compared to the table we extracted earlier, this one also has the "damaged" entries!At this point I wrote a script to just try calling every symbol that looks big enough to be a function (in separate invocations). In each case, follow the call with a call to terminate so that the output isn't overwritten by the original code. Most of them just come out blank, some crashed (by triggering my check for integer overflows), and some ran forever and I had to list them for exclusion. Some of the functions require arguments and we don't know yet what they are, so I just pushed 10 24-acid integers onto the stack first.That still leaves a lot of useful help pages and clues:There are some easter eggs, including the story of Major Imp. It also contains the Arecibo Message (which I wasted a lot of time trying to interpret during the contest). You'll also see a lot of the elements of the scene (bits of saucer etc).Let's start with the prefix we've been given in the photo of the organisers, (?[IFPC])![27] -> (0)ICCICIICPCCCICIICPCICIIIICP. Look for that marker and match things to the symbol table, and we find that we're setting giveMeAPresent, and the value looks like text, which turns out to be OPE. If you decided to try cracking purchase codes earlier you might recognise this as the encryption key for vmu-code, and indeed this prefix gives us that page: There is a symbol called vmuRegCode, so maybe we need to put it in there? Unfortunately that doesn't seem to have any effect, and if we also try setting vmuMode to some obvious small values we get an error page. We'll come back to this later.By the way, "Out of Band II" is a reference to a spaceship in "A Fire Upon The Deep", a most excellent piece of science fiction.The steganography page mentioned yellow dots. If you look at the contest history closely, some of the letters are in yellow. And all of them are either i, c, f or p. Put them all together (chronologically) and you get another prefix, which decodes as (?[IFPFCC])F -> (0)P, and matching that pattern to the symbol table tells us that it's setting hillsEnabled to 1. Unfortunately, while the hills appear, something has gone very wrong:If you compare this to the target image, you'll also see that the hills aren't in quite the right places. There was the clue earlier about some parabolas being swapped, but we'll need to learn more about how to read Fuun code before we can try to fix that.What does the steganography page mean about the one image being hidden in the other? One of the simplest forms of steganography is to put information in the least significant bits. If we take each pixel, keep only the LSB of each channel, and multiply it by 255, we get this, showing the hidden image:So let's try the same thing on all the other images we have. You can easily miss it (I did this time around, and only rediscovered it when reading our team blog again), but the left side of ET contains the number 9546. It's not immediately clear what that's good for though; if you try it as a repair guide page number it won't work, nor is it the encryption code for help-beautiful-numbers.One of the symbols is called hitWithTheClueStick, which sounds like it should give us a clue. If you extract it, you'll notice that there are a lot of I's and C's, very few P's, and no F's. Numbers are encoded with I's and C's terminated by an P, so this looks like more data than code. The first chunk also seems to have some patterns in it. Maybe the Arecibo Message is a hint? It was a string of bits that was intended to be wrapped into a bitmap. In that case it was the product of two primes, making it easy to guess the dimensions, whereas we have 12800 bits but to the first P, but some trial and error shows that a 16×800 bitmap is readable:Well, that's a pretty strong clue that the next chunk is going to be a PNG file. If we assume each 8 characters produces one byte (little endian), we get this:Ok, so the next chunk is going to be an audio file. We don't know what type, but there are tools for identifying file types from content which tells us it's an MP3. And it's a voice reading out I's, C's, F's and P's. It's a bit tedious to record (it helps to use some software to slow it down), but produces the prefix (?[IFPFP])![7] -> (0)CCICCCC, which gives us this image:Maybe some beautiful numbers are repair guide pages? 6, 28 and 496 don't do anything special, but 8128 causes my simulator to crash, so it's definitely special but we don't yet know why.We also now have documentation on a lot of the functions. One of these is printGeneTable, where we can see a boolean argument controlling integrity checking. We've already been given some hints that various parts of the DNA are damaged, and knowing which parts might help. While we're at it, let's see if we can fix the damaged entries: since they're visible in the source, they can't be that badly damaged. We saw that each symbol name is preceded by the address and size, but what else? In between the symbols are bits of code that look like this:IPPIICCCPPPIPPCICCCPICICThe general pattern seems to be "IPP", a number (which increments by 1 each time), then P or IC, and other P or IC. If we assume the last two are boolean flags, then they're probably quoted (since F is false and P is true, and those become P and IC when quoted). Match them up to the symbols, and one can deduce that these appear after the name, the first boolean indicates whether the entry is damaged or not, and the second probably indicates whether it is a function or data.So, let's just flip the damaged flag to fix the entries! Wait a second, how do we do that without changing the size? Fortunately the number immediately before is variable-size, so if we change IC to P, we can just insert an extra bit into the number (without changing the value) to make up the space. Here's my Python code for this:code = re.sub(    '([CF]{23}IC[CF]{23}IC(?:[CF]{8}IC){1,}FFFFFFFFICIPP[CI]*)PIC',    r'\1IPP', code)Next, we push a P onto the stack (to enable the integrity checking) and call printGeneTable (followed by terminate), and:So indeed, some of the functions are damaged. A few of them were encrypted, and we've decrypted them (help-activating-genes, help-error-correcting-codes, vmu-code), but that still leaves more. We also have a few potential passwords (no1@Ax3, 9546, 8128, and Out_of_Band_II), and we now have a tool that will tell us if we've decrypted with the correct password. Some trial and error will show that 9546 decrypts cow-tail and Out_of_Band_II decrypts caravan.What about cow-spot-middle? There is the interestingly-named cow-spot-middle-ecc symbol, of the same size, and the help page on error-correcting codes suggested we should expect 4 parity bits per 4 data bits. There is also the correctErrors function in the symbol table. You'll find that calling that first (with the right arguments) will cause cow-spot-middle to pass. When calling functions with multiple arguments, keep in mind that the first argument gets pushed to the stack first, and hence is further from the top (front) of the stack; and that integers must be encoded with 24 acids.What about that page on palindromes? The text fades away, but you can find all the useful information in the raw text. It strongly suggests that some code might have a copy stored backwards as a backup. That would be the same size, so let's see what happens if we group symbols by size. We know cloud is one of the damaged symbols, and there is a symbol of the same size called duolc - cloud spelled backwards! And indeed, copying and reversing duolc over cloud will fix it.How about sun? There is a function called sunflower, which is exactly the same size, and there are no sunflowers in the picture. In the case of cloud-duolc, the alteration of the name was a clue — so maybe sunflower is somehow a combination of sun and flower? Again a little trial and error is needed to consider the possibilities, but it turns out that it is their XOR (again with I=0, C=1, F=2, P=3).Let's take a break from examining functions and try just poking some of the variables we can see. I'll assume that the functions have been fixed as appropriate. Clearly we need to turn Endo into a cow, and the VMU help page hinted that there is a Biomorphological Unit that might help. What happens if we set enableBioMorph to P (true)?Well, he's roughly the right shape now, but he's an OCaml. But there is a variable called ocamlrules. Maybe if we change that from P (true) to F (false)?Clearly the contest organisers had a lot of fun. Well the BMU should be adapting Endo to the local conditions, and both camels and elephants are found in dry areas — maybe if we change the weather (it's a 24-acid number)?weather=1:weather=2:weather=3:(remember to fix clouds and sun before trying these). Other values of weather don't seem to do anything.So we can get the clouds to appear (although not in the right places or with the right sizes), together with some unwanted rain and lightning, and a bunch of things suddenly become very German. We can also get the sun to appear, in the right place, but too yellow and without the pattern in the middle. We can get Endo to turn half-way into a cow.Notice how when weather is 1 or 2, there is also a faint shadow in the outline of the desired cow shape. Maybe the real cow is there but just almost completely transparent? We'll come back to this later.There is a help page about Lindenmayer systems, and if you've played with them, the weeds (brown sticks on the left horizon) might look related. The impdoc page on lsystem-weeds is also a strong hint that these are L-systems with a random component. You can try calling the function yourself with different depths, but none of the options match the target. Maybe the target uses different random numbers? There is a seed variable, so you can try poking different numbers in there, and indeed the weeds will change. But what is the right value? Well the help page on L-systems refers to The Algorithmic Beauty of Plants, and we know that perfect numbers are considered beautiful, so let's try some of those. And indeed the 4th perfect number (8128) is the right value:What about the windmill? Windmills rotate, so if anything uses polar coordinates it'll probably be that. Let's write to polarAngleIncr (it also works to call setGlobalPolarRotation). You an use trial and error to hone in on the correct angle, or you can recall that Fuuns use 256 angle steps in a circle and measure the angle adjustment you need to make (although you'll still need an experiment or two to determine the sign convention). You'll want to set it to 5: We haven't yet used the clues about bioMul and super-adaptive genes. It looks suspiciously like functional programming, and it turns out that there is an entire functional language hidden away inside this machine! The Major Imp episodes hinted at this (Imp being short for Imperative). The terminology is a little confusing though. I'll try to explain it, but as I'm not very familiar with functional programming I'll probably make real functional programmers cry."Genes" are functions (the imperative functions we've seen so far are also called "genes", but they're not the same). "Adaptation Trees" are expressions. An Adaptation Tree consists of the address of a gene (function) followed by a sequence of arguments. Some of those arguments are themselves expected to be expressions; where an expression is expected, it is always represented by its length. One of the most common genes to use is activateAdaptationTree, which is followed by the address of an adaptation tree in the green zone. In this case, it first evaluates the expression in that adaptation tree (which resolves to a function, because this is a lambda calculus where everything is a function, including integers), when is then invoked with the arguments.In the symbol table, symbols with the _adaptation suffix are adaptation trees. There are also some functional genes (like k and intBox) that don't have the suffix. We can use the information we've been given about the encoding to see what bioAdd looks like:[ activateAdaptationTree caseVar1_adaptation    [ activateAdaptationTree var2_adaptation ]    [ activateAdaptationTree apply1_adaptation        [ activateAdaptationTree bioSucc_adaptation ]        [ activateAdaptationTree apply2_adaptation            [ activateAdaptationTree bioAdd_adaptation ]            [ activateAdaptationTree var1_adaptation ]            [ activateAdaptationTree var2_adaptation ]        ]    ]]One subtlety I didn't appreciate at first is that the BioNat type isn't a function taking two arguments (although note that currying is prevalent), but a function taking a pair (which is a distinct data type). So working through this and reading the Fuun docs, we see that if var1 is 0, it returns var2, otherwise it returns the successor of something. apply2 will call var1 and var2 on the pair (getting the first and second elements), reassemble them into a pair, then pass it to bioAdd. That is actually somewhat redundant and the whole apply2 subtree could be replaced by using bioAdd directly, but no matter. This matches the description of bioAdd.That should give us what we need to implement bioMul. Here's my implementation:[ activateAdaptationTree caseVar1_adaptation    [ activateAdaptationTree bioZero_adaptation ]    [ activateAdaptationTree apply2_adaptation        [ activateAdaptationTree bioAdd_adaptation ]        [ activateAdaptationTree var2_adaptation ]        [ activateAdaptationTree bioMul_adaptation ]    ]]In other words, 0 * y = 0, and (x+1) * y = y + x*y. My original implementation had the last two lines swapped around, which makes no semantic difference, but the implementation of this functional language is pretty simplistic and tends to evaluate some expressions multiple times in a way that can cause a stack explosion. I spent a lot of frustrated time debugging integer overflow errors as a result.When you patch the adaptation tree in the green zone, remember that it must be preceeded by the length and followed by the length of the rest of the green zone. Unfortunately making this change doesn't seem to have any effect. If you poke around the other adaptation trees for a while you might find biomorph_adaptation, which is a big complicated expression starting with this:[ activateAdaptationTree enableBioMorph_adaptation    [ activateAdaptationTree payloadBioMorph_adaptation        [ activateAdaptationTree fromNat_adaptation            [ activateAdaptationTree apply2_adaptation                [ activateAdaptationTree bioMul_adaptation ]                [ k                    [ activateAdaptationTree mkSucc_adaptation                        [ activateAdaptationTree mkZero_adaptation ]                    ]                ]                [ k                    [ activateAdaptationTree mkSucc_adaptation                        [ activateAdaptationTree mkSucc_adaptation                            [ activateAdaptationTree mkSucc_adaptation                                [ activateAdaptationTree mkZero_adaptation ]                            ]                        ]                    ]                ]  So it looks like it's constructing some constants (1 and 3) and multiplying them (k take a value and returns a constant function that always returns that value), and obviously it's depending on us to fix bioMul. But there is also that enableBioMorph_adaptation adaptation right at the top. What does that do?[ false ]Aha! Confusingly, it has nothing to do with enableBioMorph. If we change it to [true], then the clumps of grass move into the correct positions:Looking through the _adaptation symbols, there seem to be a few related to the goldfish. In particular, take a look at goldenFish_adaptation:[ activateAdaptationTree mkBeforeAbove_adaptation    [ activateAdaptationTree mkEmp_adaptation        [ intBox 20 ]        [ intBox 20 ]    ]    [ activateAdaptationTree mkBeforeAbove_adaptation        [ activateAdaptationTree mkAbove_adaptation            [ activateAdaptationTree mkBeforeAbove_adaptation                [ activateAdaptationTree mkGoldfishL_adaptation ]                [ activateAdaptationTree mkBeforeAbove_adaptation                    [ activateAdaptationTree mkEmp_adaptation                        [ intBox 8388606 ]                        [ intBox 8388607 ]                    ]                    [ activateAdaptationTree mkGoldfishR_adaptation ]                ]            ]            [ activateAdaptationTree mkBeforeAbove_adaptation                [ activateAdaptationTree mkEmp_adaptation                    [ intBox 45 ]                    [ intBox 24 ]                ]                [ activateAdaptationTree mkGoldfishL_adaptation ]            ]        ]        [ activateAdaptationTree mkBeforeAbove_adaptation            [ activateAdaptationTree mkEmp_adaptation                [ intBox 0 ]                [ intBox 24 ]            ]            [ activateAdaptationTree mkAbove_adaptation                [ activateAdaptationTree mkGoldfishR_adaptation ]                [ activateAdaptationTree mkBeforeAbove_adaptation                    [ activateAdaptationTree mkEmp_adaptation                        [ intBox 25 ]                        [ intBox 29 ]                    ]                    [ activateAdaptationTree threeFish_adaptation                        [ activateAdaptationTree mkGoldfishR_adaptation ]                        [ activateAdaptationTree emptyBox_adaptation ]                    ]                ]            ]        ]    ]]This is describing the layout of the goldfish in some way. You don't need to understand all the details. Just try changing the various numbers to see what happens. Also try changing some of the goldfish from L to R or vice versa. You can get things mostly correct this way, but there just aren't enough goldfish. But notice that emptyBox_adaptation right at the end: what if we change it to mkGoldfishR_adaptation?The full solution is to swap the direction of all the first, change the 0 to 18, and swap out the empty box as above. Now we have this:That's it for the functional programming language in terms of fixing up the scene. While trying to track down bugs in my bioMul implementation I ended up learning a lot more about it, which I'll share just for interest:True is a function taking two arguments and returning the first, while false takes two arguments and returns the second.Zero is also a function taking two arguments and returning the first. So in fact, true, k and mkZero_adaptation have identical implementations (for whatever reason the last is an adaptation tree that simply calls an anonymous gene, which seems to be quite common).Positive integers are functions that take two arguments and call the second with one less than that integer. If this sounds a lot like what caseVar1 does, it is. There is another (undocumented) adaptation called caseNat which takes a single integer (instead of a pair), and its implementation is an identity function.A pair is a functor that takes a function and calls it with the elements of the pair i.e. λf.f(x)(y).Apart from the "Nat" type (Peano integers), the language does allow "raw" 24-acid numbers to be used, but only where they're expected (using them in the wrong place causes them to be confused with lengths; you might have already seen this if you try to fully decompile biomorph_adaptation). intBox allows passing such a raw integer to the following expression. fromNat converts a Nat to a raw integer and passes it to the following expression. These are used to interface with imperative code via a special gene called wrapImp (which is in turn wrapped by adaptation trees like wrapSub_adaptation).We won't get a whole lot further by just poking at variables. We'll need to start taking apart some of the code to see how it works. For example, we'll discover that there is another repair guide page that we haven't spotted yet. But that's for Part 2. If you made it this far, I hope you're having fun!
+
+Posted by
+
+Bruce Merry
+
+at
+
+12:56 PM
+
+Email ThisBlogThis!Share to XShare to FacebookShare to Pinterest
+
+No comments:
+
+Post a Comment
+
+Newer Post
+
+Older Post
+
+Home
+
+Subscribe to:
+Post Comments (Atom)
+
+Blog Archive
+
+        ► 
+
+2025
+
+(1)
+
+        ► 
+
+January
+
+(1)
+
+        ► 
+
+2023
+
+(3)
+
+        ► 
+
+December
+
+(1)
+
+        ► 
+
+November
+
+(2)
+
+        ► 
+
+2022
+
+(2)
+
+        ► 
+
+December
+
+(1)
+
+        ► 
+
+July
+
+(1)
+
+        ▼ 
+
+2021
+
+(2)
+
+        ► 
+
+May
+
+(1)
+
+        ▼ 
+
+April
+
+(1)
+
+Disassembling Endo, part 1
+
+        ► 
+
+2020
+
+(1)
+
+        ► 
+
+January
+
+(1)
+
+        ► 
+
+2018
+
+(1)
+
+        ► 
+
+January
+
+(1)
+
+        ► 
+
+2017
+
+(3)
+
+        ► 
+
+November
+
+(1)
+
+        ► 
+
+June
+
+(2)
+
+        ► 
+
+2016
+
+(6)
+
+        ► 
+
+November
+
+(4)
+
+        ► 
+
+June
+
+(1)
+
+        ► 
+
+March
+
+(1)
+
+        ► 
+
+2015
+
+(1)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+2014
+
+(11)
+
+        ► 
+
+October
+
+(1)
+
+        ► 
+
+July
+
+(2)
+
+        ► 
+
+June
+
+(6)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+February
+
+(1)
+
+        ► 
+
+2013
+
+(4)
+
+        ► 
+
+November
+
+(1)
+
+        ► 
+
+July
+
+(2)
+
+        ► 
+
+February
+
+(1)
+
+        ► 
+
+2012
+
+(2)
+
+        ► 
+
+September
+
+(2)
+
+        ► 
+
+2011
+
+(2)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+March
+
+(1)
+
+        ► 
+
+2010
+
+(5)
+
+        ► 
+
+September
+
+(2)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+April
+
+(2)
+
+        ► 
+
+2009
+
+(10)
+
+        ► 
+
+November
+
+(1)
+
+        ► 
+
+August
+
+(3)
+
+        ► 
+
+June
+
+(1)
+
+        ► 
+
+May
+
+(3)
+
+        ► 
+
+February
+
+(1)
+
+        ► 
+
+January
+
+(1)
+
+        ► 
+
+2008
+
+(30)
+
+        ► 
+
+December
+
+(1)
+
+        ► 
+
+November
+
+(1)
+
+        ► 
+
+October
+
+(2)
+
+        ► 
+
+September
+
+(2)
+
+        ► 
+
+August
+
+(1)
+
+        ► 
+
+July
+
+(1)
+
+        ► 
+
+June
+
+(2)
+
+        ► 
+
+May
+
+(3)
+
+        ► 
+
+April
+
+(1)
+
+        ► 
+
+March
+
+(6)
+
+        ► 
+
+February
+
+(5)
+
+        ► 
+
+January
+
+(5)
+
+        ► 
+
+2007
+
+(15)
+
+        ► 
+
+November
+
+(2)
+
+        ► 
+
+October
+
+(3)
+
+        ► 
+
+June
+
+(9)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+2006
+
+(14)
+
+        ► 
+
+November
+
+(5)
+
+        ► 
+
+October
+
+(2)
+
+        ► 
+
+August
+
+(4)
+
+        ► 
+
+July
+
+(3)
+
+Simple theme. Theme images by gaffera. Powered by Blogger.
+

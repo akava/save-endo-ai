@@ -1,0 +1,725 @@
+
+
+  Jochen Hoenicke - ICFP 07 - Solution
+
+      Skip navigation
+
+	  Jochen-Hoenicke.de
+
+           home
+           publications
+           teaching
+              programs
+
+           rcx
+           scripts
+           trakker
+           quickcam
+           seahaven
+           scummvm
+              icfp-contest
+
+              2007
+
+           writeup
+              solution
+
+           quine
+
+           2008
+           2010
+           2011
+           2012
+
+           js-otp
+           trezor-spa
+
+	  ICFP 07 - Solution
+
+  The Perfect Prefix
+This page explains the parts of my ‘perfect
+prefix’, which is a solution for the ICFP Contest 2007.
+The contest task was to
+repair the genetic material of an alien called Endo.  He has a special genetic
+structure consisting of the bases I,C,F, and P, which encodes a programming
+language based on regular expressions. The output of this process, the RNA,
+consist of drawing primitives, that generates an image
+displaying Endo's shape.  The goal was to change Endo's genes by adding a
+prefix in front of it, that should modify the process to produce a different
+image where Endo lives happily in the shape of a cow.
+In fact, the DNA of Endo is a large program, written partly in an
+imperative, partly in a functional style and providing most functionality that
+is needed to build the target picture.  However, some parts are slightly
+broken and need to be repaired, other parts are encrypted, others infected
+with a virus that replaces RNA fragments.  The following description assumes
+that you are familiar with the contest task.  You can download the
+task
+description and the final technical report from the ICFP contest web-site.
+There is no official solution, but every prefix is associated with
+a ‘risk’ value, that is the length of the prefix plus 10
+times the number of wrong pixels.  The smaller the risk value, the
+better the solution. My solution reproduces the image perfectly, so
+the risk equals the length of the prefix.  It gives a survival chance of
+more than 99.99 %. I think even the organizers did not have a perfect
+prefix.  There were some contestants reproducing the image perfectly
+with a huge prefix, so their overall risk value was very poor.
+My solution is the best known solution to the problem.  A previous
+version of it appears in the technical report of the ICFP contest.
+From time to time I find new tricks to improve the prefix slightly.
+This page describes my current record of a 3404 bases prefix.  If you
+can find an even shorter prefix, please tell me.
+It roughly consists of three parts: (1) A generic
+patching routine with several patches that overwrite the original DNA,
+(2) a routine that decompresses 11 bit numbers
+and writes them over the speech bubble polygon, and (3) a routine to restore the
+cloud-duolc palindrome by copying the latter
+in reverse.
+
+  Compression tricks
+
+The main idea to keep the prefix short, is to use small loops that
+execute the same code over and over with different parameters.  The
+original DNA uses the same trick to build compressed RNA, which
+encodes characters and images.  A loop consists of a bunch of bases
+given two times.  These bases encode the commands that are repeatedly
+executed.  The last command reads in the second copy of the bases and
+outputs it twice.  The different parameters directly follow the loop
+and are removed when they are processed.  There is an end marker after
+the last parameter which will cause the loop to terminate.  
+ We need a lot of numbers which encode patch position, lengths, and
+polygon coordinates.  The original encoding uses only the bases I, C,
+and P.  We can compress these numbers slightly by
+‘unquoting’ them: P is replaced with F, IC with P, I with
+C and C with F.  Quoting the number yields the original number again,
+except that some I's are replaced with F's.  However, the DNA
+processor does not distinguish between I and F in binary numbers.
+
+The other trick is to change as few bases of the original DNA as
+possible.  If some command should not be executed, it is often enough
+to change one or two bases to prevent the pattern to be applied.  When
+we need to decrypt some code, like the cow tail and the mu character,
+we hijack existing decryption code and only change the password and
+the method to decrypt.  Also we try to reuse parts of existing
+instructions by aligning the new instructions carefully.
+
+  Patching routine
+The largest part of the prefix is a big patch table. Each entry of the
+patch table consists of an offset (which is relative to the last
+patched address), followed by the length of the patch, followed by the
+patch itself.  These patches are applied by the code at the beginning
+of the prefix.
+The prefix starts with a command to prepare the loop:
+
+IIPIFICCFPIICIICIPPPIPPPIIC
+
+This encodes the pattern and template
+‘(?IICF)→0000’, which copies the next
+bases up to IICF two times. One of these copies is executed while the second is
+used to restore the loop and thus repeat the commands. The bases forming
+the loop encode two commands. The first is 
+
+IIPIFICCFPIICIPCCICIICCPFCIICIPPPIIC
+
+ which encodes ‘(?IICF)!203CI→00’.  This is the
+loop exit instruction.  It checks for a end marker ‘CI’ and if it
+is present it will execute.  It copies the second instruction which is used to
+patch the length in the polygon in the second part of the prefix.  Everything
+else up to and including the end marker is removed from the DNA string.
+If the end marker is not found, the first command does nothing and the
+main command of the first loop is executed: 
+
+PIIPIFICCFPIICIIPIFIICIICIIPIFIPIICIIPIFIPIICIIC
+CCICCICFIFCPCCPCCFCCICCICIFPCPCICIIPICPCICFIFCPICPCCFCICFIFCPCCPCCF
+IFCPPIFCPPCCICFICCPICFICCPICICCCFIIC F
+
+  F(?IICF)(?P)(?F)(?F) →
+     IIPIPC
+	31
+     IICIIPIP
+        10
+     IP
+        |2|
+     IPC
+        21
+     IICIPC
+	31
+     IIC
+     0101
+     IIPCPIFPCPIFPPIIC
+
+The command reads in the dummy F (that is only used to search for the end
+of the loop), the copy of the loop, the binary number ending with P that encodes
+the last patch position, the ‘unquoted’ binary number ending with F
+that encodes the distance between the last and the next patch and the
+‘unquoted’ number that encodes the length of the next patch. It
+creates the second command (given in blue).  
+For space reasons the LSB of the distance and length parameter is omitted
+in the patch table.  It is always assumed to be one.  This way we can only
+encode an odd distance and length.  Because the distance is relative to the
+current position, which also depends on the length of the encoding, we can
+have arbitrary distances by adding leading zero bits to the distance.  Also,
+it does not hurt to patch one bit more to get an odd length.  The second
+command in blue encodes the following, where the parameters coming from the
+first command are marked in black:
+
+  (! »C31« )
+  (! »10«
+   ! |2|
+   ! »C21«)
+   ! »C31«
+  →
+  »0101«
+  |1| 1000
+
+A one bit (C) is prepended to the length and distance parameters. The
+first parenthesized part matches the patch, which is found immediately
+after this command.  The next match skips to the patch position: we
+add the last patch offset and the distance parameter, where we set the
+LSB to one (by prepending a C).  The fourth skip matches the bases
+that should be overwritten.  The command then rebuilds the loop by
+outputting it two times, followed by the address of the patch
+position, which is the length of match 1, followed by the original
+bases leading to the patch position (argument 1) and finally followed
+by the new patch, which was matched by argument 0.
+
+P
+
+This is the initial address (0). This is computed by the program that builds
+the patch table.  It is either one or zero, because the offset is implicitly
+odd.
+
+  Patch Table
+Each entry of the patch table has three parts: offset, length, and patch.
+The offset and length are unquoted integers.  The offset is relative to the
+last patch position.  Since the offset also depends on the length of the
+current patch it is difficult to compute.  Therefore I additionally give the
+offset relative to the start of the green zone and length in hex.
+
+00005e:021 PICPIICCCCPF CCCPF FICCCFCPCFCFCCFCPIICFCCFCPICCFCCF
+
+This writes the EBCDIC encoded string “9546” (the number hidden
+in the E.T. image) into the variable giveMeAPresent.  Normally
+this should contain the encryption key for vmu-code; we later change the code
+to decrypt the cow-tail gene instead, which is encrypted with
+E.T.'s password.
+
+00050f:001 PIICPCPCF F F
+
+Switch on daylight by setting variable night-or-day to false.
+
+03346a:0a1 CPICPPIIPCPIF CCCPPCF PCCCCCIIIIIIIIIIIIIIIIIIP
+  ICCICIICPIICIICCIPCCIIICCIPCICCICIIPICCICICIPICCIIICIPCICCICIIPICIIIIICP
+  CIIIIICIPCICICICIPIICIIICIPCICCICIIPCIICIIICPCIICIIICPCCCCCCCCPI
+
+Set hillsEnabled to true, vmuMode to 31, and vmuRegCode to
+“Out_of_Band_II”.  The latter enables drawing of the caravan.
+
+0c7dbf:00d IPPCPCPCPPCPF PIF PIIIIIICCCCCC
+
+Set seed to 8128 (a perfect number), so that the weed grows correctly.
+
+0c91df:005 PCCCCCCPPF PF PCICI
+
+Set polarAngleIncr to 5, which rotates wind mill by five degrees.
+
+0da070:001 PPIICPIICCCPF F P
+0da0af:003 IIIPF ICF CCI
+0da0b8:001 IF F C
+0da0d6:011 PF CCPF CCFFCCFFCFCFCCCCF
+
+This fixes the errors in cow-spot-middle.  Since this method
+is similar to many others, we change a call to return to a different correct
+method.
+
+0daf2f:001 PCCPCPIIF F P
+0dafb0:001 PPIIF F C
+0dafb7:001 CF F C
+0df47a:001 PIPPCPCCPF F P
+0df633:001 IPPPIF F P
+
+Skip the first part of the bmu gene to jump directly to
+the drawing of Endo.  This gene is capable of drawing Endo in several
+forms; of course, none of that is the right one.  However, there is
+the code that draws Endo in the right cow-shaped form but only as a
+shadow.  This patch skips the shadow drawing part.  At the end it
+disables the clip RNA that is normally used to clip the shadow and
+damages the call that would draw Endo in the wrong shape.  Note that
+only five bases need to be changed!
+
+206d49:001 PPIIIPIPIICPCPF CF P
+206d4e:001 F F C
+207125:001 PCCPIIIF F I
+20715d:009 CCCPF CPCF FFFCCFCCF
+20716b:005 IF PF FFFCF
+
+Fix the sun gene (values come from sunflower
+xor flower, where I=00, C=01, F=10, P=11).  Similarly to
+cow-spot-middle we only fix the call and change return
+address to jump to a correct method.
+
+21f149:003 PIIIPIIIIIIIPF IF CFI
+21f1ca:001 PPIIF F P
+
+Patch color of cargo box.  It seems, that somehow the color entries in the
+lookup table for the compressed RNA got swapped.
+
+29bdf4:005 CCCCCCCCPICPIIIIF PF FFFFF
+29be34:005 IIIPF PF CCCCC
+2aaea1:005 IPCPCCCCPIIIF PCF CICCC
+
+The printGeneTable contains a slightly broken bitmap of the whale
+blow.  Fix rotation in compressed whale blow RNA, by swapping the code for
+rotate left and rotate right.  After drawing the RNA skip to end of method.
+
+2c932e:001 IIIPICCPCPIIIF F C
+
+Fix mother duck polygon.  The numbers didn't add up correctly which lead to
+coordinates getting out of sync and breaking the remainder of the picture.  It
+turned out that a single number was wrong.
+
+3c9eb5:00b CPIPPIPCCCCCCCPF IPF FFCCCCCCFCF
+3c9ec6:005 PF PCF CFFCF
+
+Patch return address in appletree to switch to peartree.
+
+3ea48d:001 IPPPIPCCCCCPF F C
+
+Patch integrity check to always return true; Normally, the checks
+prevent activating the cow-tail or
+cow-spot-middle gene unless they are fixed.  However,
+since we modify these genes, the check would fail.
+
+45ad2e:005 CPIIICCCPCCCPIIF PCF FCCCF
+45b1ad:005 PCPICCPCF PCF CCCCC
+45b634:007 PIPICCPF IIF PCFCFFF
+45b682:005 PIIIF PF CFFCC
+45babe:005 PCPCCCPF PF FCCCF
+45bac3:001 F F C
+45bb0c:003 CPIIF ICF CFF
+
+Swap coordinates in flowerbed.  This swaps the yellow-red with the blue-white
+flowers.
+
+4aa7b8:017 PPIICCPIPIICPF IIPF FCFICFCPPPCPPFCFCCCPCPC
+4aa7d5:00b CPF IPF FICIFFFPCFC
+4aa7ea:001 PIF F C
+4aa7f4:001 IF CF C
+4aa7fe:001 IF CF P
+
+Patch color of cow-tail to draw it transparently.  It adds seven opaque and
+three transparent items to the color bucket.  This patches the encrypted
+function.  The original DNA consists of twelve RNA commands to add white to
+the color bucket.  The sequence is replaced by:
+
+RNA:opaque (!70)→ 000000 RNA:opaque opaque transp white white white white
+
+The DNA command will triple the next seven RNA command, so that it
+gives a total of seven opaque and three transparent additionally to
+the twelve white RNA commands.  The patch is carefully aligned to
+minimize the number of bases to be replaced.
+
+4cd7af:001 PPCPIIIIPCCPF F C
+4cd7e7:005 CPPF PF FCCFC
+4cd861:003 IPPIF IF CFC
+
+Patch the grass seed.  The right seed can be found by analysing the
+biomorph code.
+
+4cf436:001 PIIIPIIPICF F I
+
+Draw mother duck with children.
+
+4cfe86:009 CCPICCPPF CPCF FCFCFCFCC
+4cfed2:007 IIPIF IICF FCFFCCF
+
+Fix coordinates of single chick.  Note that this code is skipped first
+and only called from the code below.
+
+4d01fc:003 PPCCPICF IF FFC
+4d0215:003 PIF ICF CCC
+
+Change return address of resetOrigin call after chick to jump directly
+to the code that draws the text under the picture.
+
+4d08d3:005 CPPPPIF PF FFCFC
+4d08da:001 CF F C
+4d0920:005 PPICF PF FCCFC
+
+Fix coordinates of vmu (the caravan).
+
+4d0eff:009 CCCCPIIPF CPF CFFFCFCFF
+4d0f4e:007 IPIIF IIF FCFCFCC
+
+Fix coordinates of whale blow (which is called from lambda-id).
+
+4d535a:005 PIPIIIICCCPF PF CFCFF
+4d53a9:005 PIIIF PCF FCCFF
+4d54e2:001 IPPCPF F P
+
+Fix coordinates and face of whale.
+
+4d570e:007 CCPCCCPF IICF FFFCFFC
+4d575a:005 IPIIF PF FCFFF
+
+Fix coordinates of swimming pool (which is called from crater).
+
+4d5d39:007 PCCPIIPF IIF CCFFFCC
+4d5d84:003 IPIIF ICF PCF
+
+Fix coordinate of speech bubble (balloon).
+
+4d6237:001 CCCPPCPF F C
+4d6316:001 CCPPIF F C
+4d632a:005 IIF PF CCFCF
+4d6334:005 F PF CFFCF
+4d633e:005 F PF FCCFF
+4d6348:001 IF CF F
+4d6352:005 F PF CCCFC
+4d635c:005 F PF FCFCC
+4d6368:003 IF IF FCC
+4d6372:005 F PF FFCCC
+
+Replace ‘Endo hat gemorpht’ with
+‘Endo has morphed!’.
+
+4d687b:017 PIIPICPF IIPCF IIICIICIICCCCCCCIICCIIC
+4d6899:009 IPF CPCF ICCCICICI
+4d68a5:003 IF IF CCC
+4d68df:003 PIPF IF IIC
+
+Patch the second drawString call to do something completely different,
+namely jump to the chick code that was skipped earlier, this will
+finally return back to the first drawString.
+
+4d7347:003 PPPCPPF IF IPF
+4d7d0a:023 CPCCPICPF ICCPF CCFFFFCFFCCFCFCICFCFFCCFCCFCCCCCCFC
+
+Draw first polygon in lambda-id only transparent, so that it is not
+visible.  Then change return address in first call to jump to the code
+that draws the whale blow.
+
+52dd16:005 CPPIIIIIIIPPPF PF FFFFC
+52dd61:007 IIPIF IIF CFCFFCC
+52de43:005 PICPICF PF PFFFF
+52de59:00b IF IPCF IPIIIPFFFFF
+
+Patch the water gene to include the RNA for two turns.  This
+prepares the rotation for the ufo-cup.  Since there is only space for one RNA
+command we need to hack the return statement to include the second RNA
+command.  Getting the water into the ufo-cup is easy, since the original DNA
+already does this when the weather condition changes.  Rotating the cup is the
+difficult part.
+
+592d0f:005 PPCPPIICPCPIF PF FFCFF
+592d59:005 CPIIF PF PFFFF
+592dff:011 PCCCPF CCPF CCCFFFCFFCCFCFCCF
+592e14:00d CF PIF FCCCCFCFFCCCF
+
+Fix position of crater, then patch return address of setOrigin, to
+return to the code that draws the ufo cup with water instead of the crater.
+
+5c9164:005 PIPCPICCPIPICF PF FCCFF
+5c9169:001 F F C
+5c94fa:005 CPIIIPIF PCF FFFCF
+5c963d:003 IIIPCPF ICF CFC
+5c989d:003 PICPCPF IF FFC
+5c99dd:005 PIPCPF PF CCFCF
+
+Patch scale factor of clouds.  The original DNA draws them all in the same
+size and at the wrong position.
+
+6130e2:001 CPPIIPIPCPCPF F I
+
+Patch duolc gene to not set the cloudy variable.  The latter
+has some very strange effects :)
+
+63a567:04b CPICCCCPPIICPF IPCPF FCFCFCFCICCFFCFCFCICFCCCFFCFIC
+           CCFFFFCCICFCCCCCCFICFFFCCFFCICFFCCFFCFICFFFFF
+
+This replaces the password in the locals of main with the one for
+the mu character “No1@Ax3” (found in the sticky note bitmap).
+
+63a7a5:017 PPCCCPF IIPF CFFFFFCFFFCCFCFCFCFCCFI
+63aaa0:009 IIIIPIPF CPF CCCIIICPI
+63b699:00b CPIPIIIPF IPF FFCFFFFCFCC
+63b6a5:005 CF PF CFCFF
+63b6ac:001 CF F C
+63b992:003 PPPIPF IF IIC
+63b99c:005 F PF PIICI
+
+Patch main to decrypt cow tail and mu.  The original DNA already
+contains some code to decrypt vmu-code and
+help-beautiful-numbers, which we reuse.
+
+642bad:007 PIPIIICCPIICF IIF IICIICP
+642bb7:005 F PF IICII
+64d41d:001 PICPCCCPPPF CF P
+
+The original DNA contains a page about spirographs.  One of them is the one
+that should be drawn into the sun, just scaled up.  We add a jump operation
+after this code to the resetOrigin gene.
+The spirograph part of main is called from ufo, see below.
+
+654ca3:003 CPPICCCPIIIF IF FFF
+654cab:003 F IF FFF
+654d20:00b PIIPF IPF FCFCFCCFFFF
+654d6c:003 PIIIF IF FFF
+654d71:001 F F F
+654e12:00b PCCCPCF IPF FFFFCCFCCCC
+654e25:00d F PIF FFFCFFFCFCCCC
+654e33:003 PF IF FFC
+
+The ufo function is rewritten to draw the upside-down cup filled with
+water and the return address of some call is set to the spirograph function.
+
+6d4032:001 PIIPIICCPIIIIIIF F P
+
+Disable the virus code in surfaceTransform which damages RNA.  Note that we
+just need to change a single base to sabotage the virus.
+
+6d4576:003 IIIPCPPF IF FFC
+6d46bb:001 PPICPCF F F
+6d4706:00b PPIF IPF CFFCCCFFFCC
+6d48c9:001 PPIPIF F F
+6d4913:005 CPIIF PF CCCFC
+6d5440:005 PPCCPIPF PCF FCFCF
+6d5584:005 IIIPCPF PF CCFCC
+6d55d2:00b PPICF IPCF FCFCCCFCFFC
+6d6439:007 IPCPCPIIF IIF CCFFFFC
+
+Restore the parabolas that draw the hills.  It was one of most
+difficult tasks to find the right values for them.
+
+6f33d4:005 IIPIIPIIICPIIF PCF FCFCF
+6f3420:005 IPIIF PF FCCFC
+6f3821:007 PCPIIIICF IIF FCCFFCC
+6f386a:009 PPIF CPF PFCCFCFCF
+6f4a70:003 PIPIIICCPF IF CCF
+
+Reposition the background of the balloon polygon, and
+change lambda to mu.  The actual polygon is overwritten here.
+
+6f4f6b:001 CPPIICPF F I
+6f5200:001 PCCCPPF F F
+
+Disable the scaler in spirograph that would draw the spirographs four
+times bigger.
+
+6f9e45:001 PIPCCCPICPF F C
+6fa554:02f IPCPIPIF IIIPF CIIIIICICIICCCICPIIPIFICFPICIICIICIICIPPPIPPCPI
+
+Patch sky-day-bodies to draw clouds and sun.  The original DNA
+contained code that draws them depending on the weather value.  However, there
+is no setting for drawing both sun and clouds. We also change here
+the sun color by copying the contents of the colorSoftYellow gene.
+
+71cc40:005 IPCPIPICPCCPF PF CIICI
+71cf0e:00f PIPPPCF IIIF PIICICIICICIIIC
+
+Patch goldenFish_adaptation to draw two extra fishes and move the bottom fishes.
+
+72035f:007 CCPICCCPPIF IIF CCCCCCI
+72038f:007 PIIF IICF ICCCIIC
+
+Patch pictureDescrRenderer_adaptation to swap drawGoldFishR with
+drawGoldfishL.
+
+CI
+
+The end marker.  This will tell the patching loop to terminate.
+
+  Compressed speech bubble polygon
+The speech bubble in the target image looks quite different from
+the one in the source image.  Endo's DNA uses a polygon routine to
+draw it.  Unfortunately there is no polygon in the DNA matching the
+bubble in the target image.  I therefore had to find the right
+coordinates by hand and write them over the old polygon.  Doing it
+straight-forward would take about 1700 bases.  Therefore, I compressed
+the numbers forming the polygon (using variable length numbers and the
+unquoting trick).  The compressed numbers and the decompressor take
+together about 700 bases.  The following loop will decode the
+compressed numbers.
+
+IPCCICCICIICPFCIIPIFIFPCCFIICIICIPPPIPPPIIC
+
+This encodes ‘!603CI(?CFIIC)→0000’,
+which checks for end marker CI and aborts polygon loop.  It also prepares the
+palindrome loop by doubling it.
+
+PIIPIFICCFPIICIIPIFIICIICIIPIFIPIICIICCCICCPCICCFCCFFCCFFFCFFCFCCICI
+CFFPFICFICFFPCPFICICFCFCFCFFFPFCFFCFFCFFFFFFFCCFCCICCICIFCPICPCICFFFFF
+FFFFFFICCCFCCFFFCFFCFPPFPCFFFPFICFFPFFCFFCFIPCPCPFICFPICFFPFCFPPFPCFFF
+PIPICPPIPICPPFFCFPCFFICCFPCFFICPCFCFFFPCCICICCPICICCCFIIC F
+
+The decompressor.  This is a bit tricky. There is some self-modifying code:
+the gray and green instructions change the low bits in the red number to zero.
+
+F(?IICF)(?P)(?F) →
+
+IIPIFIPICIICCIIC
+ CCICCICIIPPCCFCPCPCCFIFCPPCICICICCCFCICCICCICCCCCCCIIC
+
+IIPIP 21
+IPCCCCCCCCCCCPIICIIC
+  CCICCICFFCFICCCFCPCCFCCICCIC
+  11
+  CPFFPCCFCICFFCFICCCF
+  0202
+  CCICFICCPICFICCPFICICCCFIIPPIFPPIIC
+
+The gray/green instruction that is output by the above command is a conditional
+command.  If a negative number is encoded (trailing FP), it can match on the
+blue command.  It outputs a new green command, which replaces the low bits of
+the red number with zeros.  The number of zeros equals the length of the
+number minus one.
+
+(?FP)I → IIPIP |0| IICIFIFIIC 01 IPPP IIC IPIPIPIIIIII
+
+(! |0| )?C →
+01 00
+
+Now the blue/magenta instruction is executed, which computes the value of the sum.
+For positive numbers it will compute 0x800+number, so that there are enough
+leading zeros in the encoding.  The eleven low bits of the results can then be
+copied directly into the right position by the magenta command.
+
+(! 21 !0x7ff) → 
+  IIPIPCCICPIICIFIICIIPIP
+  11
+  IFCCFIICIPCCICPIIC
+  0202
+  IIPCPIFPCPIFCPPIIC
+
+ |0| 00
+
+(!11)?P(!11?IC)!11 →
+  0202
+  |1| 10 01
+
+P PCPCPICPIIPIIIPIF F C
+
+The patch for the polygon size.  This is processed by the patch routine, which
+is copied by the abort condition of the first loop.  It reads the offset
+P and unquoted offset PCPCPICPIIPIIIPIF and patches
+one byte.  It also writes the offset back, which can then be used by the
+polygon patching routine.
+
+CPIPF IIIIPPF F ICF IF IIICF CCPF PCF CPCPF IPIICF
+IIF ICF ICF PCF ICF CCF CCF PCF IF ICF ICF ICF F ICF IF PICF IIIF ICCF
+CPF CF IIF CF IPF ICF CF IICF CF PCF F CCCF IIF IICCF CPF IICF IIF ICF
+IIIF PCF PIF CF IIIF CF IIIF F PF PF IIPF CPF PPF IIIF IPF CPF IIIF
+PPF PF PIF CF IPIF F PF CF CPF ICF PIF CF IIF ICCF IPF CCF CPF IPCF
+IIF PCCF IF ICCF F PCF IIF CCF PIF CF IIF IF IPIF IIF CPF CPF PIF IIF
+IIIF PIF IIIF ICF PIF CF PF CCF CCPF F IF ICF CPF CPCF PIIF CPICF PCPF
+IF CPF PF PIF CPF PIF IPF IPF PIF PF PF PF PIF IF IF PF F IF CF IPF
+F F CCCF ICFPPF PPF
+
+The compressed numbers of the polygon.  Numbers ending with CF encode
+negative, F encodes -1, and those ending with PF or IF encode positive
+numbers.  These are decompressed by quoting, adding 0x7ff for positive
+numbers.  For numbers ending with CF, we set the last bits of 0x7ff to
+zero according to the length of the number.
+For example, “CPICF” gets unquoted to “FICCFP”, which
+marks a negative number. We add to it “IIIIICCCCCCCCCCCCCCP” since
+it is 5 bits long, which results into “IICCICCCCCCCCCCCCCCP”,
+i.e., the number -20.
+
+CI
+
+The end marker.
+
+  Palindrome
+The cloud gene was seriously scrambled by Endo's sudden
+crash.  Luckily the DNA contains a copy of itself right afterwards in the gene
+duolc.  Though, as suggested by its name, the bases are in
+reversed order and thus form a palindrome (a word that equals its reverse,
+just like cloudduolc).  The following loop will copy the bases from the
+duolc part back over the cloud gene.
+
+IIPIPCCCCICICPIICIIPIPCICCPFIICICIICCCICCICCCFCCCFCFCFFCCCC
+FCCCCFFICCCICPCICIPPCPICCCFCCFCICFICCCICCICCIPCPCPICCCICCIC
+FICCCFCCFCCFIPCPPIPCPPCCICICCPICFICCPICCFICCPICFFICCCFIIC
+
+This loop has no explicit aborting condition, instead the loop instruction
+just does not apply when we are finished and thus it is no longer copied.  It
+prints some dummy RNA after terminating, but this does not hurt.
+
+(!175)(!13C)P →
+
+IIPIPIICIIICICICCIIIICIIIICCPIIPFIP 10
+PIICIIC IPCP IIPIP I 11
+PIIPIPCPIICIICIIC 
+0101
+IIPP IFPCP IFPICP IFPCCP IIC
+
+(!0x610d44(C!«10P»)) !1
+(!«I11P»(!1)) →
+
+0101
+ |0| 10 20 30
+
+ICIICIICICCIICPIIII
+
+This is the negative length of the cloud function.  This number is
+incremented in every step until there is an overflow.  Then the loop
+terminates, because the CP is not at the expected position anymore.  Together
+with the trailing ‘IIII’ this number is then exactly 20 bases long
+and consists mostly of I.  These encode two dummy RNA commands.
+
+  The full prefix
+
+IIPIFICCFPIICIICIPPPIPPPIICIIPIFICCFPIICIPIICICICCPFCIICIPPPIICPIIPIFI
+CCFPIICIIPIFIICIICIIPIFIPIICIIPIFIPIICIICCCICCICFIFCPCCPCCFCCICCICIFPC
+PCICIIPICPCICFIFCPICPCCFCICFIFCPCCPCCFIFCPPIFCPPCCICFICCPICFICCPICICCC
+FIICFPPICPIICCCCPFCCCPFFICCCFCPCFCFCCFCPIICFCCFCPICCFCCFPIICPCPCFFFCPI
+CPPIIPCPIFCCCPPCFPCCCCCIIIIIIIIIIIIIIIIIIPICCICIICPIICIICCIPCCIIICCIPC
+ICCICIIPICCICICIPICCIIICIPCICCICIIPICIIIIICPCIIIIICIPCICICICIPIICIIICI
+PCICCICIIPCIICIIICPCIICIIICPCCCCCCCCPIIPPCPCPCPPCPFPIFPIIIIIICCCCCCPCC
+CCCCPPFPFPCICIPPIICPIICCCPFFPIIIPFICFCCIIFFCPFCCPFCCFFCCFFCFCFCCCCFPCC
+PCPIIFFPPPIIFFCCFFCPIPPCPCCPFFPIPPPIFFPIIIPIIPIPIICPCPFPCFCIIICCPCPIII
+FFICCCPFCPCFFFFCCFCCFIFPFFFFCFPIIIPIIIIIIIPFIFCFIPPIIFFPCCCCCCCCPICPII
+IIFPFFFFFFIIIPFPFCCCCCIPCPCCCCPIIIFPCFCICCCIIIPICCPCPIIIFFCCPIPPIPCCCC
+CCCPFIPFFFCCCCCCFCFPFPCFCFFCFIPPPIPCCCCCPFFCCPIIICCCPCCCPIIFPCFFCCCFPC
+PICCPCFPCFCCCCCPIPICCPFIIFPCFCFFFPIIIFPFCFFCCPCPCCCPFPFFCCCFFFCCPIIFIC
+FCFFPPIICCPIPIICPFIIPFFCFICFCPPPCPPFCFCCCPCPCCPFIPFFICIFFFPCFCPIFFCIFC
+FCIFCFPPPCPIIIIPCCPFFCCPPFPFFCCFCIPPIFIFCFCPIIIPIIPICFFICCPICCPPFCPCFF
+CFCFCFCCIIPIFIICFFCFFCCFPPCCPICFIFFFCPIFICFCCCCPPPPIFPFFFCFCCFFCPPICFP
+FFCCFCCCCCPIIPFCPFCFFFCFCFFIPIIFIIFFCFCFCCPIPIIIICCCPFPFCFCFFPIIIFPCFF
+CCFFIPPCPFFPCCPCCCPFIICFFFFCFFCIPIIFPFFCFFFPCCPIIPFIIFCCFFFCCIPIIFICFP
+CFCCCPPCPFFCCCPPIFFCIIFPFCCFCFFPFCFFCFFPFFCCFFIFCFFFPFCCCFCFPFFCFCCIFI
+FFCCFPFFFCCCPIIPICPFIIPCFIIICIICIICCCCCCCIICCIICIPFCPCFICCCICICIIFIFCC
+CPIPFIFIICPPPCPPFIFIPFCPCCPICPFICCPFCCFFFFCFFCCFCFCICFCFFCCFCCFCCCCCCF
+CCPPIIIIIIIPPPFPFFFFFCIIPIFIIFCFCFFCCPICPICFPFPFFFFIFIPCFIPIIIPFFFFFPP
+CPPIICPCPIFPFFFCFFCPIIFPFPFFFFPCCCPFCCPFCCCFFFCFFCCFCFCCFCFPIFFCCCCFCF
+FCCCFPIPCPICCPIPICFPFFCCFFFFCCPIIIPIFPCFFFFCFIIIPCPFICFCFCPICPCPFIFFFC
+PIPCPFPFCCFCFCPPIIPIPCPCPFFICPICCCCPPIICPFIPCPFFCFCFCFCICCFFCFCFCICFCC
+CFFCFICCCFFFFCCICFCCCCCCFICFFFCCFFCICFFCCFFCFICFFFFFPPCCCPFIIPFCFFFFFC
+FFFCCFCFCFCFCCFIIIIIPIPFCPFCCCIIICPICPIPIIIPFIPFFFCFFFFCFCCCFPFCFCFFCF
+FCPPPIPFIFIICFPFPIICIPIPIIICCPIICFIIFIICIICPFPFIICIIPICPCCCPPPFCFPCPPI
+CCCPIIIFIFFFFFIFFFFPIIPFIPFFCFCFCCFFFFPIIIFIFFFFFFFPCCCPCFIPFFFFFCCFCC
+CCFPIFFFFCFFFCFCCCCPFIFFFCPIIPIICCPIIIIIIFFPIIIPCPPFIFFFCPPICPCFFFPPIF
+IPFCFFCCCFFFCCPPIPIFFFCPIIFPFCCCFCPPCCPIPFPCFFCFCFIIIPCPFPFCCFCCPPICFI
+PCFFCFCCCFCFFCIPCPCPIIFIIFCCFFFFCIIPIIPIIICPIIFPCFFCFCFIPIIFPFFCCFCPCP
+IIIICFIIFFCCFFCCPPIFCPFPFCCFCFCFPIPIIICCPFIFCCFCPPIICPFFIPCCCPPFFFPIPC
+CCPICPFFCIIIIIPPIFIIPIFCCCIIIIICICIICCCICIPIIPIPIICICICICIIPIICIICIICI
+PPPIPPCPPICPIPICPCCPFPFCIICIPIPPPCFIIIFPIICICIICICIIICCCPICCCPPIFIIFCC
+CCCCIPIIFIICFICCCIICCIIPCCCICICIICPFCIIPIFIFPCCFIICIICIPPPIPPPIICPIIPI
+FICCFPIICIIPIFIICIICIIPIFIPIICIICCCICCPCICCFCCFFCCFFFCFFCFCCICICFFPFIC
+FICFFPCPFICICFCFCFCFFFPFCFFCFFCFFFFFFFCCFCCICCICIFCPICPCICFFFFFFFFFFFI
+CCCFCCFFFCFFCFPPFPCFFFPFICFFPFFCFFCFIPCPCPFICFPICFFPFCFPPFPCFFFPIPICPP
+IPICPPFFCFPCFFICCFPCFFICPCFCFFFPCCICICCPICICCCFIICFPPCPCPICPIIPIIIPIFF
+CCPIPFIIIIPPFFICFIFIIICFCCPFPCFCPCPFIPIICFIIFICFICFPCFICFCCFCCFPCFIFIC
+FICFICFFICFIFPICFIIIFICCFCPFCFIIFCFIPFICFCFIICFCFPCFFCCCFIIFIICCFCPFII
+CFIIFICFIIIFPCFPIFCFIIIFCFIIIFFPFPFIIPFCPFPPFIIIFIPFCPFIIIFPPFPFPIFCFI
+PIFFPFCFCPFICFPIFCFIIFICCFIPFCCFCPFIPCFIIFPCCFIFICCFFPCFIIFCCFPIFCFIIF
+IFIPIFIIFCPFCPFPIFIIFIIIFPIFIIIFICFPIFCFPFCCFCCPFFIFICFCPFCPCFPIIFCPIC
+FPCPFIFCPFPFPIFCPFPIFIPFIPFPIFPFPFPFPIFIFIFPFFIFCFIPFFFCCCFICFPPFPPFCI
+IIPIPCCCCICICPIICIIPIPCICCPFIICICIICCCICCICCCFCCCFCFCFFCCCCFCCCCFFICCC
+ICPCICIPPCPICCCFCCFCICFICCCICCICCIPCPCPICCCICCICFICCCFCCFCCFIPCPPIPCPP
+CCICICCPICFICCPICCFICCPICFFICCCFIICICIICIICICCIICPIIII
+
+	©
+
+  2013
+ Jochen Hoenicke, last updated:   Tue Jul 16, 2013
+

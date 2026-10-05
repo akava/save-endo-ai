@@ -1,0 +1,479 @@
+
+
+Entropy always increases: Disassembling Endo, part 2
+
+Entropy always increases
+
+Sunday, May 02, 2021
+
+Disassembling Endo, part 2
+
+If you haven't read Part 1 yet, read that first. This is Part 2.As a reminder, here's how far we got in Part 1:We have a bit of trouble with the VMU. It's time we started doing a bit of disassembly to see why. In general, static disassembly is impossible, because the machine is entirely built on self-modifying code, but fortunately most of the time one rule follows another in a sensible way. There are exceptions where some data is embedded directly into the code (rather than stored on the stack or in separate symbols), but these can be treated as special cases.The first thing we see in the function vmu is IIICCPIICC, which emits the RNA CCPIICC. Why? It's not valid RNA. This was mentioned on help page 2181889, suggesting that these codes starting with a C indicate "a small part of the morphing process" is done. In fact, you'll find that all the functions start with such a piece of RNA, and they have unique codes. From this, it's possible to examine an RNA trace to determine the control flow at the function level. I ended up not really needing this, because I had some tools in my DNA interpreter for determining what code was running (since copying the code to the red zone just references the original code, it's possible to determine the origin of instructions), but it was quite useful when our team originally competed.Incidentally, while RNA is technically part of the pattern-matching rules, it almost always occurs as the very beginning and so can be treated as if it is an instruction on its own, and I'll continue to treat it like that. The "next" instruction, then, is (![7512628]) -> (0)IIIIIIIIIIIIIIIIIIIIIIIPIIIIIIIIIIIIIIIIIIIIIIIP. If you do some calculations based on how much of the function is left in the red zone, you'll see that this is adding some data to the start of the stack. Those calculations rapidly get tedious, so it's worth writing a tool to match various patterns and print out higher-level information. In this case one can recognise it as a push and print that out.Next is ![33](![213118]CCIICCIIIIIIIIIIIIIIIIIP) -> (0). This is a conditional forward jump: it moves to a particular address (which is vmuMode) and tries to match a number there (51). If it all matches, then the next 33 acids will vanish; otherwise nothing happens. The next 33 acids are exactly the length of the next instruction, which is ![218] ->, which is an unconditional jump. Taken together, these say to jump ahead if vmuMode is not 51.Now we have ![2906](![4406243](![1805])![3101361]) -> (0)(1)IICCCIICICCCCCICCCIIICIPICICCICICCICIIIIIIIIIIIP. Once again, one needs to interpret the numbers: 2906 is the remainder of the red zone, 4406243 and 1805 are the address and size of the function ufo-with-smoke, and 3101361 takes us to the blue zone. We then erase the rest of the red zone, copy ufo-with-smoke to the red zone, and push two numbers on the stack. That sounds like a function call, and indeed you can confirm that the two numbers are the address of the following instruction, and the length of the remainder of the function, for returning to.After this there is another jump (![2586] ->), and another conditional jump: ![33](![212772]CCCCCIIIIIIIIIIIIIIIIIIP) -> (0), this time comparing vmuMode to 31. Aha, we didn't know to try that value earlier!Fortunately we've already followed the clues to find the registration code (Out_of_Band_II), so let's write that into vmuRegCode (remember to terminate the string with a value of 255). And now we get our caravan, but in the wrong place:Wait a second, the caravan was encrypted, and we didn't decrypt it. But we know that the VMU registration code is also the encryption key for the caravan, so presumbly vmu is doing the decryption for us. Let's take a look at the next few instructions: (![7511175])![48] -> (0)IICIICICICCIIIIICCCICICPCICIICCICCIICIIIIIIIIIIP((![1200])![7509907]) -> (1)(0)(![211586](![1152])) -> IIPIPIIIIIIICIICPIICIIPIPIIIICICCCCICCIICICIICCCPIICIPIIIIIIICIICPIICIPPCPIPPPIIC(0)(1)The first writes some values into those stack variables we saw earlier: specifically, the address and size of caravan. Then it pushes more data to the stack. Weirdly, it's pushing the immediately following 1200 acids, which form code. It turns out that the compiler the organisers used to generate code makes function calls by first pushing a block of garbage to the stack, then overwriting it, rather than directly pushing arguments. So this is just making space on the stack for 1200 acids of arguments.What's going on with the third instruction? It's writing a long bunch of stuff at the business end, prior to any substitutions. Code generating code! This turns out to be fairly common, and disassembly becomes much easier if you detect this, parse the embedded code and present it as a separate rule. Where it's important I'll prefix such follow-on instructions with a +. So let's try to parse that again:(![211586](![1152])) -> (0)(1)+ (![1152])(![7510992])![1152] -> (1)(0)The first instruction copies 1152 acids from the green zone (vmuRegCode) and inserts them at the "start" of the DNA (although not really the start, because it's after the embedded instruction). Then the embedded rule vacuums it back up and writes it into the stack. This shows one advantage of the embedded rule: if it had been written as a separate rule, then the first rule would have inserted the data before the second rule, and things would have gone wrong.You may be wondering why this needed to be done with this trick, instead of just a single rule that both collected and delivered the data to the stack. It would be possible, but if the data source occurred after the destination in the DNA, it would have been required a different sort of pattern. With this approach, the loading and storing are independent, which probably makes the compiler easier to write.Carrying on we see just such usage:(![7511999](![24])) -> (0)(1)+(![24])(![7510823])![24] -> (1)(0)(![7511878](![24])) -> (0)(1)+(![24])(![7510654])![24] -> (1)(0)This copies the address and size of caravan to that 1200-acid block as well. Here's more evidence that a compiler (and not a super-optimised one) is involved: a human would have just written the values directly to where they were needed, rather than writing them into a temporary and then copying the temporary.Perhaps not surprisingly, at this point we call crypt. We've given it the decryption key, address and size of caravan, so it will do its thing. Note that, as documented, strings are always passed as 128 characters, even if they are actually cut short by a terminator.The rest of the function isn't particularly exciting, so I'll jump ahead to near the end.(![7509644])![48] -> (0)RNA: CFPICFP![75](![7509409])(![24])(![24]) -> IIPIP(1)IIPIP(2)IICIICIICIPPPIPPCPIIC(0)The first pops 48 acids from the stack (the ones we pushed right at the start), which should leave the return address at the top of the stack. Then we see the RNA sequence that we're told indicates a return. The return statement itself uses more code-generating-code, but this time it's not just a fixed rule stuck on the front of the template: the rule is generated based on values in the pattern! This is how indirection is performed. To split off the leading rule, I had to invent some new syntax: <t:X> means part of a rule is defined by the template at the previous level. So rewriting the return using this syntax gives:![75](![7509409])(![24])(![24]) -> (0)+(![<t:(1)>](![<t:(2)>])) -> (0)(1)In other words, the second rule will skip forward not by a constant difference, but by the number found in replacement (1) of the first rule i.e., the return address; then it will skip forward by (2) from the first rule i.e. the return size (remaining amount of code to execute from the calling function).Parsing this requires the disassembler to do another impossible thing, because the parsing of the inner rule depends on the replacement values e.g. if (1) was empty then the following IIP would be the number zero on skip instead of an opening bracket. Once again, it's possible to make progress because the actual code seen is generated in fairly consistent ways and so heuristics work well e.g. if one sees a skip instruction immediately followed by a template parameter, it's a good chance that it will be substituted by a number, rather than some arbitrary code. And again, there are exceptions that need to be handled on a case-by-case basis.There is also some trailing stuff at the end of the function which I haven't entirely understood. It seems to occur at the end of every function. I've split it across several lines since it appears to consist of distinct pieces:CPPPPPPIICIICIICIICIICIICIICIICIICIICCCFIICIICIFFCPICCFPICICFCPICIICIIC = ?[IFPICFPPCIFP] ->IIIIOverall I think the idea is to terminate the machine if code is being executed in the wrong place (e.g. if you patched code in a broken way that meant rule decoding wasn't happening on the intended boundaries). I don't know what the first and last lines are for, although the first might might be intended to terminate numbers and to create a match item that won't match. Then there are a lot of IIC's, which should ensure that any open brackets get closed; excess IIC's will be consumed in pairs (forming empty rules). The middle line can be interpreted in two possible ways: if all the previous IIC's were consumed, then it is the rule IIC ->, which won't match so is ignored. If the last IIC on the previous line formed an (empty) pattern, then CCFIIC becomes the template IIC, which will combine with the remaining IIC to form another empty rule. So regardless of the parity, the end of this line is highly likely to be the end of a rule so that we're all synchronized for line 4, which searches for a marker that's right at the end of the DNA and skips to it, shutting everything down.Let's see how addition works, because it comes up here and there. There is a function called addInts, which seems like a good place to start. It's almost never called, addition normally being done inline, so I suspect it's mostly provided for educational purposes. The core instructions look like this:(![7510064](![24])) -> (1)+(![7510040](![24])) -> (1)+(![170])(![<t:<t:(0,1)>>]![<t:(0)>]) -> (0)|1|(1)(?[P]) -> F(0)+(![<t:|0|>])P -> (0)IIIIIIIIIIIIIIIIIIIIIIIP+F(![23])?[P](![7509918])![24] -> (1)(0)PNow we have 3 layers of rules in one, and nested <t:...> constructs. <t:<t:...>> means that the content is defined by the rule two lines above.The first set of rules does the actual addition. The first two lines just grab the two values to add (from the blue zone). The third line does the real work. ![170] moves just past the following rule, and then we have two skips, with the distances determined by the two numbers we grabbed. We then write the length of this combined skip (i.e. the sum) just after the next rule.So we're using the length-of template operation as a hack to implement addition. The paper by the organisers mentioned that this feature was specifically added to make arithmetic faster, although it's useful in other places too. It also explains the documentation for the init function: "Ensures happy, trouble-free arithmetic by growing the DNA to the right length." That is necessary because if the jumps go off the end of the DNA the pattern will be considered not to have matched.The reason for the second rule is that the first will write the sum with the minimum number of bases, whereas the higher-level code is all designed to deal with 24-acid numbers (or sometimes 9 or 12). So we need to pad the number out to the right length. We want to be able to grab the bits of the number without the terminating P, so that we can add some I's after it. Unfortunately, (?[P]) includes the P, so we need to use a little trickery. Let's say the number is currently CICCP: 4 bits and P. The first step inserts an F in front of the number. The second reads 5 bits, namely FCICC, discards the original P, and appends a bunch of I's and a replacement P. The third discards the F, reads 23 bits (the original 4 plus some of the I's), skips ahead to the P, then places those 23 bits and a P. So we now have a 24-acid number in the right place.Now that we've seen some function calls and returns, let's see if we can fix something in the picture. Note that there many, many ways to achieve each goal, and I'm just going to list one (or a few) of them.We'll replace the apple trees with pear trees. To do that, we're replace the code in appletree to just call peartree instead of drawing an apple tree. He's the code we'll write at the front:![14036](![5800492](![14123])) -> (0)(1)This looks similar to the function call we saw earlier, but the return address is missing, and so is the jump to the start of the blue zone (which we no longer need since we're not pushing anything). So how does peartree know where to return to? The function that called appletree will have pushed a return address, and that's what peartree will pop and return to. This is what's known as a tail call, and it saves us the bother of writing our own return statement.Let's take a look at what went wrong with the virus help page that caused the title to be upside down (and if you swapped out the wingding font for a normal one, you'd have noticed that all the text is upside down). It has a very deeply nested rule:(![313]) -> (0)(0)(![313])(?[P]) -> +(![<t:(1)>]?[IIIPCCCCCP]) -> IIIPCCCCCP(0)+(![<t:|0|>])![10] -> (0)IIIPIPIPIP+![10](![<t:|0|>]) -> <t:<t:<t:(0,3)>>>|0|(0)+(![313]) -> (0)(0)This shows one way to implement a loop, particularly in standalone code that can't rely on the green zone. The first instruction reads the body of the loop and makes two copies of it. The last instruction of the loop does the same thing, so there is always one copy of the loop being consumed and one backup copy.The loop itself reads a number embedded immediately after the (backup) loop cody, jumps that far ahead (using <t:(1)> to read the number loaded in the previous line), then searches for a string. It also adds a copy of that string to the front of the DNA. This is for a similar reason to addInts adding an F to the front: it allows one to skip to the start of the searched-for string, instead of the end (third line of the loop body), and replace it with a different string. The fourth line discards those 10 filler acids that were placed at the front, and makes a jump purely so that its length can be used in the replacement. The template replaces the backup copy of the loop (which was consumed in the first line) and puts the jump distance after it (replacing the number read in the first line).What does all that mean? It's a search-and-replace. The number stored after the backup loop is the distance already searched, so that searches don't have to restart from the beginning. It jumps ahead to the position indicated by the number, then finds the next match and replaces it. One thing to keep in mind with nested rules is that if one rule in a set doesn't match, the subsequent ones aren't produced and hence are not run. Thus, once the last match is replaced, the loop stops, because the first step erases the backup copy of the loop (and the number) and the steps that replace it won't occur.In this case, the loop replaces IIIPCCCCCP, the RNA for counter-clockwise turn, with IIIPIPIPIP (nonsense RNA). This followed by a similar loop that replaces IIIPFFFFFP with IIIPCCCCCP, then another to replace IIIPIPIPIP with IIIPFFFFFP (RNA for clockwise turn). Thus, it's swapped left with right, which explains the upside-down page.We probably wouldn't have been warned about this for nothing. Maybe this loop is the virus that the page warns us about? We can search for it elsewhere. Some parts of it change depending on what swap is being been made, but the replacement template <t:<t:<t:(0,3)>>>|0|(0) seems pretty unusual, and is independent of the replacement code. That corresponds to IPCCPPPPFPFPPFPFPFP in the original DNA, which we can search for. There are 4 matches: the 3 we've already seen..., and one in surfaceTransform. Just by running that function, we can see that it's responsible for the hills, but also recall from part 1 that when we tried setting hillsEnabled, things went horribly wrong:In that case the virus is replacing IIIPIIPICP (RNA for resetting the colour bucket) with IIIPIPIPIF (nonsense RNA). No wonder everything seems so green. Let's consider a general approach to getting rid of sections of code we don't want: using a forward jump. We overwrite the start of the virus with the rule ![n] ->, for some n. It's actually not quite trivial to determine n, because it needs to be the length of the virus minus the length of the replacement rule, and we don't know the length of the rule until we know how many acids we need to encode n. One approach is just to use a large fixed number of bits (with 0's in the high-order bits); this seems to be generally the approach taken by the organiser's compiler. However, we get a higher score if we use a shorter prefix, so there is some motivation to use shorter replacements. My approach was to use a function that would take an initial estimate of the position of the end of the rule, compile it, then update the estimate and repeat until convergence. In theory there are some corner cases where this could oscillate and a padding bit would be required, but I've not hit one yet.A more efficient solution (in terms to changing fewer bases) is just to change the string that is searched for. But the tool above will come in handy elsewhere.With that fixed, the hills now appear in the scene, although they're not yet in quite the right positions:So how are those hills drawn anyway? It actually involves a fair amount of code. Here's what my disassembler spits out for the first hill:0x0542 <blue+0x018> := 00x058e <blue+0x000> := 2420x05da CALL moveTo0x0693 PUSHS 1200x06d3 <blue+0x018> := 83885800x071f <blue+0x000> := 33480x076b CALL functionParabola0x0824 cbfArray+0x48[:72] := POP 720x08a1 PUSHS 1440x08e2 <blue+0x030> := 4080x092e <blue+0x018> := 70x097a <blue+0x000> := 40x09c6 CALL functionSine0x0a7f cbfArray+0x90[:72] := POP 720x0afc PUSHS 2160x0b3d <blue+0x048>[:72] = cbfArray+0x48[:72]0x0bd4 <blue+0x000>[:72] = cbfArray+0x90[:72]0x0c6b CALL functionAdd0x0d24 cbfArray[:72] := POP 720x0da1 PUSHS 1200x0de1 <blue+0x030>[:72] = cbfArray[:72]0x0e78 <blue+0x018> := 2500x0ec4 <blue+0x000> := 500x0f10 CALL drawFunctionBasePUSHS X means make X acids of space on the stack. [:72] just indicates the size of a value. The disassembler doesn't know about negative numbers and two's complement, so 8388580 is really 8388580 - 2^23 = -28. In summary, it generates two closures, one from functionParabola and one from functionSine, and adds them, then passes the resulting closure to drawFunctionBase.The second hill is similar, but with different parameters and moveTo location, while the third uses only a sine function. The first piece of text we found in the DNA mentioned that the organisers had sabotaged the DNA by swapping some parabolas around, so see what happens if you swap the parameters of the two parabolas. To do this you'll need to find the positions of the numbers in the DNA (they're quoted). I found it very useful to reuse some of my disassembly and assembly code to disassemble the desired instruction, replace the value (after checking that it matched what I expected it to be) and reassemble the instruction. That allowed me to put in a number of safety checks so that typing errors didn't send me off on long debugging sessions.That looks worse, but actually it is progress. If you compare this to the target image, you'll find that the left two hills are merely at the wrong heights. It helps to use an image editor that lets you shift the images relative to each other while showing a difference or other blend of them (I used the GIMP, opening the images as two layers and dragging one across the other). On the first hill, change the second argument to moveTo from 242 to 218, and on the second hill, from 209 to 235.The third hill is trickier. You can almost make it match by changing both the x and y positions, but there are always a few pixels that don't quite match. I don't know if there is a clever way to determine the solution (maybe analysing functionSine to determine the meaning of the parameters and then fitting them), but brute force (automatically trying multiple values) will get you there if you know that only one of the parameters is wrong. In fact, the second argument must change from 65 to 60.While it's generally not this bad, the contest does have a fair amount of tedious modification of coordinates of things to put them into the right place. For example, the caravan will need to move; you can find the position being set at offset 0x3b66 in scenario if you want to try your hand.For now let's keep things interesting by looking at some code. But first let's get the last few pages of the repair guide. If you disassemble main, you'll see various bits of code that compare the value at helpScreen to a constant and then call one of the help functions we've already seen. Even if you don't have a disassembler that can interpret all the rules, you should be able to extract these to determine the valid repair page numbers. There are two that weren't shown in Part 1, and we missed them because they're implemented inline in main rather than in a help- function we could call.1024 (which you might have found by brute force): 180878:That yellow shape in the middle looks like exactly what we need to put at the centre of the sun (although it's too large). But page 1024 tells us more about the compressor hinted at by page 123456. Now that we've seen the virus, the principle of a loop that keeps copying itself makes more sense. It says it's used for bitmaps, so let's look inside a page that has a bitmap: alien-lifeforms.The compressor itself looks like this:0x182b   (![19])(![944])(?[P]) -> (0)(2)(1)0x186c   (![56]![128]![32]) -> (1)(0)(1)0x18a5   (![672])(![178]) -> (1)(0)(1)Or at least it appears to: this is one of those rare cases of self-modifying code that fools disassembly. One should be suspicious of the middle line because it appears to reference a capture group that doesn't exist. Here's the raw DNA for it:IIPIPIIICCCPIPIIIII   IICIIPIPIIIIICPIICIICIPPCPIPPPIPPCPIICThe first rule grabs the next number from the green area, and pastes it into the middle of the next instruction (at the gap shown). It appears after IPIIIII, which turns it into a jump that's 32× bigger than the number (left shift by 5). So for example, if the number is 3, the rule becomes(![56]![96])(![32]) -> (1)(0)(1)The ![56] jumps over the 3rd instruction, and the ![96] jumps to the 3rd 32-bit table entry, which is then copied to the front and executed. The final instruction just restores the red part from the orange part.What's in these 32-acid table entries? One could conceivably do quite a lot, but they aren't used for much. Most of them consist of IPIIIIII...IPIII<RNA> i.e. a jump of 0 (just for padding) and then one piece of RNA (all of which get welded onto the front of the next instruction). The last entry (20) is special: it simply jumps over the rest of the compressor to resume execution.Now that we know what the decompressor looks like, let's go see where it gets used. We can take the raw DNA and just search for it in the downloaded DNA. It appears in the following functions: 'M-class-planet', 'alien-lifeforms', 'cargobox', 'fontCombinator', 'fuundoc1', 'fuundoc2', 'fuundoc3', 'grass1', 'grass2', 'grass3', 'grass4', 'help-steganography', 'most-wanted', 'printGeneTable', 'sticky', 'transmission-buffer'.Most of these are unsurprising, since they contain some sort of image or complex shape. But what about printGeneTable? It's just text — at least on the pages we asked for. Maybe, like the repair guide, there are hidden pages? Let's ask for page 15:Notice the image in the bottom-right corner? It's a match for the whale spout in the target picture, although upside down. We'll come back to it when we start assembling the final picture.The cargo box also uses the compressor. Dump the RNA in the table:0x0256   Entry  0: RNA: move0x0276   Entry  1: RNA: cw0x0296   Entry  2: RNA: line0x02b6   Entry  3: RNA: mark0x02d6   Entry  4: RNA: ccw0x02f6   Entry  5: RNA: red0x0316   Entry  6: RNA: black0x0336   Entry  7: RNA: white0x0356   Entry  8: RNA: magenta0x0376   Entry  9: RNA: fill0x0396   Entry 10: RNA: reset0x03b6   Entry 11: RNA: cyan0x03d6   Entry 12: RNA: greenThe source image has a rather purple cargo box, which is probably built from the magenta in the table. What if we change that table entry to yellow?Visually it looks right, but comparing pixel values to the target, the filling in the A is now slightly the wrong colour, with too much green and not enough blue. The only other table colour that uses different amounts of green and blue is the last one (green). So maybe we need to change that to blue to balance it out? This does indeed work.It's about time we turned the weather on again so that we can get the clouds and work on the cow. Set weather to 2 and enableBioMorph to true:There are a few elements in the scene we don't want, such as the lightning bolt and the rain. We've seen one way to disable code we don't want (replace a chunk of code by a jump), but I'll demonstrate another that can disable individual rules with just a one-acid change (which will help our score). If you disassemble sky-day-bodies, you'll see the call to lightningBolt at 0x29a, with DNA that starts with a jump:IPIIIICICIIIICIIIIIIIIIIIIP = ![2128]What happens if we change the last I to a P? It becomesIPIIIICICIIIICIIIIIIIIIIIPP = ![2128]FSuddenly the rule is expect to have an F in a particular place (the start of the green zone) or it won't work, and there isn't one there. So instead of making a call, nothing happens:Note that this only works for calls to functions without arguments, since the arguments are normally pushed separately and without the function call, they won't get popped again.While we have this tool handy, let's also zap the calls to lambda-id (at scenario+0x4322), crater (at scenario+0x8b30) and cloak-rain (at scenario+0xa370).What's with all the red, yellow and black? Disassembling the various functions shows that a variable called cloudy seems to play a role. Patching its value in the original DNA doesn't seem to help. With some hacks on the DNA interpreter it's possible to see where it gets changed (or you could just disassemble all the things): when cloud is run, it sets it to true. The trick we used earlier doesn't have quite the same effect here: we end up replacing(![831561])![1] -> (0)Pwith(![831561]F)![1] -> (0)Pand since cloudy starts off as F, the rule still matches, and ends up writing a P into the following acid. Fortunately it's one that doesn't matter, but there is an alternative way to disable the rule, which will be useful later. The ![1] encodes as IPCP, and we change that to PPCP, which decodes as FFIF, which is unlikely to match unless we're very unlucky (if we are though, things will go badly wrong because we'll be resizing the green zone).In Part 1 I pointed out that we can see a faint shadow of the desired cow behind the endo-cow hybrid. Let's see if we can recover the cow. If you look at the start of bmu, you'll see RNA early on to put one opaque and 9 transparent into the bucket. What if we change all the transparent to opaque?Not quite what we were hoping for. You'll notice that after the transparency RNA there is a fill; so the entire layer is now solid black. The reason only a cow-shaped region appears black is that the cow is used to clip this layer. What we actually want is to compose the cow onto the scene. There are a few ways to fix this. One is to change the clip RNA into compose, and instead of changing the transparent commands to opaque, change the one opaque command to transparent (if the opaque command is left in, the whole scene ends up a bit too dark).We'd better get rid of the unwanted endocow, which we can do the same way we've dealt with other unwanted scene elements.His tail is missing, because I forgot to decrypt it. In this case, the code actually runs an integrity check on the tail (as well as on cow-spot-middle) and skips it if the integrity check fails. Recall from Part 1 that it is encrypted with 9546.At first glance it looks good, but the colour is wrong. It fact, it's completely opaque, whereas in the target image it is translucent, and you can see the grass through it. We're going to need to patch it to insert some opaque and transparent commands to get the colour right. We'll need to determine the correct number. One complication is that the entire scene is overlaid by a fine grid of almost-transparent lines, which is produced by the function anticompressant (as the name suggests, the purpose is to make it more difficult to brute-force the problem by generating the image directly with RNA). While not strictly necessary, it'll be easier to solve colour problems if we don't have to worry about it. For the source picture we can use one of the techniques already discussed to disable the function, but what about the target picture? To fix that that, we'll start by finding the image that anticompressant overlays. We can do that by getting our RNA-to-image tool to spit out the first image (including the alpha channel) each time composition is done. It's easy to mistake the anticompressant pattern for a black image because it is so faint. With the levels adjusted in an image editor, the colour and alpha components look like this:Now using the equation for composing images from the specification, you can reverse the process. There is a rounding step which loses information, but because the overlay is so faint, in most cases the colour value can be recovered exactly, and in other cases there are only two possibilities.So returning to the problem of the tail: let's choose a pixel and check its colour when the tail is absent (e.g. it wasn't decrypted), when it's present and fully opaque, and in the target picture; in each case with the anti-compressant absent or reversed. I got the following at (454, 348):(0, 100, 0) when absent(119, 166, 219) when opaque (and indeed on all pixels of the tail)(83, 145, 152) in the targetLet's say we now add some alpha RNA to the mix, so that the tail has an alpha value of a. The colour will then be (119a/255, 166a/255, 219a/255, a), where division rounds down. Just looking at the red component, this tells us that 83*255 ≤ 119a < 84*255, and similarly from the blue component, 152*255 ≤ 219a < 153*255. The only integer value for a that fails into those intervals is 178. 178/255 = 0.6980, which looks pretty close to 0.7, and indeed creating 70% opacity (by issuing opaque 7 times and transparent 3 times) will produce an alpha of 178.That tells us what RNA to add, but how to we do it? There isn't room in the function to add them directly, but we can do some compression. For example, if one replaces some RNA with a rule like ([!30]) -> (0)(0)(0) it will repeat the following three pieces of RNA three times. So as long as we write a rule that is a multiple of 10 bases long, we can overwrite some of the existing RNA, and generate our new RNA plus the RNA we overwrite. I'll leave the details as an exercise for the reader (if you get stuck, there is a solution listed here).Unfortunately when you do this, the tail disappears again! Now the integrity check is working against us: because we modified the function, it fails the integrity check. We can hack checkIntegrity to always return true by disabling the jump at offset 0x611, which then gives us the cow with the correct translucent tail:What about the whale? When we simply called whale it looked alive, but in our picture it looks dead. So possibly it examines some state to determine whether it is alive or dead? Indeed, the code has an IF statement (following the pattern we've seen before), and we can disable it in the usual way (replacing the high bit of a jump with a P in the instruction at offset 0xcb1). Incidentally, it seems like the function takes two boolean arguments but only uses one of them; I don't know why.While we're dealing with animals, what about the ducks? If you disassemble scenario you'll see that there is a call to motherDuckWithChicks — so where they? Look a little further and you'll realise that it's unreachable code: a boolean is set to true, and then if that same boolean is true, we jump over the code. Break the goto in the usual way, and the ducks appear  — although one seems to become lost in the trees.What's not immediately obvious, but far more serious, is that half the elements in the scene have shifted two pixels to the left! You might remember from part 1 that motherDuck failed the integrity check, so there is probably an issue somewhere there that causes the cursor to end up in the wrong position.Page 8 of the field repair guide describes how polygons are encoded, and says that the last pair is the sum of all movements. What if it isn't? It will lead to exactly this sort of problem. Polygons are easy to recognise in the DNA with a regex (remember that they appear quoted), so we can find the polygons and check them, and indeed one of the polygons in motherDuck is 2 pixels off. Finding which offset is wrong takes a little more work. I just used brute force: try adjusting every X value by 2 pixels, render them all, and check which matches the target (it turns out to be the 63 numbers from the start of the polygon). Visually not much has changed, but everything is back in the right place:Next let's sort out the text at the bottom. It's going to be a little trickier than just replacing the text in the DNA, because the replacement text is longer. However, when everything went German, the text changed to "Endo hat gemorpht" which is exactly the right length for our replacement. So perhaps we can use just that bit of the code instead. Here's the relevant area of code:0x9444 <blue+0x4b0>[:9216] = fontTable_Cyperus[:9216]0x94f0 <blue+0x498> := 2850x953c <blue+0x480> := 5700x9588 <blue+0x000>[:162] := "Endo hat gemorpht"0x968d CALL drawString0x9746 GOTO 0x9c160x9767 colorTable := ...0x98a2 charColorCallback := useColorTable,67090x9908 PUSHS 104160x994f <blue+0x4b0>[:9216] = fontTable_Cyperus[:9216]0x99fb <blue+0x498> := 2850x9a47 <blue+0x480> := 5700x9a93 <blue+0x000>[:108] := "Morph Endo!"0x9b5d CALL drawString0x9c16 RNA: composeImmediately after the PUSHS at 0x9908, we'll make a (backwards) jump to 0x9444, which will print the longer piece of text (and which will then safely jump forwards to 0x9c16). What does a backwards jump look like? Unlike a forward jump, the target code doesn't exist in the red zone, so we have to restore it from the green zone. We copy the code from the jump target to just after the jump instruction. As for forward jumps, we can use two passes to solve the problem of not knowing where the jump instruction ends until after we've compiled it. In my implementation, it ends up looking like this:(![5074344](![1358])) -> (0)(1) Let's get the sun back into the sky. We saw in Part 1 that we could see it, in the right place but the wrong shade of yellow, by setting weather to 3. From the target picture (particularly with the anticompressant removed) one can see that the sun is the same shade as the flowers in the bottom-right. Disassembling flowerbed shows that colour to be colorSoftYellow. So we need to somehow call that before drawing the sun. And as luck would have it, there is some code we don't need or want in sky-day-bodies just before drawing the sun, which is to check the value of weather!0x072c IF weather != 3 GOTO 0x0aae0x07ac PUSHS 480x07eb <blue+0x018> := 4800x0837 <blue+0x000> := 200x0883 CALL setOrigin0x093c CALL sun0x09f5 CALL resetOrigin0x0aae RNA: composeThere is plenty of room in that weather check to overwrite it with a function call, but we can also keep the prefix length down by not calling the whole function and instead just copying the RNA (which saves having to jump to the blue zone and write a return address). The recipe for this looks exactly like the backwards jump from above: we're copying code from the green zone to the front of the red zone, without disturbing the remaining code of the current function. Immediately after that we have to insert a forward jump to 0x07ac to skip over the remnants of the original code.Unfortunately on its own this won't fix the colour of the sun, because sun starts by setting the colour:0x000a RNA: reset0x0014 RNA: yellowWe can fix this either by modifying the call to sun to enter after the unwanted RNA, or just alter the RNA to become nonsense RNA that will be ignored. With that in place (and don't forget to replace the whole sun function with the XOR of flower and sunflower first):Next let's sort out the spirograph at the centre of the sun. As we saw, the code for it is in main, but we need a way to call it. A powerful technique is to patch the return addresses of function calls: this allows you to resume execution anywhere, even in another function, rather than with the next instruction. We're going to want to be able to control the position, so it'll be useful to get a call to setOrigin before executing the desired code. As it happens, crater has a call to setOrigin very early on. So instead of disabling the call to crater, let's leave it enabled and hijack it to draw the spirograph.Change the return address at crater+0xf5 to main+0x6f9a, which starts drawing the central spirograph. It's completed at main+0x866d, which has a compose RNA to balance the add RNA from the start of crater. We still need a resetOrigin to balance the setOrigin added by crater. So add a forward jump to main+0x8ae7 (which is a call to resetOrigin).After that resetOrigin call, we don't want to run the rest of the code in main. We could add another forward jump from after it to the end, or change the return address, but there is another trick we can use that requires a smaller change: we can remove the return address entirely, turning this into a tail call so that the callee returns directly to the caller. This isn't completely trivial: if we just terminate the terminate early then the skips in the call instruction will go to the wrong place (because we'll have consumed less of the red zone than expected). So we have to remove the return address without changing the length of the rule. We can do that by replacing the first three bases of the return address with IPP and the last with P. This turns this part of the template into (n,0), where n is some very large number. The specification says that such substitutions are simply ignored.That gives us this (don't forget to remove the code that disabled the crater):Clearly both the size and position will need to be fixed. We'll sort out a whole bunch of positions later, but let's look at the size. The first argument to spirograph is called magnify, which is a bit of a clue. One option is just to change it from 4 to 1 each time spirograph is called. If you want to make a smaller patch, one can look inside spirograph. It multiplies the next two arguments (radiusSum and radiusMoving) by magnify, writing the results back in place. We'd like to disable that code. The writeback looks like this:(![7519442])(![24]) -> (0)+ (![7519707])![24] -> (0)<t:(1,1)>The first line fetches and removes the return value left by mulInts, and the second line uses it to replace an existing value. We can't disable the whole rule (remember, the + indicates that the second line is really a rule emitted by the template on the first line), but if we disable the second line it will have the desired effect. We can do this in our usual way (writing a P just before the end of the number in a jump), except that this time everything is quoted by an extra level, so we write IC instead.While we're calling into odd bits of code to draw missing picture elements, let's sort out the whale spout. We can again pick a function that we suppressed earlier and repurpose it. We have to be a little careful in our choice though, because it needs to be drawn before the whale (which overwrites part of it). I chose to use lambda-id. For this part I haven't tried to be optimal, just to get something working. Replace the start of lambda-id with a tail call to printGeneTable+0x16ef5 (which sets the location before drawing the spout). At printGeneTable+0x23c62 place a jump to printGeneTable+0x271dc (the return statement). The return statement contains a ![1] to pop the boolean argument from the stack; change it to ![0] (without changing the length). In the RNA compression table, swap the entries for clockwise and counter-clockwise rotation. Don't forget to re-enable the call to lambda-id.Well that went badly wrong. I'm not sure exactly why, but when objects wrap around (particularly to negative positions) it seems to confuse the code that keeps track of the current position. It's probably time to fix a whole bunch of positions. This is tedious work: find the code that calls moveTo to setOrigin, check pixel positions in an image editor, figure out how much to adjust the position by, and make the patch. In some cases one needs to provide a negative position to setOrigin so that the actual drawn position is in range (encoded using 2's complement). I'll just provide a list of instruction offsets (for the first of two instructions that set x and y) and the correct values:scenario+0x3ba5: (267, 210) (caravan)scenario+0x862c: (410, 200) (whale)scenario+0x3157: (171, 410) (chick)crater+0x005d: (-133, 147) printGeneTable+0x16f34: (385, -75) (spout)flowerbed+0x0049: (34, 0) (flowers in bottom right)flowerbed+0x04c8: (0, 0)flowerbed+0x0951: (58, 12)flowerbed+0x0dda: (17, 24)clouds+0x0049: (20, 25)clouds+0x03df: (180, 55)clouds+0x077f: (340, 30)We also need to fix the sizes of the clouds (in practice, you'd do this before trying to fix the positions):clouds+0x56e: 10clouds+0x90e: 20 That makes things look a lot better:What do we still need to fix?The speech bubble and the swimming pool are pretty clear, but there is also a little bit of red at the base of the windmill, because the chick is drawn before the windmill and so the top of its head is clipped. Let's sort that out first. We need to call the code that draws the chick at some point after the windmill. There are probably lots of ways to do this, but I chose one that also lets us eliminate the rain at the same time without a separate patch. At scenario+0xa2b7 (the instruction before calling cloak-rain), change the return address to scenario+0x32a8 (which is the start of the call to chick). Then after 0x346d, jump forward to 0xa429 (just after the call to cloak-rain). The chick now takes its position from the position set at 0xa21f, so the position needs to be patched there instead of where it was originally patched.We also need to prevent the chick from being drawn earlier, since then the forward jump will skip right over the windmill (and a lot of other things besides). At 0x273c there is an instruction to set ducksShown to true, which is later checked to decide whether to draw the chick. We can disable that in the same way we've disabled other instructions that set a boolean to true.Now let's change the λ to a μ. The speech bubble is drawn in the function balloon. And the relative bit of code is0x16e4 PUSHS 104160x172b <blue+0x4b0>[:9216] = fontTable_Tempus-Bold-Huge[:9216]0x17d7 <blue+0x498> := 980x1823 <blue+0x480> := 200x186f <blue+0x000>[:18] := "L"0x18d5 CALL drawStringIn Part 1 we swapped out the font on help page 10646 to see different fonts, but if you try this with Tempus-Bold-Huge it'll draw the lambda, then (in my implementation) crash out with an integer overflow. I'm left with this:So there may be something wrong with this font. The symbol table includes charInfo_Tempus-Bold-Huge_, charInfo_Tempus-Bold-Huge_L and charInfo_Tempus-Bold-Huge_M; maybe one of them is broken. On extracting the DNA from the first two we see that there are no F's and that the P's are generally preceeded by either C or P, which suggests they are sequences of variable-length numbers. We were told that the RNA compressor was used for font tables, so this isn't surprising. However, the last one seems almost random, with a mix of all four bases.Random... or encrypted? In Part 1 we found one password that we haven't found a use for yet: no1@Ax3. And indeed, if we decrypt charInfo_Tempus-Bold-Huge_M with it, the font table looks healthy again, and we have our μ.Now we can change the "L" to an "M" where it is used:Getting the shape if the speech balloon right is much harder. As far as I'm aware, the right shape isn't present in Endo's DNA.One approach is to reverse-engineer the polyline that forms it, and replace the existing polyline. I took a different approach: drawing the outline directly with RNA. However, RNA is rather unwieldy (requiring 10 bases per command), so some compression is in order. We'll start withit it though.Firstly we'll extract the shape of the balloon. Start at some arbitrary point inside the balloon, and do a flood-fill. The inside isn't quite a uniform colour, so match anything that's close enough to gray e.g. difference between min and max channel is at most 50.Next, identify just the border pixels: those that are inside the balloon, but share an edge with the outside.These pixels can be arranged in a linear order with each adjacent (possibly diagonally) to the previous one. In most cases it's obvious which pixel to go to next, but a little care is needed at the bottom corner where the path loops back on itself. We can trace out this shape using RNA, using the commands to move forward and turn left and right. Before leaving a pixel, issue a mark command, and after arriving at the next pixel, issue a line command. It doesn't really matter where you start (we'll add a moveTo call before-hand to get us there), but it's important to end facing east (which is also the starting direction) and to end in the same place you started, as otherwise the higher-level code will be confused about the current location.Once we've done some compression we'll be able to patch the balloon function in place, but for now we don't have enough room. We'll pick some other function we don't need and overwrite it (I used contest-2005). Overwrite it with a call to moveTo (use 0, 0 as coordinates for now), then the RNA, then a return that pops 24529 from the stack (look at the end of drawPolyline to see what that looks like). Now in balloon, replace the call to drawPolyline with a call to the replacement function. The result will depend on which point on the boundary you picked as a starting point; I used the left-most point on the top row.Definitely not a complete success, but we can see the top-right of the balloon (if it looks a bit out-of-shape, that's just because you're seeing the sail of the windmill through the hole), and it tells us a bit about how it is being drawn. It's a little hard to see, but that white rectangle isn't a uniform colour — it has a gradient to it. The balloon shape is then used as mask on this gradient rectangle.We can see this more clearly if we apply a transformation to the colours to make gradients more apparent. I wrote a small tool that multiplies R by 11, G by 17 and B by 29 (all wrapping modulo 256). The anticompressant really interferes with this, so here's the result for the image above but with the anticompressant disabled.And the target, with the anticompressant reversed:Since we can only see a small part of the gradient in the target it's not that easy to determine where the rectangle should move to. What's more, if you try to line them up you'll find that they seem to have different slopes. It's worth looking at how the gradient is generated. balloon calls drawGradientCornerNW. Before doing so, it sets a special flag colorReset to false. This prevents the colour callback (in this case, colorWhite) from resetting the bucket before adding a colour. So as drawGradientCornerNW proceeds, it will keep adding more white to the bucket, gradually changing the overall colour. As the colour bucket gets fuller, each new addition has less relative impact, which is why the gradient is strongest at the top-right and gets gentler towards the bottom left. drawGradientCornerNW works by setting a mark at the current position (the NW corner), moves to the NE corner, then steps down the east edge, drawing a line to the mark at each pixel before repeating the process along the bottom edge. On the target we can get an estimate of where the NW corner is by extending the lines of colour in the image to their intersection, and we can estimate how wide the rectangle is by looking at the slopes of the lines and comparing them to the slopes in our generated image. Getting the height is trickier, because we only get a little information from the stem of the balloon, but we know it has to extend at least to the bottom of the balloon and can just try multiple options from there. It turns out that the rectangle is exactly the bounding box of the balloon, which is also something you might have guessed and tried.So, we're going to make a few changes:Change the coordinates of our call to moveTo to 67, 0, to move the bubble to the correct position relative to the box.Change the coordinates of the setOrigin call at scenario+0x900b to 198, 324 to place the NW corner of the box correctly. Change the arguments to drawGradientCornerNW in balloon to 101, 169 to set the size of the box.Change the coordinates of the moveTo at balloon+0x13ca to 74, 37. This is the point from which the balloon is filled, and we need it to be somewhere inside the balloon. There are lots of choices, but this one requires changing only a single bit.Nearly there! We just need to shift the μ to the right place. At balloon+0x17d7, change the coordinates to 56, 2.That just leaves the swimming pool for the whale. Once again, we can repurpose a function that we previously suppressed. This time it needs to occur after the whale, so we'll use endocow. In Part 1 we say something similar to what we need, when we set the weather to 2 but before activating the VMU. Here it is again:Notice that the cupola of the UFO is half-filled with water. It's also the shape we need, but we need it upside down. Let's see if we can get just that part into our scene, without trying to flip it over.As usual, we'll rewrite a return address in endocow so that the return jumps into the code we actually want. endocow starts with a call to setOrigin, so we'll change the return address of that to jump to ufo+0x0a08, which calls water. For now we'll also change the coordinates in the setOrigin call in endocow to 55, 42, to match those that would have been used for the water if we'd run through ufo from the top.The following code in ufo after needs a bit of explanation: it first draws the shape of the cup (inline) and uses it to clip the water to the right shape. It then draws the shape again (again, inline, rather than by calling ufo-cup) partially transparent, and composes it. That code ends at 0x1c30 with a jump to 0x1f53. We don't want to run any of the subsequent code, so replace 0x1f53 with a jump to the return statement (at 0x2c77).The cup is visible (between the balloon and the windmill), but the cow has disappeared. This happened because by jumping into the middle of ufo, we've messed up the image layers. If you step through the RNA a piece at a time, one can see the water being drawn on the same layer as the cow, and when it is clipped, the cow is clipped away. So we need to add an extra layer. Fortunately, endocow starts with a piece of junk RNA to identify the function, which we can change to an add RNA.Now let's flip the cup upside down. We'll need to wedge in two turns between drawing the water and drawing the first instance of the cup. We can overwrite the CFPICFP marker RNA in the return of water. For the polyline used for clipping, the colour doesn't matter, so we can replace the white RNA at ufo+0x0b8e with a second turn. We also need to restore the original orientation afterwards. Since we added a jump at ufo+0x1f53, we can just insert two turn RNA's at the start of that jump.That's flipped the cup upside-down. The water now appears to be filling the top instead of the bottom. That's because the water is just a polyline, and we're now seeing the bottom edge instead of the top. More seriously of course, we've messed up the position tracking so a number of elements of the scene are now in the wrong place. This is not unexpected when we flip the direction under the hood.One way to fix this is to make sure that the movements done while flipped bring us back to where we started. The last movement before the flip is a call to moveTo in water; the last before we flip back is another call to moveTo in ufo. We don't need to change the coordinates of either: the one in water is called within a setOrigin/resetOrigin pair (one started in endocow), and we can bring them into alignment by adjusting those coordinates. Specifically, the coordinates that we changed to 55, 42 earlier instead need to become 48, 8 for the arithmetic to balance.This has also shifted the water relative to the cup, and we'll need to adjust it further. But haven't we just pinned down the knob we have to adjust these relative positions? There is another knob: polylines have a starting position, encoded as the 2nd and 3rd numbers in the list (refer back to repair guide page 8). That is currently 56, 65; it'll take a little trial and error to get it right (you first need to get it close enough to see some reference points), but these need to be replaced by 62, 72. Don't forget to update both copies of the polyline.There's just one more step! At bmu+0x45ee, we need to change the position from (160, 310) to (372, 257) to place the cup in the right position.If you made it this far, thanks for reading, and if you've actually produced a perfect prefix yourself, congratulations!I had originally planned to write a Part 3 which showed how to optimise the prefix, but this series has already become very long and I need a break. I've also incorporated a lot of tricks into Part 2. Jochen Hoenicke's page describes his incredibly short prefix, and you can probably learn a few things from it (I certainly did: several ideas presented here are originally his). If I do get back to it one day, the interesting parts would beCompressing the RNA for the balloon. I've written a decompressor that maps each of I, C, F and P to a short sequence of integers, after which the standard RNA decompressor is used to decompress those into RNA. It works out to 773 bases for the decompressor and data (but requires a separate moveTo call first). If one could find the right tradeoff between complexity of the decompressor and length of the data it might be competitive with Jochen's polygon decompressor.Writing a code reverser to turn duolc into cloud and an XORer to fix sun, in DNA.Writing a patcher that takes a compact table of patches to apply and runs a loop to apply them.
+
+Posted by
+
+Bruce Merry
+
+at
+
+6:27 AM
+
+Email ThisBlogThis!Share to XShare to FacebookShare to Pinterest
+
+No comments:
+
+Post a Comment
+
+Newer Post
+
+Older Post
+
+Home
+
+Subscribe to:
+Post Comments (Atom)
+
+Blog Archive
+
+        ► 
+
+2025
+
+(1)
+
+        ► 
+
+January
+
+(1)
+
+        ► 
+
+2023
+
+(3)
+
+        ► 
+
+December
+
+(1)
+
+        ► 
+
+November
+
+(2)
+
+        ► 
+
+2022
+
+(2)
+
+        ► 
+
+December
+
+(1)
+
+        ► 
+
+July
+
+(1)
+
+        ▼ 
+
+2021
+
+(2)
+
+        ▼ 
+
+May
+
+(1)
+
+Disassembling Endo, part 2
+
+        ► 
+
+April
+
+(1)
+
+        ► 
+
+2020
+
+(1)
+
+        ► 
+
+January
+
+(1)
+
+        ► 
+
+2018
+
+(1)
+
+        ► 
+
+January
+
+(1)
+
+        ► 
+
+2017
+
+(3)
+
+        ► 
+
+November
+
+(1)
+
+        ► 
+
+June
+
+(2)
+
+        ► 
+
+2016
+
+(6)
+
+        ► 
+
+November
+
+(4)
+
+        ► 
+
+June
+
+(1)
+
+        ► 
+
+March
+
+(1)
+
+        ► 
+
+2015
+
+(1)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+2014
+
+(11)
+
+        ► 
+
+October
+
+(1)
+
+        ► 
+
+July
+
+(2)
+
+        ► 
+
+June
+
+(6)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+February
+
+(1)
+
+        ► 
+
+2013
+
+(4)
+
+        ► 
+
+November
+
+(1)
+
+        ► 
+
+July
+
+(2)
+
+        ► 
+
+February
+
+(1)
+
+        ► 
+
+2012
+
+(2)
+
+        ► 
+
+September
+
+(2)
+
+        ► 
+
+2011
+
+(2)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+March
+
+(1)
+
+        ► 
+
+2010
+
+(5)
+
+        ► 
+
+September
+
+(2)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+April
+
+(2)
+
+        ► 
+
+2009
+
+(10)
+
+        ► 
+
+November
+
+(1)
+
+        ► 
+
+August
+
+(3)
+
+        ► 
+
+June
+
+(1)
+
+        ► 
+
+May
+
+(3)
+
+        ► 
+
+February
+
+(1)
+
+        ► 
+
+January
+
+(1)
+
+        ► 
+
+2008
+
+(30)
+
+        ► 
+
+December
+
+(1)
+
+        ► 
+
+November
+
+(1)
+
+        ► 
+
+October
+
+(2)
+
+        ► 
+
+September
+
+(2)
+
+        ► 
+
+August
+
+(1)
+
+        ► 
+
+July
+
+(1)
+
+        ► 
+
+June
+
+(2)
+
+        ► 
+
+May
+
+(3)
+
+        ► 
+
+April
+
+(1)
+
+        ► 
+
+March
+
+(6)
+
+        ► 
+
+February
+
+(5)
+
+        ► 
+
+January
+
+(5)
+
+        ► 
+
+2007
+
+(15)
+
+        ► 
+
+November
+
+(2)
+
+        ► 
+
+October
+
+(3)
+
+        ► 
+
+June
+
+(9)
+
+        ► 
+
+May
+
+(1)
+
+        ► 
+
+2006
+
+(14)
+
+        ► 
+
+November
+
+(5)
+
+        ► 
+
+October
+
+(2)
+
+        ► 
+
+August
+
+(4)
+
+        ► 
+
+July
+
+(3)
+
+Simple theme. Theme images by gaffera. Powered by Blogger.
+

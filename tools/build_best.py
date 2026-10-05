@@ -160,8 +160,11 @@ def P_box():          # cargobox decompressor table: magenta->yellow, green->blu
     return [lambda o: write_at(s + 876 + 8, 'CF', 2, o), lambda o: set_base(s + 1004 + 9, 'P', off=o)]
 
 
-def P_pears():
-    return [retarget_call(a, 5800492, 14123) for a in (5044497, 5045287, 5047240)]
+def P_pears():         # appletree -> peartree with one edit: the return words of appletree's first call (a drawPolyline
+    # of the trunk, identical in both trees) say 'continue with peartree's code', so peartree runs and its ret returns
+    # to appletree's caller (instead of retargeting the three appletree calls in scenario)
+    o, l = GENES['appletree']
+    return [lit_word_patch(o + 5922, 3972841, 5800492), lit_word_patch(o + 5922, o + l - 3972841, 14123)]
 
 
 def P_cow():          # real cow: transparent shadow, CLIP->COMPOSE, no endocow hybrid
@@ -563,7 +566,7 @@ ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears',
          'whale_pos', 'balloon', 'blades', 'text', 'sun', 'biomorph', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu', 'tailmain', 'ecc', 'mumain']
 
 
-def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
+def build(names=ORDER, adapters=()):
     pats = []
     for n in names:
         pats += globals()['P_' + n]()

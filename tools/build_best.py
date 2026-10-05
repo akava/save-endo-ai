@@ -482,6 +482,14 @@ def crypt_call2(key, offset, size, off=0):
     return push_key(key, len(tail) + off) + tail
 
 
+ECC_FIX = {2069: 'P', 2132: 'C', 2134: 'I', 2141: 'C', 2182: 'C', 2283: 'I', 2306: 'C', 2364: 'P', 2379: 'C', 2450: 'I', 2535: 'C', 2610: 'C', 2615: 'C', 2715: 'I', 2730: 'C', 2827: 'I', 2861: 'I'}   # cow-spot-middle offset -> base, as restored by the program's own correctErrors(cow-spot-middle,
+# cow-spot-middle-ecc, 2868) (Hamming codes, help page 84); 17 point mutations
+
+
+def P_ecc():          # the 17 mutated bases of cow-spot-middle put back (instead of a new correctErrors call)
+    return [lambda o, k=k, c=c: set_base(G + 890971 + k, c, off=o) for k, c in sorted(ECC_FIX.items())]
+
+
 def ADAPTER_ecc(off=0):    # correctErrors(cow-spot-middle) via the Adapter, runs before the patches
     return ''.join(push_arg(word(a)) for a in [890971, 893863, 2868]) + adapter_call(5995507, 59614)
 
@@ -508,7 +516,7 @@ def ADAPTER_tail(off=0):   # decrypt the cow tail in place, before everything el
 import json  # noqa: E402
 GENES = json.load(open(os.path.join(ROOT, 'analysis', 'gene_table.json')))
 ORDER = ['day', 'hills', 'bio', 'caravan', 'clouds', 'cloudpos', 'box', 'pears', 'cow', 'ducks', 'whale',
-         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'biomorph', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu', 'tailmain']
+         'whale_pos', 'balloon', 'blades', 'text', 'sun', 'biomorph', 'tailalpha', 'hill2', 'seed', 'spiro', 'fish', 'flowers', 'cup', 'bubble', 'mu', 'tailmain', 'ecc']
 
 
 def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
@@ -526,7 +534,7 @@ def build(names=ORDER, adapters=('tail', 'ecc', 'mu')):
 NOMERGE = False
 
 
-def build_merged(names=ORDER, adapters=('ecc', 'mu'), plain=()):
+def build_merged(names=ORDER, adapters=('mu',), plain=()):
     """build() with all same-length replacements merged globally: the patches are recorded, overlaid on the original
     DNA, and the changed bases are written as spans chosen by DP over the real write cost."""
     import endo as E

@@ -590,7 +590,7 @@ def build_merged(names=ORDER, adapters=('ecc', 'mu'), plain=()):
                     final[TA + i] = c
                 elif TA + i in final:
                     del final[TA + i]
-    prot = ([(TA, TA + TL)] if 'tail' in adapters else []) + [(G + 502139, G + 502139 + 3665)]   # adapters decrypt first
+    prot = ([(TA, TA + TL)] if 'tail' in adapters else []) + ([(G + 502139, G + 502139 + 3665)] if 'mu' in adapters else [])
     chg = {}
     for p_, c in final.items():
         if dna[p_] != c:

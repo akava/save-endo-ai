@@ -531,6 +531,8 @@ def build_merged(names=ORDER, adapters=('tail', 'ecc', 'mu'), plain=()):
     g = globals()
     others = []
     E.write_at, E.set_base, g['write_at'], g['set_base'] = w_rec, s_rec, w_rec, s_rec
+    owner = []
+    raw = {}
     try:
         for n in names:
             if n in plain:
@@ -538,14 +540,25 @@ def build_merged(names=ORDER, adapters=('tail', 'ecc', 'mu'), plain=()):
             for p in g['P_' + n]():
                 k = len(rec)
                 out = p(0)
+                owner += [n] * (len(rec) - k)
                 if out:
                     others.append(p)
+                    raw[n] = raw.get(n, 0) + len(out)
                 if out and len(rec) > k:
                     raise Exception('mixed patch ' + n)
     finally:
         E.write_at, E.set_base, g['write_at'], g['set_base'] = real_w, real_s, real_w, real_s
     final = {}
     keep = []
+    per = {}                                   # intervention stats: bases of Endo's DNA each patch changes
+    for (pos, bases, oldlen), n in zip(rec, owner):
+        if len(bases) != oldlen:
+            per.setdefault(n, set()).update(range(pos, pos + oldlen))
+        else:
+            per.setdefault(n, set()).update(pos + i for i, c in enumerate(bases) if dna[pos + i] != c)
+    global LAST_STATS
+    LAST_STATS = dict(changed={n: len(v) for n, v in per.items()}, raw=raw,
+                      adapters={a: len(g['ADAPTER_' + a](0)) for a in adapters})
     for pos, bases, oldlen in rec:
         if len(bases) != oldlen:
             keep.append((pos, bases, oldlen)); continue

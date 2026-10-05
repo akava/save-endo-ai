@@ -40,25 +40,24 @@ python3 -m venv .venv && .venv/bin/pip install pillow numpy
 - `analysis/genes.json` (250 генов, [start,end] в G-координатах), `analysis/gene_ids.json` (RNA-ID → ген), `analysis/functions.json`, `analysis/gene_sweep.txt`.
 - `build/dna` флаги: `-p/-s` префикс, `-n N`, `-t FROM TO` трасса, `-L file` журнал происхождения (`B` — сравнения, `R` — копирования в координатах исходной DNA), `--dump`.
 
-## Текущее состояние (облачная сессия, 2026-10-02)
+## Текущее состояние (2026-10-05)
 
-Работаем прямо в `main`. Перед каждым коммитом — `CHECKLIST.md` (что обновить: сборка, findings, process, обе истории, картинки, README, NEXT_SESSION). Лучший префикс **`prefixes/55_merged.dna`** (14 124 основания, `tools/build_best.py` собирает его из именованных патчей и адаптеров `tail`, `ecc`, `mu`), **0** неверных пикселей, точно по полноразмерному target `doc/Target-image-600.png` (`score()` в tools/endo.py). История улучшений и таблица — в `reports/findings.md`.
+**Задача решена.** `prefixes/55_merged.dna` (собирается `tools/build_best.py`) даёт **0** неверных пикселей по полноразмерному target `doc/Target-image-600.png`. Длина префикса по вводной пользователя не важна. Работаем прямо в `main`, перед коммитом — `CHECKLIST.md`.
 
-Инструменты: `tools/endo.py` (`kill_instr`, `noop`, `fix_bases`, `push_arg`, `adapter_call`, `crypt_call`, `key128`, `enc_str`), `tools/build_best.py` (`wdiff`, `lit_word_patch`, `retarget_call`, `jmp_at`, `rna_moves`), `tools/polyfit.py` (контур многоугольника по маске, растеризация как у RNA), `tools/hillmodel.py` + `tools/hillridge.py` (точная модель гребней холмов), `tools/polylit.py`, `tools/disasm.py` (`LITMAX`), `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/c/rc4crack2.c`, `tools/grass_emu.py`.
+**Аудит чистоты закрыт** (`reports/audit_search.md`, сверка — `reports/research_full_writeups.md`, сырые тексты — `reports/web/`):
+- по подсказкам из DNA найдены: день, `]` (MP3), µ (`no1@Ax3`, записка), 8128, трава (биоморф + `bioMul`), параболы холмов (`shoutOut`), облака (`duolc`), фургон (фото команды), спирограф, фонтан, чаша (Major Imp 222/285), флаги, цвета;
+- измерено по target («чертёж», подсказки нет ни у кого): координаты, высоты холмов, фаза холма 3 (60), поворот лопастей (5), контур шарика, текст, `mkEmp` 18, альфа хвоста 7:3;
+- по-настоящему пропущена одна подсказка: **9546** на портрете E.T. (стр. 112, младший бит), мы взяли ключ перебором;
+- две задуманные подсказки не замечены, но результат получен честно другим путём: `sun` = `sunflower` XOR `flower` (у нас — хвост с близнеца `lightningBolt`), жёлтые буквы в `contest-1998…2002` = префикс `hillsEnabled` (у нас — по проверкам флага в коде);
+- `transmission-buffer` — бит в бит послание Arecibo, сюжетная пасхалка.
 
-Ключи: «42» (error-correcting-codes), «OPE» (vmu-code), «Out_of_Band_II» (caravan), «9546» (cow-tail), `]` для `goodVibrations` (аудио в `hitWithTheClueStick`), **`no1@Ax3`** (глиф µ, жёлтая записка в гене `sticky`). Ключ травы — исходная фраза плюс `bioMorphPerturb`, который считает биоморф (нужны `enableBioMorph_adaptation` = true и починенный `bioMul`).
+**Что ещё можно сделать** (необязательно, «соревнование с собой»):
+1. Перевести решение на задуманные пути: ключ хвоста — из стеганографии E.T., солнце — через `sunflower` XOR `flower`, холмы — префиксом из жёлтых букв.
+2. Переделать патчи в духе урока «Чини, а не перестраивай» (`reports/what_i_learned.md`, урок 13): вместо адаптеров и новых вызовов — минимальные правки существующего кода (перехват готовых вызовов `crypt` в `main`, адреса возврата, одно основание).
+3. Отчёты и обе истории закончены; новые главы — только если появятся новые находки.
 
-Подсказки, которые нашлись в данных: ROT13 на странице безопасности (ключи на жёлтой бумажке), `sticky` (записка), `hitWithTheClueStick` (картинка, PNG, MP3), `shoutOut` (послание пленников: «переставили несколько парабол» — параболы холмов 1 и 2, исправлено), страница Palindromes (зеркальные копии). Эпизоды Major Imp 222 и 285 (чашка под дождём, «смотри на противоположную стену» — чаша кита), `InitialBioMorph.hs` (`enableBioMorph = False`), Beautiful Numbers («the fourth one» → 8128), ImpDoc `checkIntegrity` (сторож для перебора цифрового ключа хвоста).
+**Доступ в интернет:** отдельная сессия «Продолжение работы» (окружение «Anthropic – Full Web access», ветка `claude/youthful-planck-3zi41n`) — ей шлют запрос, ответ она кладёт в `reports/web/` своей ветки.
 
-**Сверка с полными разборами** (`reports/research_full_writeups.md`, `reports/web/`): открытых пунктов нет; фаза холма 3 и угол 5 подбирали все; третья пропущенная подсказка — жёлтые буквы в `contest-1998…2002` (префикс `hillsEnabled`). Для доступа в интернет есть отдельная сессия «Продолжение работы» (окружение «Anthropic – Full Web access», ветка `claude/youthful-planck-3zi41n`): ей шлют запрос, она кладёт ответ в `reports/web/` своей ветки.
+Ключи: «42» (error-correcting-codes), «OPE» (vmu-code), «Out_of_Band_II» (caravan), «9546» (cow-tail), `]` (`goodVibrations`), `no1@Ax3` (глиф µ).
 
-**Сверка с интернетом** (`reports/audit_search.md`): 9546 — стеганография на портрете E.T. (стр. 112), `sun` = `sunflower` XOR `flower`; поворот 5, контур шарика, текст и холмы другие решатели тоже подбирали по target.
-
-**Аудит чистоты** (`reports/audit_search.md`, проходы 1–6): почти всё, что нашлось перебором, объяснено подсказками или чтением кода; координаты, контур шарика, текст, `mkEmp` 18 и альфа хвоста 7:3 — «чертёж», их честно мерить по target. Открыто: фаза холма 3 (65 → 60) и значение поворота лопастей 5. Проверено и отброшено: неучтённые гены (помощник печати в `printGeneTable`), `sunflower` (испорченная копия `sun`), `transmission-buffer` (послание в духе Arecibo, пасхалка), стеганография, совпадение пятёрок.
-
-## Где остались ошибки (0 px)
-
-1. **Пучки травы** — готово по задуманному пути: `P_biomorph` (`enableBioMorph_adaptation` → `true`, починенный `bioMul`); биоморф пишет `bioMorphPerturb`, который прибавляется к ключу. Обходной `P_grass` (построенное состояние RC4, `tools/rc4craft.py`) больше не нужен.
-2. **Фонтан** — готово: сжатая картинка из мёртвого кода `printGeneTable`, зеркальная (словарь cw ↔ ccw), вызывается вместо последнего пучка `grass1` перед китом.
-3. **Край воды** — готово (сдвиг только воды: w −= d, s += 2d, фонтан −= 2d).
-4. **Длина префикса** (14 124) — теперь весь риск. `tools/build_best.py` собирает через `build_merged` (общая склейка правок). Самые дорогие патчи: шарик ~2600 (литерал многоугольника), облака ~1770, чашка ~1600, `spiro` ~1070, `sun` ~1000. Ключи `crypt` уже копируются из `giveMeAPresent`.
+Инструменты: `tools/endo.py`, `tools/build_best.py`, `tools/polyfit.py`, `tools/hillmodel.py` + `tools/hillridge.py`, `tools/polylit.py`, `tools/disasm.py`, `tools/flow.py`, `tools/flagrefs.py`, `tools/genetable.py`, `tools/strings.py`, `tools/c/rc4crack2.c`, `tools/grass_emu.py`.
